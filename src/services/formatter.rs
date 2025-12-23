@@ -150,7 +150,7 @@ impl ZenithService {
 
         // 格式化
         let zenith_config = ZenithConfig::default();
-        match zenith.format(&content, &zenith_config).await {
+        match zenith.format(&content, &path, &zenith_config).await {
             Ok(formatted) => {
                 result.formatted_size = formatted.len() as u64;
                 if formatted != content {

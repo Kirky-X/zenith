@@ -10,9 +10,9 @@ use zenith::services::formatter::ZenithService;
 use zenith::storage::backup::BackupService;
 use zenith::utils::environment::EnvironmentChecker;
 use zenith::zeniths::impls::{
-    c_zenith::ClangZenith, java_zenith::JavaZenith, prettier_zenith::PrettierZenith,
-    python_zenith::PythonZenith, rust_zenith::RustZenith, shell_zenith::ShellZenith,
-    toml_zenith::TomlZenith,
+    c_zenith::ClangZenith, ini_zenith::IniZenith, java_zenith::JavaZenith,
+    prettier_zenith::PrettierZenith, python_zenith::PythonZenith, rust_zenith::RustZenith,
+    shell_zenith::ShellZenith, toml_zenith::TomlZenith,
 };
 use zenith::zeniths::registry::ZenithRegistry;
 
@@ -38,6 +38,7 @@ async fn main() -> Result<()> {
     registry.register(Arc::new(PrettierZenith));
     registry.register(Arc::new(ClangZenith));
     registry.register(Arc::new(JavaZenith));
+    registry.register(Arc::new(IniZenith));
     registry.register(Arc::new(TomlZenith));
     registry.register(Arc::new(ShellZenith));
 
@@ -98,27 +99,26 @@ async fn main() -> Result<()> {
             }
         }
         Commands::Doctor { verbose } => {
-            println!("{}", "Checking environment...".bold());
-            let tools = vec![
-                "rustfmt",
-                "ruff",
-                "prettier",
-                "clang-format",
-                "google-java-format",
-                "taplo",
-                "shfmt",
-            ];
-            for tool in tools {
-                let status = EnvironmentChecker::check_tool(tool)?;
-                let mark = if status { "✓".green() } else { "✗".red() };
-                println!("  [{}] {}", mark, tool);
-                if verbose && !status {
-                    println!(
-                        "      -> Please install {} to enable formatting support.",
-                        tool
-                    );
+            info!("Checking system environment...");
+            let results = EnvironmentChecker::check_all(registry);
+
+            println!("\n{}", "Tool Environment Check:".bold().underline());
+            for res in results {
+                let status = if res.available {
+                    "✅ Available".green()
+                } else {
+                    "❌ Not Found".red()
+                };
+
+                print!("  {:<20} {}", res.name.bold(), status);
+                if let Some(v) = res.version {
+                    if verbose {
+                        print!(" ({})", v.dimmed());
+                    }
                 }
+                println!();
             }
+            println!();
         }
         Commands::ListBackups => {
             let backup_service = BackupService::new(config.backup.clone());
