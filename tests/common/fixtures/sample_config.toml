@@ -1,0 +1,11 @@
+[global]
+log_level = "debug"
+
+[zeniths.rust]
+enabled = true
+config_path = ".rustfmt.toml"
+use_default = false
+
+[zeniths.default]
+enabled = true
+use_default = true
