@@ -171,6 +171,28 @@ async fn main() -> Result<()> {
             let server = McpServer::new(config, registry);
             server.run(socket_addr).await?;
         }
+        Commands::AutoRollback => {
+            info!("Starting auto-rollback to latest backup...");
+            
+            let backup_service = Arc::new(BackupService::new(config.backup.clone()));
+            let service = ZenithService::new(config, registry, backup_service, false);
+            
+            match service.auto_rollback().await {
+                Ok(recovered_files) => {
+                    println!(
+                        "{}",
+                        format!("Successfully auto-rolled back {} files.", recovered_files.len()).green()
+                    );
+                    if !recovered_files.is_empty() {
+                        println!("\nRecovered files:");
+                        for file_path in recovered_files {
+                            println!("  - {}", file_path);
+                        }
+                    }
+                }
+                Err(e) => error!("Auto-rollback failed: {}", e),
+            }
+        }
     }
 
     Ok(())

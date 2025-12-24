@@ -67,4 +67,7 @@ pub enum Commands {
         #[arg(short, long, default_value = "127.0.0.1:9000")]
         addr: String,
     },
+
+    /// Auto-rollback to the latest backup
+    AutoRollback,
 }
