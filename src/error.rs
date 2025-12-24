@@ -41,6 +41,9 @@ pub enum ZenithError {
     
     #[error("No backups available")]
     NoBackupsAvailable,
+    
+    #[error("Permission denied for file: {path} - {reason}")]
+    PermissionDenied { path: PathBuf, reason: String },
 }
 
 pub type Result<T> = std::result::Result<T, ZenithError>;

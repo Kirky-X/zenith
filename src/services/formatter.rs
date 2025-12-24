@@ -1,6 +1,6 @@
 use crate::config::types::AppConfig;
 use crate::core::types::{FormatResult, ZenithConfig};
-use crate::error::Result;
+use crate::error::{Result, ZenithError};
 use crate::storage::{backup::BackupService, cache::HashCache};
 use crate::utils::path::validate_path;
 use crate::zeniths::registry::ZenithRegistry;
@@ -176,6 +176,12 @@ impl ZenithService {
             }
         };
 
+        // Check read permissions before attempting to read the file
+        if let Err(e) = self.check_file_permissions(&path, "read").await {
+            result.error = Some(e.to_string());
+            return result;
+        }
+        
         let content = match fs::read(&path).await {
             Ok(c) => c,
             Err(e) => {
@@ -227,6 +233,12 @@ impl ZenithService {
                 if formatted != content {
                     result.changed = true;
                     if !self.check_mode {
+                        // Check write permissions before attempting to write the file
+                        if let Err(e) = self.check_file_permissions(&path, "write").await {
+                            result.error = Some(e.to_string());
+                            return result;
+                        }
+                        
                         if let Err(e) = fs::write(&path, &formatted).await {
                             // 如果写入失败，尝试回退到备份
                             if let Err(rollback_err) = self.rollback_file(&root, &path).await {
@@ -357,6 +369,58 @@ impl ZenithService {
         variance.sqrt()
     }
 
+    /// Check file permissions before performing file operations
+    async fn check_file_permissions(&self, path: &PathBuf, operation: &str) -> Result<()> {
+        use tokio::fs::metadata;
+        
+        // Get file metadata
+        let metadata = match metadata(path).await {
+            Ok(metadata) => metadata,
+            Err(e) => {
+                // If the file doesn't exist, check the parent directory permissions
+                if let Some(parent) = path.parent() {
+                    let parent_metadata = metadata(parent).await
+                        .map_err(|_| ZenithError::PermissionDenied {
+                            path: path.clone(),
+                            reason: format!("Cannot access parent directory: {}", e),
+                        })?;
+                    
+                    if !parent_metadata.permissions().readonly() {
+                        // Parent directory is writable, so we can create the file
+                        return Ok(());
+                    } else {
+                        return Err(ZenithError::PermissionDenied {
+                            path: path.clone(),
+                            reason: "Parent directory is read-only".to_string(),
+                        });
+                    }
+                } else {
+                    return Err(ZenithError::PermissionDenied {
+                        path: path.clone(),
+                        reason: format!("Cannot access file: {}", e),
+                    });
+                }
+            }
+        };
+
+        // Check if the file is read-only when we need to write to it
+        if operation == "write" && metadata.permissions().readonly() {
+            return Err(ZenithError::PermissionDenied {
+                path: path.clone(),
+                reason: "File is read-only".to_string(),
+            });
+        }
+
+        // Check if the file is readable when we need to read from it
+        if operation == "read" {
+            // On Unix systems, we could check specific permission bits,
+            // but for now we'll just try to access the file metadata
+            // to verify we have basic access
+        }
+
+        Ok(())
+    }
+
     /// Check current memory usage and enforce limits
     fn check_memory_usage(&self) -> std::result::Result<(), String> {
         let mut system = System::new_all();
@@ -428,6 +492,9 @@ impl ZenithService {
             }
         }
 
+        // Check write permissions before attempting to write the file during rollback
+        self.check_file_permissions(file_path, "write").await?;
+        
         // 将备份内容写回原文件
         tokio::fs::write(file_path, &backup_content).await
             .map_err(|e| crate::error::ZenithError::RecoverFailed(e.to_string()))?;
@@ -489,9 +556,8 @@ impl ZenithService {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::types::{AppConfig, BackupConfig, ConcurrencyConfig, GlobalConfig, LimitsConfig, ZenithSettings};
+    use crate::config::types::AppConfig;
     use crate::zeniths::registry::ZenithRegistry;
-    use std::path::PathBuf;
     use tempfile::TempDir;
 
     #[tokio::test]
@@ -578,6 +644,76 @@ mod tests {
         
         // 恢复原始目录
         std::env::set_current_dir(&current_dir).unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_file_permission_checks() {
+        // Skip this test on non-Unix systems since we're changing file permissions
+        #[cfg(unix)]
+        {
+            use std::fs::File;
+            use std::os::unix::fs::PermissionsExt; // This is Unix-specific, so this test will only run on Unix systems
+            // Create a temporary directory for testing
+            let temp_dir = TempDir::new().unwrap();
+            let test_file = temp_dir.path().join("readonly.rs");
+            
+            // Create a test file
+            std::fs::write(&test_file, "fn main() { println!(\"readonly\"); }").unwrap();
+            
+            // Make the file read-only
+            let mut perms = std::fs::metadata(&test_file).unwrap().permissions();
+            perms.set_readonly(true);
+            std::fs::set_permissions(&test_file, perms).unwrap();
+            
+            // Create configuration
+            let config = AppConfig::default();
+            
+            // Create service
+            let registry = Arc::new(ZenithRegistry::new());
+            let backup_service = Arc::new(BackupService::new(config.backup.clone()));
+            let service = ZenithService::new(config, registry, backup_service, false);
+            
+            // Test read permission check (should succeed for reading)
+            let result = service.check_file_permissions(&test_file, "read").await;
+            assert!(result.is_ok());
+            
+            // Test write permission check on read-only file (should fail)
+            let result = service.check_file_permissions(&test_file, "write").await;
+            assert!(result.is_err());
+            match result.unwrap_err() {
+                ZenithError::PermissionDenied { path, reason } => {
+                    assert_eq!(path, test_file);
+                    assert!(reason.contains("read-only"));
+                }
+                _ => panic!("Expected PermissionDenied error"),
+            }
+        }
+        
+        // For non-Unix systems, we'll just have a placeholder test
+        #[cfg(not(unix))]
+        {
+            // Create a temporary directory for testing
+            let temp_dir = TempDir::new().unwrap();
+            let test_file = temp_dir.path().join("test.rs");
+            
+            // Create a test file
+            std::fs::write(&test_file, "fn main() { println!(\"test\"); }").unwrap();
+            
+            // Create configuration
+            let config = AppConfig::default();
+            
+            // Create service
+            let registry = Arc::new(ZenithRegistry::new());
+            let backup_service = Arc::new(BackupService::new(config.backup.clone()));
+            let service = ZenithService::new(config, registry, backup_service, false);
+            
+            // Test permission checks (these will pass on non-Unix systems since we can't set read-only)
+            let result = service.check_file_permissions(&test_file, "read").await;
+            assert!(result.is_ok());
+            
+            let result = service.check_file_permissions(&test_file, "write").await;
+            assert!(result.is_ok());
+        }
     }
 }
 

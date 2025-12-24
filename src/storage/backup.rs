@@ -48,11 +48,17 @@ impl BackupService {
             fs::create_dir_all(parent).await?;
         }
 
+        // 检查目标文件写入权限
+        self.check_file_permissions(&target_path, "write").await?;
+        
         // 写入内容
         fs::write(&target_path, content)
             .await
             .map_err(|e| ZenithError::BackupFailed(e.to_string()))?;
 
+        // 检查哈希文件写入权限
+        self.check_file_permissions(&hash_path, "write").await?;
+        
         // 写入哈希
         let hash = blake3::hash(content);
         fs::write(&hash_path, hash.to_hex().as_str())
@@ -138,6 +144,9 @@ impl BackupService {
                         fs::create_dir_all(parent).await?;
                     }
 
+                    // 检查恢复目标文件的写入权限
+                    self.check_file_permissions(&restore_target, "write").await?;
+                    
                     fs::copy(&path, &restore_target).await?;
                     restored_count += 1;
                 }
@@ -145,6 +154,51 @@ impl BackupService {
         }
 
         Ok(restored_count)
+    }
+
+    /// 检查文件权限
+    async fn check_file_permissions(&self, path: &Path, operation: &str) -> Result<()> {
+        use tokio::fs::metadata;
+        
+        // Get file metadata
+        let metadata = match metadata(path).await {
+            Ok(metadata) => metadata,
+            Err(e) => {
+                // If the file doesn't exist, check the parent directory permissions
+                if let Some(parent) = path.parent() {
+                    let parent_metadata = metadata(parent).await
+                        .map_err(|_| ZenithError::PermissionDenied {
+                            path: path.to_path_buf(),
+                            reason: format!("Cannot access parent directory: {}", e),
+                        })?;
+                    
+                    if !parent_metadata.permissions().readonly() {
+                        // Parent directory is writable, so we can create the file
+                        return Ok(());
+                    } else {
+                        return Err(ZenithError::PermissionDenied {
+                            path: path.to_path_buf(),
+                            reason: "Parent directory is read-only".to_string(),
+                        });
+                    }
+                } else {
+                    return Err(ZenithError::PermissionDenied {
+                        path: path.to_path_buf(),
+                        reason: format!("Cannot access file: {}", e),
+                    });
+                }
+            }
+        };
+
+        // Check if the file is read-only when we need to write to it
+        if operation == "write" && metadata.permissions().readonly() {
+            return Err(ZenithError::PermissionDenied {
+                path: path.to_path_buf(),
+                reason: "File is read-only".to_string(),
+            });
+        }
+
+        Ok(())
     }
 
     /// 清理过期备份
@@ -167,5 +221,71 @@ impl BackupService {
         }
 
         Ok(deleted_count)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    #[tokio::test]
+    async fn test_backup_permission_checks() {
+        // Skip this test on non-Unix systems
+        #[cfg(unix)]
+        {
+            use std::fs::File;
+            use std::os::unix::fs::PermissionsExt; // Unix-specific
+            // Create a temporary directory for testing
+            let temp_dir = TempDir::new().unwrap();
+            let backup_dir = temp_dir.path().join("backups");
+            
+            // Create backup config
+            let config = BackupConfig {
+                dir: backup_dir.to_string_lossy().to_string(),
+                retention_days: 7,
+            };
+            
+            // Create backup service
+            let service = BackupService::new(config);
+            
+            // Initialize backup service
+            service.init().await.unwrap();
+            
+            // Create a test file in the temp directory
+            let test_file = temp_dir.path().join("readonly.txt");
+            std::fs::write(&test_file, "test content").unwrap();
+            
+            // Make the file read-only
+            let mut perms = std::fs::metadata(&test_file).unwrap().permissions();
+            perms.set_readonly(true);
+            std::fs::set_permissions(&test_file, perms).unwrap();
+            
+            // Test write permission check on read-only file (should fail)
+            let result = service.check_file_permissions(&test_file, "write").await;
+            assert!(result.is_err());
+            match result.unwrap_err() {
+                ZenithError::PermissionDenied { path, reason } => {
+                    assert_eq!(path, test_file);
+                    assert!(reason.contains("read-only"));
+                }
+                _ => panic!("Expected PermissionDenied error"),
+            }
+        }
+        
+        // For non-Unix systems, we'll just have a placeholder test
+        #[cfg(not(unix))]
+        {
+            // Create a temporary directory for testing
+            let temp_dir = TempDir::new().unwrap();
+            let test_file = temp_dir.path().join("test.txt");
+            
+            // Create a test file
+            std::fs::write(&test_file, "test content").unwrap();
+            
+            // Test permission checks (these will pass on non-Unix systems)
+            let result = service.check_file_permissions(&test_file, "write").await;
+            assert!(result.is_ok());
+        }
     }
 }
