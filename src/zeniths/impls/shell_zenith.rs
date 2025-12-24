@@ -19,8 +19,11 @@ impl Zenith for ShellZenith {
         &["sh", "bash", "zsh"]
     }
 
-    async fn format(&self, content: &[u8], _path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
+    async fn format(&self, content: &[u8], path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
+        // 使用 shfmt -filename 以支持自动查找配置文件
         let mut child = Command::new("shfmt")
+            .arg("-filename")
+            .arg(path)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())

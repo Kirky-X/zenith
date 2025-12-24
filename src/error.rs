@@ -38,12 +38,30 @@ pub enum ZenithError {
 
     #[error("Backup is disabled")]
     BackupDisabled,
-    
+
     #[error("No backups available")]
     NoBackupsAvailable,
-    
+
     #[error("Permission denied for file: {path} - {reason}")]
     PermissionDenied { path: PathBuf, reason: String },
+
+    #[error("Plugin validation error for '{name}': {error}")]
+    PluginValidationError { name: String, error: String },
+
+    #[error("Plugin '{name}' is disabled")]
+    PluginDisabled { name: String },
+
+    #[error("Plugin error for '{name}': {error}")]
+    PluginError { name: String, error: String },
+
+    #[error("Serialization error: {0}")]
+    Serialization(#[from] serde_json::Error),
+
+    #[error("TOML deserialization error: {0}")]
+    TomlDeserialization(#[from] toml::de::Error),
+
+    #[error("UTF-8 conversion error: {0}")]
+    Utf8Conversion(#[from] std::string::FromUtf8Error),
 }
 
 pub type Result<T> = std::result::Result<T, ZenithError>;

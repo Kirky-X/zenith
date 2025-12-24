@@ -19,13 +19,16 @@ impl Zenith for RustZenith {
         &["rs"]
     }
 
-    async fn format(&self, content: &[u8], path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
-        // 调用 rustfmt，使用 --stdin-filename 以支持自动查找配置文件
+    async fn format(
+        &self,
+        content: &[u8],
+        _path: &Path,
+        _config: &ZenithConfig,
+    ) -> Result<Vec<u8>> {
+        // 调用 rustfmt，使用 --emit stdout 从标准输入读取
         let mut child = Command::new("rustfmt")
             .arg("--emit")
             .arg("stdout")
-            .arg("--stdin-filename")
-            .arg(path)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())

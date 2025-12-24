@@ -19,9 +19,12 @@ impl Zenith for TomlZenith {
         &["toml"]
     }
 
-    async fn format(&self, content: &[u8], _path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
+    async fn format(&self, content: &[u8], path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
+        // 使用 taplo fmt --stdin-filepath 以支持自动查找配置文件
         let mut child = Command::new("taplo")
             .arg("fmt")
+            .arg("--stdin-filepath")
+            .arg(path)
             .arg("-")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())

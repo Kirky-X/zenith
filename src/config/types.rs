@@ -13,6 +13,8 @@ pub struct AppConfig {
     pub concurrency: ConcurrencyConfig,
     #[serde(default)]
     pub limits: LimitsConfig,
+    #[serde(default)]
+    pub mcp: McpConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -25,6 +27,8 @@ pub struct GlobalConfig {
     pub recursive: bool,
     #[serde(default = "default_true")]
     pub cache_enabled: bool,
+    #[serde(default = "default_config_dir")]
+    pub config_dir: String,
 }
 
 impl Default for GlobalConfig {
@@ -34,6 +38,7 @@ impl Default for GlobalConfig {
             log_level: "info".into(),
             recursive: true,
             cache_enabled: true,
+            config_dir: default_config_dir(),
         }
     }
 }
@@ -108,6 +113,49 @@ impl Default for LimitsConfig {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct McpConfig {
+    #[serde(default = "default_mcp_enabled")]
+    pub enabled: bool,
+    #[serde(default = "default_mcp_host")]
+    pub host: String,
+    #[serde(default = "default_mcp_port")]
+    pub port: u16,
+    #[serde(default = "default_mcp_auth_enabled")]
+    pub auth_enabled: bool,
+    #[serde(default)]
+    pub api_key: Option<String>,
+    #[serde(default = "default_mcp_allowed_origins")]
+    pub allowed_origins: Vec<String>,
+    #[serde(default)]
+    pub users: Vec<McpUser>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct McpUser {
+    pub api_key: String,
+    #[serde(default = "default_mcp_user_role")]
+    pub role: String,
+}
+
+fn default_mcp_user_role() -> String {
+    "user".into()
+}
+
+impl Default for McpConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_mcp_enabled(),
+            host: default_mcp_host(),
+            port: default_mcp_port(),
+            auth_enabled: default_mcp_auth_enabled(),
+            api_key: None,
+            allowed_origins: default_mcp_allowed_origins(),
+            users: vec![],
+        }
+    }
+}
+
 // Default value helpers
 fn default_true() -> bool {
     true
@@ -132,7 +180,31 @@ fn default_max_file_size_mb() -> u64 {
 }
 
 fn default_max_memory_mb() -> u64 {
-    100  // 100MB default limit as per PRD
+    100 // 100MB default limit as per PRD
+}
+
+fn default_config_dir() -> String {
+    ".zenith".into()
+}
+
+fn default_mcp_enabled() -> bool {
+    false
+}
+
+fn default_mcp_host() -> String {
+    "127.0.0.1".into()
+}
+
+fn default_mcp_port() -> u16 {
+    8080
+}
+
+fn default_mcp_auth_enabled() -> bool {
+    true
+}
+
+fn default_mcp_allowed_origins() -> Vec<String> {
+    vec!["*".to_string()]
 }
 
 #[cfg(test)]

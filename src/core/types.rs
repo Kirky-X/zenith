@@ -28,3 +28,14 @@ pub struct FormatResult {
     pub duration_ms: u64,
     pub error: Option<String>,
 }
+
+#[derive(Debug, Clone, Serialize)]
+pub struct PerformanceMetrics {
+    pub total_files: usize,
+    pub p95_duration_ms: f64,
+    pub p99_duration_ms: f64,
+    pub avg_duration_ms: f64,
+    pub min_duration_ms: u64,
+    pub max_duration_ms: u64,
+    pub std_deviation_ms: f64,
+}

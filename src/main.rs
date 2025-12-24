@@ -6,8 +6,10 @@ use zenith::cli::commands::{Cli, Commands};
 use zenith::config::load_config;
 use zenith::error::Result;
 use zenith::mcp::server::McpServer;
+use zenith::plugins::PluginLoader;
 use zenith::services::formatter::ZenithService;
 use zenith::storage::backup::BackupService;
+use zenith::storage::cache::HashCache;
 use zenith::utils::environment::EnvironmentChecker;
 use zenith::zeniths::impls::{
     c_zenith::ClangZenith, ini_zenith::IniZenith, java_zenith::JavaZenith,
@@ -31,8 +33,19 @@ async fn main() -> Result<()> {
 
     let mut config = load_config(cli.config)?;
 
+    // Initialize plugin loader
+    let mut plugin_loader = PluginLoader::new();
+
+    // Load external plugins from configuration directory
+    let plugins_dir = std::path::Path::new(&config.global.config_dir).join("plugins");
+    if let Err(e) = plugin_loader.load_plugins_from_dir(&plugins_dir).await {
+        eprintln!("Failed to load external plugins: {}", e);
+    }
+
     // 统一注册中心
     let registry = Arc::new(ZenithRegistry::new());
+
+    // Register built-in plugins
     registry.register(Arc::new(RustZenith));
     registry.register(Arc::new(PythonZenith));
     registry.register(Arc::new(PrettierZenith));
@@ -41,6 +54,13 @@ async fn main() -> Result<()> {
     registry.register(Arc::new(IniZenith));
     registry.register(Arc::new(TomlZenith));
     registry.register(Arc::new(ShellZenith));
+
+    // Register loaded external plugins
+    for plugin_info in plugin_loader.list_plugins() {
+        if let Some(plugin) = plugin_loader.get_plugin(&plugin_info.name) {
+            registry.register(plugin);
+        }
+    }
 
     match cli.command {
         Commands::Format {
@@ -67,9 +87,15 @@ async fn main() -> Result<()> {
             );
 
             let backup_service = Arc::new(BackupService::new(config.backup.clone()));
-            let service = ZenithService::new(config, registry, backup_service, check);
+            let hash_cache = Arc::new(HashCache::new());
+            let service = ZenithService::new(config, registry, backup_service, hash_cache, check);
 
-            let results = service.format_paths(paths).await?;
+            // Convert PathBuf to String for format_paths compatibility
+            let string_paths: Vec<String> = paths
+                .into_iter()
+                .map(|p| p.to_string_lossy().into_owned())
+                .collect();
+            let results = service.format_paths(string_paths).await?;
 
             let total = results.len();
             let success = results.iter().filter(|r| r.success).count();
@@ -101,24 +127,23 @@ async fn main() -> Result<()> {
         Commands::Doctor { verbose } => {
             info!("Checking system environment...");
             let results = EnvironmentChecker::check_all(registry);
+            let summary = EnvironmentChecker::print_results(&results, verbose);
 
-            println!("\n{}", "Tool Environment Check:".bold().underline());
-            for res in results {
-                let status = if res.available {
-                    "✅ Available".green()
-                } else {
-                    "❌ Not Found".red()
-                };
-
-                print!("  {:<20} {}", res.name.bold(), status);
-                if let Some(v) = res.version {
-                    if verbose {
-                        print!(" ({})", v.dimmed());
-                    }
-                }
-                println!();
-            }
             println!();
+
+            if summary.missing_tools > 0 {
+                println!(
+                    "{}",
+                    format!(
+                        "Warning: {} tool(s) are missing. Some formatting features may not work.",
+                        summary.missing_tools
+                    )
+                    .yellow()
+                );
+                std::process::exit(1);
+            } else {
+                println!("{}", "All tools are available!".green());
+            }
         }
         Commands::ListBackups => {
             let backup_service = BackupService::new(config.backup.clone());
@@ -168,20 +193,26 @@ async fn main() -> Result<()> {
                 .parse()
                 .map_err(|_| zenith::error::ZenithError::Config("Invalid address".into()))?;
 
-            let server = McpServer::new(config, registry);
+            let hash_cache = Arc::new(HashCache::new());
+            let server = McpServer::new(config, registry, hash_cache);
             server.run(socket_addr).await?;
         }
         Commands::AutoRollback => {
             info!("Starting auto-rollback to latest backup...");
-            
+
             let backup_service = Arc::new(BackupService::new(config.backup.clone()));
-            let service = ZenithService::new(config, registry, backup_service, false);
-            
+            let hash_cache = Arc::new(HashCache::new());
+            let service = ZenithService::new(config, registry, backup_service, hash_cache, false);
+
             match service.auto_rollback().await {
                 Ok(recovered_files) => {
                     println!(
                         "{}",
-                        format!("Successfully auto-rolled back {} files.", recovered_files.len()).green()
+                        format!(
+                            "Successfully auto-rolled back {} files.",
+                            recovered_files.len()
+                        )
+                        .green()
                     );
                     if !recovered_files.is_empty() {
                         println!("\nRecovered files:");

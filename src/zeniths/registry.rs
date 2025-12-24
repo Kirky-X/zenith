@@ -34,4 +34,11 @@ impl ZenithRegistry {
             .get(ext)
             .and_then(|name| self.zeniths.get(name.value()).map(|z| z.clone()))
     }
+
+    pub fn list_all(&self) -> Vec<Arc<dyn Zenith>> {
+        self.zeniths
+            .iter()
+            .map(|item| item.value().clone())
+            .collect()
+    }
 }

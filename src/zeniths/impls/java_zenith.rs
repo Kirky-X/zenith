@@ -19,9 +19,11 @@ impl Zenith for JavaZenith {
         &["java"]
     }
 
-    async fn format(&self, content: &[u8], _path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
-        // 使用 google-java-format -
+    async fn format(&self, content: &[u8], path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
+        // 使用 google-java-format --stdin-filename 以支持自动查找配置文件
         let mut child = Command::new("google-java-format")
+            .arg("--stdin-filename")
+            .arg(path)
             .arg("-")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())

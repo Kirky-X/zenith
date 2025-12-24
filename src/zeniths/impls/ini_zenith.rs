@@ -16,7 +16,12 @@ impl Zenith for IniZenith {
         &["ini", "conf"]
     }
 
-    async fn format(&self, content: &[u8], _path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
+    async fn format(
+        &self,
+        content: &[u8],
+        _path: &Path,
+        _config: &ZenithConfig,
+    ) -> Result<Vec<u8>> {
         let text = String::from_utf8_lossy(content);
         let mut result = String::new();
 
