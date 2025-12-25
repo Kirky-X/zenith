@@ -3,10 +3,13 @@
 .zenith_backup/
 .env
 *.log
+Cargo.lock
 .DS_Store
 .trae
+.idea
 docs/prd.md
 docs/tdd.md
 docs/test.md
 docs/uat.md
 docs/task.md
+dist/
