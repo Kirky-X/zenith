@@ -25,7 +25,7 @@ impl Zenith for PythonZenith {
     async fn format(&self, content: &[u8], path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
         let formatter = StdioFormatter {
             tool_name: "ruff",
-            args: vec!["format".into(), "-".into()],
+            args: vec!["format".into(), "--stdin-filename".into()],
         };
         formatter.format_with_stdio(content, path, None).await
     }

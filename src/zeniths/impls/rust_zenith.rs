@@ -46,10 +46,10 @@ impl Zenith for RustZenith {
 
         let formatter = StdioFormatter {
             tool_name: "rustfmt",
-            args: vec![],
+            args: extra_args,
         };
         formatter
-            .format_with_stdio(content, path, Some(extra_args))
+            .format_with_stdio_no_path(content, path, None)
             .await
     }
 }
