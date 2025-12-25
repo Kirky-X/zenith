@@ -257,6 +257,84 @@ Zenith 使用 JSON 或 TOML 格式的配置文件来控制格式化行为。配�
 }
 ```
 
+## 插件配置
+
+### plugins
+
+Zenith 支持通过外部插件来扩展格式化能力。插件配置文件位于 `plugins/` 目录下，支持以下格式：
+
+- **JSON 格式**：单个插件配置
+- **TOML 格式**：单个插件配置或插件列表配置
+
+#### 单个插件配置（JSON）
+
+```json
+{
+  "name": "prettier-js",
+  "command": "prettier",
+  "args": ["--stdin-filepath", "{filepath}", "--parser", "babel"],
+  "extensions": ["js", "jsx", "ts", "tsx"],
+  "enabled": true
+}
+```
+
+#### 单个插件配置（TOML）
+
+```toml
+[plugin]
+name = "prettier-js"
+command = "prettier"
+args = ["--stdin-filepath", "{filepath}", "--parser", "babel"]
+extensions = ["js", "jsx", "ts", "tsx"]
+enabled = true
+```
+
+#### 插件列表配置（TOML）
+
+使用 `[[plugins]]` 数组语法可以在单个 TOML 文件中定义多个插件：
+
+```toml
+[[plugins]]
+name = "prettier-js"
+command = "prettier"
+args = ["--stdin-filepath", "{filepath}", "--parser", "babel"]
+extensions = ["js", "jsx", "ts", "tsx"]
+enabled = true
+
+[[plugins]]
+name = "markdown-lint"
+command = "markdownlint-cli2"
+args = ["**/*.md", "--fix"]
+extensions = ["md"]
+enabled = false
+```
+
+#### 字段说明
+
+| 字段 | 类型 | 描述 |
+|------|------|------|
+| `name` | string | 插件名称 |
+| `command` | string | 要执行的命令（可以是命令名或路径） |
+| `args` | array | 命令参数列表，支持 `{filepath}` 占位符 |
+| `extensions` | array | 该插件处理的文件扩展名 |
+| `enabled` | boolean | 是否启用该插件 |
+
+#### 插件目录结构
+
+```
+plugins/
+├── prettier-js.json
+├── markdown-lint.json
+└── plugins.toml      # 也可以合并为列表格式
+```
+
+### 默认插件位置
+
+默认情况下，Zenith 会从以下位置加载插件：
+
+1. `./plugins/` - 项目根目录下的 plugins 目录
+2. `~/.config/zenith/plugins/` - 用户配置目录下的 plugins 目录
+
 ## 配置优先级
 
 Zenith 按以下优先级加载配置：

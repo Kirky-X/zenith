@@ -55,6 +55,10 @@ jobs:
       with:
         toolchain: stable
         components: rustfmt, clippy
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
     - name: Cache dependencies
       uses: actions/cache@v3
       with:
@@ -62,11 +66,16 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           target
+          node_modules
         key: ${{ runner.os }}-cargo-lint-${{ hashFiles('**/Cargo.lock') }}
     - name: Check formatting
       run: cargo fmt --all -- --check
     - name: Run Clippy
       run: cargo clippy --all-targets --all-features -- -D warnings
+    - name: Install markdownlint-cli2
+      run: npm install -g markdownlint-cli2
+    - name: Run markdownlint
+      run: markdownlint-cli2 "**/*.md" --config .markdownlint.jsonc
 
   build:
     runs-on: ${{ matrix.os }}

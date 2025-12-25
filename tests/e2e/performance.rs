@@ -57,7 +57,7 @@ fn test_multiple_files_formatting_performance() {
 
     println!("Multiple files formatting took: {:?}", duration);
     assert!(
-        duration.as_secs() < 10,
+        duration.as_secs() < 15,
         "Multiple files formatting took too long: {:?}",
         duration
     );

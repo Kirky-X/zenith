@@ -277,8 +277,12 @@ impl PluginLoader {
 
                             self.validate_plugin_config(config).await?;
 
-                            let external_plugin =
-                                ExternalZenith::new(config.name.clone(), config.command.clone(), config.args.clone(), config.extensions.iter().map(|s| s.clone()).collect());
+                            let external_plugin = ExternalZenith::new(
+                                config.name.clone(),
+                                config.command.clone(),
+                                config.args.clone(),
+                                config.extensions.to_vec(),
+                            );
 
                             info!("Successfully loaded plugin: {}", external_plugin.name());
                             return Ok(Arc::new(external_plugin));
@@ -286,8 +290,14 @@ impl PluginLoader {
                     }
 
                     // All plugins are disabled
-                    let first_disabled_name = config_list.plugins.first().map(|p| p.name.clone()).unwrap_or_else(|| "unknown".to_string());
-                    return Err(ZenithError::PluginDisabled { name: first_disabled_name });
+                    let first_disabled_name = config_list
+                        .plugins
+                        .first()
+                        .map(|p| p.name.clone())
+                        .unwrap_or_else(|| "unknown".to_string());
+                    return Err(ZenithError::PluginDisabled {
+                        name: first_disabled_name,
+                    });
                 }
             }
         }
