@@ -49,26 +49,31 @@
 
 ### Installation
 
-**Method 1: Cargo (Recommended)**
+**Method 1: Quick Install (Recommended)**
+```bash
+# Linux/macOS
+curl -sSL https://raw.githubusercontent.com/user/zenith/main/install.sh | sh
+
+# Windows (PowerShell)
+iwr -useb https://raw.githubusercontent.com/user/zenith/main/install.ps1 | iex
+```
+
+**Method 2: Cargo (Development Version)**
 ```bash
 cargo install zenith
 ```
 
-**Method 2: Pre-compiled Binaries**
-```bash
-# Linux/macOS
-curl -sSL https://github.com/user/zenith/releases/latest/download/install.sh | sh
+**Method 3: Pre-compiled Binaries**
+1. Visit the [Releases page](https://github.com/user/zenith/releases)
+2. Download the appropriate binary for your platform
+3. Extract and place in your PATH
 
-# Windows (PowerShell)
-iwr https://github.com/user/zenith/releases/latest/download/install.ps1 | iex
-```
-
-**Method 3: Build from Source**
+**Method 4: Build from Source**
 ```bash
 git clone https://github.com/user/zenith.git
 cd zenith
 cargo build --release
-sudo mv target/release/zenith /usr/local/bin/
+# Binary available at target/release/zenith
 ```
 
 ### Verify Installation
@@ -123,6 +128,9 @@ zenith clean-backups --days 7
 
 # Start MCP server
 zenith mcp
+
+# Check system environment
+zenith doctor
 ```
 
 ### Configuration Example
@@ -133,6 +141,7 @@ Create `zenith.toml`:
 backup_enabled = true
 log_level = "info"
 recursive = true
+cache_enabled = true
 
 [zeniths.rust]
 enabled = true
@@ -149,6 +158,21 @@ batch_size = 100
 [backup]
 dir = ".zenith_backup"
 retention_days = 7
+
+[mcp]
+enabled = true
+host = "127.0.0.1"
+port = 8080
+auth_enabled = true
+allowed_origins = ["http://localhost:3000"]
+
+[[mcp.users]]
+api_key = "admin-secret-key"
+role = "admin"
+
+[[mcp.users]]
+api_key = "user-secret-key"
+role = "user"
 ```
 
 ### Environment Variables
@@ -159,6 +183,57 @@ export ZENITH_NO_BACKUP=false
 
 zenith format src/
 ```
+
+### MCP Server Authentication
+
+The MCP server supports API key authentication and role-based authorization. Configure users in `zenith.toml`:
+
+```toml
+[mcp]
+enabled = true
+auth_enabled = true
+
+[[mcp.users]]
+api_key = "your-admin-key"
+role = "admin"
+
+[[mcp.users]]
+api_key = "your-user-key"
+role = "user"
+```
+
+**User Roles**:
+- `admin`: Full access to all MCP methods
+- `user`: Limited access to `format` and `recover` methods
+- `readonly`: Read-only access to `format` method
+
+**Usage**:
+```bash
+# Start MCP server with authentication
+zenith mcp
+
+# Make requests with Authorization header
+curl -X POST http://127.0.0.1:8080 \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"format","params":{"path":"src/main.rs"}}'
+```
+
+### Doctor Command
+
+The `doctor` command checks your system environment and reports the status of required tools:
+
+```bash
+zenith doctor
+```
+
+The command categorizes tools into:
+- **Required**: Essential tools that must be available
+- **Optional**: Tools that enhance functionality
+
+Exit codes:
+- `0`: All required tools are available
+- `1`: Some required tools are missing
 
 ---
 
@@ -234,6 +309,9 @@ cargo tarpaulin --out Html
 cargo run -- format test.rs
 ```
 
+### Cross-Platform Compilation
+Zenith supports cross-compilation for multiple platforms. See [BUILDING.md](docs/BUILDING.md) for detailed instructions on building for different platforms.
+
 ### Project Structure
 ```
 zenith/
@@ -256,7 +334,7 @@ zenith/
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please check [CONTRIBUTING.md](CONTRIBUTING.md)
+Contributions are welcome! Please check [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
 ### How to Contribute
 1. Fork the repository

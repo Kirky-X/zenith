@@ -123,6 +123,9 @@ zenith clean-backups --days 7
 
 # 启动 MCP 服务器
 zenith mcp
+
+# 检查系统环境
+zenith doctor
 ```
 
 ### 配置文件示例
@@ -133,6 +136,7 @@ zenith mcp
 backup_enabled = true
 log_level = "info"
 recursive = true
+cache_enabled = true
 
 [zeniths.rust]
 enabled = true
@@ -149,6 +153,21 @@ batch_size = 100
 [backup]
 dir = ".zenith_backup"
 retention_days = 7
+
+[mcp]
+enabled = true
+host = "127.0.0.1"
+port = 8080
+auth_enabled = true
+allowed_origins = ["http://localhost:3000"]
+
+[[mcp.users]]
+api_key = "admin-secret-key"
+role = "admin"
+
+[[mcp.users]]
+api_key = "user-secret-key"
+role = "user"
 ```
 
 ### 环境变量
@@ -159,6 +178,57 @@ export ZENITH_NO_BACKUP=false
 
 zenith format src/
 ```
+
+### MCP 服务器身份验证
+
+MCP 服务器支持 API 密钥身份验证和基于角色的授权。在 `zenith.toml` 中配置用户：
+
+```toml
+[mcp]
+enabled = true
+auth_enabled = true
+
+[[mcp.users]]
+api_key = "your-admin-key"
+role = "admin"
+
+[[mcp.users]]
+api_key = "your-user-key"
+role = "user"
+```
+
+**用户角色**：
+- `admin`：完全访问所有 MCP 方法
+- `user`：仅限访问 `format` 和 `recover` 方法
+- `readonly`：只读访问 `format` 方法
+
+**使用方法**：
+```bash
+# 启动带身份验证的 MCP 服务器
+zenith mcp
+
+# 使用 Authorization 头发送请求
+curl -X POST http://127.0.0.1:8080 \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"format","params":{"path":"src/main.rs"}}'
+```
+
+### Doctor 命令
+
+`doctor` 命令检查系统环境并报告必需工具的状态：
+
+```bash
+zenith doctor
+```
+
+该命令将工具分类为：
+- **必需**：必须可用的关键工具
+- **可选**：增强功能的工具
+
+退出代码：
+- `0`：所有必需工具都可用
+- `1`：某些必需工具缺失
 
 ---
 
@@ -256,7 +326,7 @@ zenith/
 
 ## 🤝 贡献
 
-欢迎贡献！请查看 [CONTRIBUTING.md](CONTRIBUTING.md)
+欢迎贡献！请查看 [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
 ### 如何贡献
 1. Fork 本仓库
