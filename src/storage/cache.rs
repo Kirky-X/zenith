@@ -1,3 +1,8 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
 use crate::error::Result;
 use blake3::Hash;
 use serde::{Deserialize, Serialize};
