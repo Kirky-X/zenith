@@ -13,3 +13,13 @@ docs/test.md
 docs/uat.md
 docs/task.md
 dist/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+*$py.class
+.cache/
+*.tmp
+*.temp
+*.bak
+*~
+Thumbs.db
