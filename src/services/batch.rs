@@ -37,7 +37,22 @@ impl BatchOptimizer {
             let process_fn = Arc::clone(&process_fn);
 
             let handle = tokio::spawn(async move {
-                let _permit = sem_clone.acquire().await.unwrap();
+                let _permit = match sem_clone.acquire().await {
+                    Ok(permit) => permit,
+                    Err(_) => {
+                        // Semaphore was closed, which shouldn't happen in normal operation
+                        // Return a failed result
+                        return FormatResult {
+                            file_path: file,
+                            success: false,
+                            changed: false,
+                            original_size: 0,
+                            formatted_size: 0,
+                            duration_ms: 0,
+                            error: Some("Semaphore closed".to_string()),
+                        };
+                    }
+                };
                 process_fn(file).await
             });
             handles.push(handle);

@@ -233,7 +233,7 @@ impl zenith::core::traits::Zenith for MockZenith {
         &self,
         content: &[u8],
         _path: &std::path::Path,
-        _config: &zenith::core::types::ZenithConfig,
+        _config: &zenith::config::types::ZenithConfig,
     ) -> zenith::error::Result<Vec<u8>> {
         Ok(content.to_vec())
     }

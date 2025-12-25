@@ -4,6 +4,7 @@ pub mod core;
 pub mod error;
 pub mod mcp;
 pub mod plugins;
+pub mod prelude;
 pub mod services;
 pub mod storage;
 pub mod utils;

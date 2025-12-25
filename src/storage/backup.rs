@@ -83,8 +83,10 @@ impl BackupService {
             if metadata.is_dir() {
                 let name = entry.file_name().to_string_lossy().into_owned();
                 if name.starts_with("backup_") {
-                    let created = metadata.created().unwrap_or(SystemTime::now());
-                    // 计算大小（简单递归）
+                    let created = match metadata.created() {
+                        Ok(time) => time,
+                        Err(_) => SystemTime::now(), // fallback if creation time cannot be determined
+                    };
                     let size = fs_extra::dir::get_size(entry.path()).unwrap_or(0);
                     backups.push((name, created, size));
                 }
@@ -103,7 +105,17 @@ impl BackupService {
             return Err(ZenithError::BackupNotFound(backup_id.into()));
         }
 
-        let target_root = target_dir.unwrap_or_else(|| std::env::current_dir().unwrap());
+        let target_root = match target_dir {
+            Some(path) => path,
+            None => match std::env::current_dir() {
+                Ok(path) => path,
+                Err(_) => {
+                    return Err(ZenithError::BackupFailed(
+                        "Cannot determine current directory".to_string(),
+                    ))
+                }
+            },
+        };
         let mut restored_count = 0;
 
         // 遍历备份目录并恢复
