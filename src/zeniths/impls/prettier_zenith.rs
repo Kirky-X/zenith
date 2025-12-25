@@ -66,7 +66,7 @@ impl Zenith for PrettierZenith {
         );
 
         let mut cmd = Command::new("prettier");
-        cmd.args(&["--parser", parser])
+        cmd.args(["--parser", parser])
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());

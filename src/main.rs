@@ -14,8 +14,8 @@ use zenith::config::load_config;
 use zenith::error::Result;
 use zenith::internal::{
     BackupService, ClangZenith, Cli, Commands, EnvironmentChecker, HashCache, IniZenith,
-    JavaZenith, McpServer, PluginLoader, PrettierZenith, PythonZenith, RustZenith, ShellZenith,
-    TomlZenith, ZenithRegistry, ZenithService,
+    JavaZenith, MarkdownZenith, McpServer, PluginLoader, PrettierZenith, PythonZenith, RustZenith,
+    ShellZenith, TomlZenith, ZenithRegistry, ZenithService,
 };
 use zenith::plugins::loader::PluginSecurityConfig;
 
@@ -61,6 +61,7 @@ async fn main() -> Result<()> {
     // 注册内置插件 (Built-in Zeniths)
     registry.register(Arc::new(RustZenith));
     registry.register(Arc::new(PythonZenith));
+    registry.register(Arc::new(MarkdownZenith));
     registry.register(Arc::new(PrettierZenith));
     registry.register(Arc::new(ClangZenith));
     registry.register(Arc::new(JavaZenith));

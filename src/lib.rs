@@ -38,8 +38,9 @@ pub mod internal {
     pub use crate::utils::environment::EnvironmentChecker;
     pub use crate::zeniths::impls::{
         c_zenith::ClangZenith, ini_zenith::IniZenith, java_zenith::JavaZenith,
-        prettier_zenith::PrettierZenith, python_zenith::PythonZenith, rust_zenith::RustZenith,
-        shell_zenith::ShellZenith, toml_zenith::TomlZenith,
+        markdown_zenith::MarkdownZenith, prettier_zenith::PrettierZenith,
+        python_zenith::PythonZenith, rust_zenith::RustZenith, shell_zenith::ShellZenith,
+        toml_zenith::TomlZenith,
     };
     pub use crate::zeniths::registry::ZenithRegistry;
 }

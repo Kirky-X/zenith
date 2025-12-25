@@ -1,0 +1,7 @@
+{
+  "name": "markdown-lint",
+  "command": "markdownlint-cli2",
+  "args": ["\"**/*.md\"", "--fix"],
+  "extensions": ["md"],
+  "enabled": false
+}

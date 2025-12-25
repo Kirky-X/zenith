@@ -302,7 +302,15 @@ impl ZenithService {
         match zenith.format(&content, &path, &zenith_config).await {
             Ok(formatted) => {
                 result.formatted_size = formatted.len() as u64;
-                if formatted != content {
+                let content_changed = formatted != content;
+                tracing::debug!(
+                    "Content comparison for {:?}: original_size={}, formatted_size={}, changed={}",
+                    path,
+                    result.original_size,
+                    result.formatted_size,
+                    content_changed
+                );
+                if content_changed {
                     result.changed = true;
                     if !self.check_mode {
                         if let Err(e) = check_file_permissions(&path, "write").await {
@@ -313,11 +321,13 @@ impl ZenithService {
                             result.error = Some(format!("Write failed: {}", e));
                         } else {
                             result.success = true;
+                            tracing::debug!("Successfully wrote formatted content to {:?}", path);
                             if self.config.global.cache_enabled {
                                 if let Ok(new_state) =
                                     self.hash_cache.compute_file_state(&path).await
                                 {
                                     let _ = self.hash_cache.update(path.clone(), new_state).await;
+                                    tracing::debug!("Updated cache for {:?}", path);
                                 }
                             }
                         }
@@ -327,6 +337,7 @@ impl ZenithService {
                 } else {
                     result.success = true;
                     result.changed = false;
+                    tracing::debug!("No changes needed for {:?}", path);
                     if !self.check_mode && self.config.global.cache_enabled {
                         if let Ok(state) = self.hash_cache.compute_file_state(&path).await {
                             let _ = self.hash_cache.update(path.clone(), state).await;

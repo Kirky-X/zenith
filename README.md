@@ -40,7 +40,7 @@
 | | YAML | `.yaml` `.yml` | Built-in |
 | | TOML | `.toml` | taplo |
 | | INI | `.ini` | Built-in |
-| | Markdown | `.md` | mdformat |
+| | Markdown | `.md` | mdformat / markdownlint |
 | | Shell | `.sh` | shfmt |
 
 ---

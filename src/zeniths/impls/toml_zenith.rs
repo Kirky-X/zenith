@@ -25,8 +25,15 @@ impl Zenith for TomlZenith {
     async fn format(&self, content: &[u8], path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
         let formatter = StdioFormatter {
             tool_name: "taplo",
-            args: vec!["format".into(), "-".into(), "--stdin-filepath".into(), path.to_string_lossy().into()],
+            args: vec![
+                "format".into(),
+                "-".into(),
+                "--stdin-filepath".into(),
+                path.to_string_lossy().into(),
+            ],
         };
-        formatter.format_with_stdio_no_path(content, path, None).await
+        formatter
+            .format_with_stdio_no_path(content, path, None)
+            .await
     }
 }

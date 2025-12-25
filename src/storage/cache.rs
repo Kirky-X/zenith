@@ -245,12 +245,24 @@ impl HashCache {
 
         match cache.get(path) {
             Some(cached_state) => {
-                // 检查哈希值、修改时间和文件大小
-                Ok(cached_state.hash != current_state.hash
-                    || cached_state.modified != current_state.modified
-                    || cached_state.size != current_state.size)
+                let hash_changed = cached_state.hash != current_state.hash;
+                let modified_changed = cached_state.modified != current_state.modified;
+                let size_changed = cached_state.size != current_state.size;
+
+                tracing::debug!(
+                    "Cache comparison for {:?}: hash_changed={}, modified_changed={}, size_changed={}",
+                    path,
+                    hash_changed,
+                    modified_changed,
+                    size_changed
+                );
+
+                Ok(hash_changed || modified_changed || size_changed)
             }
-            None => Ok(true), // 文件不在缓存中，需要处理
+            None => {
+                tracing::debug!("File {:?} not in cache, needs processing", path);
+                Ok(true) // 文件不在缓存中，需要处理
+            }
         }
     }
 

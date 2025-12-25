@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 pub struct ZenithRegistry {
     zeniths: DashMap<String, Arc<dyn Zenith>>,
-    extension_map: DashMap<String, String>, // extension -> zenith_name
+    extension_map: DashMap<String, Vec<(i32, String, usize)>>, // extension -> Vec<(priority, zenith_name, order)>
 }
 
 impl Default for ZenithRegistry {
@@ -28,8 +28,16 @@ impl ZenithRegistry {
 
     pub fn register(&self, zenith: Arc<dyn Zenith>) {
         let name = zenith.name().to_string();
+        let priority = zenith.priority();
         for ext in zenith.extensions() {
-            self.extension_map.insert(ext.to_string(), name.clone());
+            self.extension_map
+                .entry(ext.to_string())
+                .and_modify(|entries: &mut Vec<(i32, String, usize)>| {
+                    entries.retain(|(p, n, _)| !(p == &priority && n != &name));
+                    entries.push((priority, name.clone(), entries.len()));
+                    entries.sort_by_key(|(p, _, idx)| (std::cmp::Reverse(*p), *idx));
+                })
+                .or_insert_with(|| vec![(priority, name.clone(), 0)]);
         }
         self.zeniths.insert(name, zenith);
     }
@@ -37,7 +45,8 @@ impl ZenithRegistry {
     pub fn get_by_extension(&self, ext: &str) -> Option<Arc<dyn Zenith>> {
         self.extension_map
             .get(ext)
-            .and_then(|name| self.zeniths.get(name.value()).map(|z| z.clone()))
+            .and_then(|entries| entries.first().map(|(_, n, _)| n.clone()))
+            .and_then(|name| self.zeniths.get(&name).map(|z| z.clone()))
     }
 
     pub fn list_all(&self) -> Vec<Arc<dyn Zenith>> {
