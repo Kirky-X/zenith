@@ -1,0 +1,13 @@
+[[plugins]]
+name = "prettier-js"
+command = "prettier"
+args = ["--stdin-filepath", "{filepath}", "--parser", "babel"]
+extensions = ["js", "jsx", "ts", "tsx"]
+enabled = true
+
+[[plugins]]
+name = "markdown-lint"
+command = "markdownlint-cli2"
+args = ["**/*.md", "--fix"]
+extensions = ["md"]
+enabled = false

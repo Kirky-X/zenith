@@ -116,6 +116,12 @@ pub struct ExternalPluginConfig {
     pub enabled: bool,
 }
 
+/// Configuration for a list of plugins (TOML array format)
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ExternalPluginConfigList {
+    pub plugins: Vec<ExternalPluginConfig>,
+}
+
 /// Security configuration for plugin loading
 #[derive(Debug, Clone)]
 pub struct PluginSecurityConfig {
@@ -239,6 +245,7 @@ impl PluginLoader {
     }
 
     /// Load a single plugin from its configuration file
+    /// Supports both single plugin (JSON or TOML) and plugin list (TOML array) formats
     async fn load_plugin_from_config<P: AsRef<Path>>(
         &self,
         config_path: P,
@@ -249,7 +256,43 @@ impl PluginLoader {
 
         let config_content = fs::read_to_string(config_path).await?;
 
-        // Try to parse as JSON first, then TOML
+        // Check if this is a TOML file that might contain a list of plugins
+        if config_path.extension().is_some_and(|ext| ext == "toml") {
+            // Try to parse as a list of plugins first
+            if let Ok(config_list) = toml::from_str::<ExternalPluginConfigList>(&config_content) {
+                if !config_list.plugins.is_empty() {
+                    info!(
+                        "Found {} plugins in list format from: {}",
+                        config_list.plugins.len(),
+                        sanitized_path
+                    );
+
+                    // Load the first enabled plugin from the list
+                    for config in &config_list.plugins {
+                        if config.enabled {
+                            debug!(
+                                "Loading plugin from list: name={}, extensions={:?}",
+                                config.name, config.extensions
+                            );
+
+                            self.validate_plugin_config(config).await?;
+
+                            let external_plugin =
+                                ExternalZenith::new(config.name.clone(), config.command.clone(), config.args.clone(), config.extensions.iter().map(|s| s.clone()).collect());
+
+                            info!("Successfully loaded plugin: {}", external_plugin.name());
+                            return Ok(Arc::new(external_plugin));
+                        }
+                    }
+
+                    // All plugins are disabled
+                    let first_disabled_name = config_list.plugins.first().map(|p| p.name.clone()).unwrap_or_else(|| "unknown".to_string());
+                    return Err(ZenithError::PluginDisabled { name: first_disabled_name });
+                }
+            }
+        }
+
+        // Try to parse as single plugin config (JSON or TOML)
         let config: ExternalPluginConfig =
             if config_path.extension().is_some_and(|ext| ext == "json") {
                 serde_json::from_str(&config_content)?
