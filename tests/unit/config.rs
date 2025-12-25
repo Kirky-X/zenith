@@ -1,10 +1,15 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
 use std::fs;
 use std::path::PathBuf;
 use tempfile::TempDir;
 use zenith::config::types::{AppConfig, ZenithSettings};
-use zenith::services::formatter::ZenithService;
-use zenith::storage::backup::BackupService;
-use zenith::storage::cache::HashCache;
+use zenith::internal::BackupService;
+use zenith::internal::HashCache;
+use zenith::internal::ZenithService;
 use zenith::zeniths::registry::ZenithRegistry;
 
 #[tokio::test]

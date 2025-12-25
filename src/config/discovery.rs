@@ -1,7 +1,16 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
+//! 配置自动发现模块。
+//! 负责在文件系统中向上遍历，查找各种格式化工具的配置文件或项目标识文件。
+
 use crate::error::{Result, ZenithError};
 use crate::utils::directory::traverse_upwards;
 use std::path::{Path, PathBuf};
 
+/// 项目级配置文件的候选列表。
 const PROJECT_CONFIG_FILES: &[&str] = &[
     ".zenith.toml",
     "zenith.toml",
@@ -31,6 +40,7 @@ const PROJECT_CONFIG_FILES: &[&str] = &[
     ".gitattributes",
 ];
 
+/// 获取特定格式化工具可能使用的配置文件名。
 fn get_formatter_config_files(formatter_name: &str) -> &'static [&'static str] {
     match formatter_name {
         "rust" => &[".rustfmt.toml", "rustfmt.toml"],
@@ -88,14 +98,27 @@ fn get_formatter_config_files(formatter_name: &str) -> &'static [&'static str] {
     }
 }
 
+/// 发现指定文件所属项目的配置。
+///
+/// # 参数
+///
+/// * `file_path` - 文件的路径。
+///
+/// # 返回值
+///
+/// 如果找到项目配置文件，返回其 `PathBuf`，否则返回 `None`。
 pub fn discover_project_config(file_path: &Path) -> Result<Option<PathBuf>> {
-    let config_files = PROJECT_CONFIG_FILES.to_vec();
-    let start_dir = file_path
-        .parent()
-        .ok_or_else(|| ZenithError::Config("Invalid file path".to_string()))?;
+    let start_dir = if file_path.is_dir() {
+        file_path
+    } else {
+        file_path.parent().ok_or_else(|| {
+            ZenithError::Config(format!("无法获取文件 {} 的父目录", file_path.display()))
+        })?
+    };
 
+    // 向上遍历目录查找配置文件
     traverse_upwards(start_dir, |dir| {
-        for config_file in &config_files {
+        for config_file in PROJECT_CONFIG_FILES {
             let config_path = dir.join(config_file);
             if config_path.exists() {
                 return Some(config_path);
@@ -105,6 +128,16 @@ pub fn discover_project_config(file_path: &Path) -> Result<Option<PathBuf>> {
     })
 }
 
+/// 发现特定格式化工具的配置。
+///
+/// # 参数
+///
+/// * `file_path` - 待处理文件的路径。
+/// * `formatter_name` - 格式化工具名称（如 "rust", "python" 等）。
+///
+/// # 返回值
+///
+/// 如果找到匹配的工具配置文件，返回其 `PathBuf`，否则返回 `None`。
 pub fn discover_formatter_config(
     file_path: &Path,
     formatter_name: &str,
@@ -114,10 +147,11 @@ pub fn discover_formatter_config(
         return Ok(None);
     }
 
-    let start_dir = file_path
-        .parent()
-        .ok_or_else(|| ZenithError::Config("Invalid file path".to_string()))?;
+    let start_dir = file_path.parent().ok_or_else(|| {
+        ZenithError::Config(format!("无法获取文件 {} 的父目录", file_path.display()))
+    })?;
 
+    // 向上遍历目录查找工具特定的配置文件
     traverse_upwards(start_dir, |dir| {
         for config_file in config_files {
             let config_path = dir.join(config_file);

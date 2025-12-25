@@ -1,3 +1,8 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
 //! Unit tests for formatters
 //! Tests for Zenith trait implementations and specific language formatters
 
@@ -5,9 +10,7 @@ use crate::common::create_temp_dir;
 use std::path::PathBuf;
 use zenith::config::types::ZenithConfig;
 use zenith::core::traits::Zenith;
-use zenith::zeniths::impls::{
-    prettier_zenith::PrettierZenith, python_zenith::PythonZenith, rust_zenith::RustZenith,
-};
+use zenith::internal::{PrettierZenith, PythonZenith, RustZenith};
 
 #[test]
 fn test_rust_zenith_name() {

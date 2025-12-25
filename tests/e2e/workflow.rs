@@ -1,3 +1,8 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
 //! End-to-end tests for the zenith application
 //! These tests verify complete workflows from user perspective
 

@@ -1,4 +1,9 @@
-pub mod directory;
-pub mod environment;
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
+pub(crate) mod directory;
+pub(crate) mod environment;
 pub mod path;
-pub mod version;
+pub(crate) mod version;

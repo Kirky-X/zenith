@@ -1,47 +1,61 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
+//! 配置缓存模块。
+//! 用于缓存项目级的配置，以避免频繁的文件系统查找。
+
 use crate::config::{load_config_with_project_discovery, types::AppConfig};
 use crate::error::{Result, ZenithError};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-/// Cache for project-level configurations to avoid repeated file system lookups
+/// 项目级配置缓存。
 pub struct ConfigCache {
-    /// Cache mapping directory paths to their project configurations
+    /// 缓存映射：目录路径 -> 该目录对应的项目配置。
     cache: HashMap<PathBuf, AppConfig>,
 }
 
 impl ConfigCache {
+    /// 创建一个新的配置缓存。
     pub fn new() -> Self {
         Self {
             cache: HashMap::new(),
         }
     }
 
-    /// Get the configuration for a file path, using project-level discovery if needed
+    /// 获取指定文件路径的配置，如果需要则执行项目级自动发现。
+    ///
+    /// # 参数
+    ///
+    /// * `app_config` - 全局应用配置，作为基础配置。
+    /// * `file_path` - 需要获取配置的文件路径。
     pub fn get_config_for_file(
         &mut self,
         app_config: &AppConfig,
         file_path: &Path,
     ) -> Result<AppConfig> {
-        // Find the project directory for this file by looking for project config files
+        // 通过查找项目配置文件来确定该文件所属的项目目录
         let project_dir = self.find_project_directory(file_path)?;
 
-        // Check if we already have this configuration cached
+        // 检查是否已有缓存
         if let Some(cached_config) = self.cache.get(&project_dir) {
-            // Merge with the application config to ensure app-level settings are preserved
+            // 与应用级配置合并，确保应用级设置得以保留
             return Ok(self.merge_configs(app_config, cached_config));
         }
 
-        // Load configuration with project-level discovery
+        // 执行项目级配置自动发现并加载
         let project_config = load_config_with_project_discovery(None, Some(file_path))?;
 
-        // Cache the configuration
+        // 存入缓存
         self.cache.insert(project_dir, project_config.clone());
 
-        // Merge with the application config to ensure app-level settings are preserved
+        // 与应用级配置合并
         Ok(self.merge_configs(app_config, &project_config))
     }
 
-    /// Merge application-level config with project-level config (project config takes precedence)
+    /// 将应用级配置与项目级配置合并（项目级配置优先级更高）。
     fn merge_configs(&self, app_config: &AppConfig, project_config: &AppConfig) -> AppConfig {
         // Create a new config with app-level settings as base and project settings overriding them
         AppConfig {
@@ -91,6 +105,16 @@ impl ConfigCache {
                 project_config.mcp.clone()
             } else {
                 app_config.mcp.clone()
+            },
+            security: if !project_config.security.allowed_plugin_commands.is_empty()
+                || project_config.security.allow_absolute_paths
+                    != app_config.security.allow_absolute_paths
+                || project_config.security.allow_relative_paths
+                    != app_config.security.allow_relative_paths
+            {
+                project_config.security.clone()
+            } else {
+                app_config.security.clone()
             },
         }
     }

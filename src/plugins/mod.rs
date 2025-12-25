@@ -29,5 +29,5 @@
 pub mod loader;
 pub mod types;
 
-pub use loader::PluginLoader;
+pub use loader::{PluginLoader, PluginSecurityConfig};
 pub use types::PluginInfo;

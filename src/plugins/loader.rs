@@ -9,10 +9,20 @@
 //! - Validation of plugin commands to ensure they exist and are executable
 //! - Integration with the main Zenith registry system
 //! - Error handling for plugin loading and execution
+use crate::config::types::ZenithConfig;
 use crate::core::traits::Zenith;
 use crate::error::{Result, ZenithError};
+use crate::plugins::types::PluginInfo;
+use crate::utils::path::sanitize_path_for_log;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::path::Path;
+use std::process::Stdio;
 use std::sync::Arc;
+use tokio::fs;
+use tokio::io::AsyncWriteExt;
+use tokio::process::Command;
+use tracing::{debug, error, info, warn};
 
 #[cfg(test)]
 mod tests {
@@ -95,16 +105,6 @@ mod tests {
         assert_eq!(external_plugin.extensions(), &["txt"]);
     }
 }
-use crate::config::types::ZenithConfig;
-use crate::plugins::types::PluginInfo;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-#[allow(unused_imports)]
-use std::path::PathBuf;
-use std::process::Stdio;
-use tokio::fs;
-use tokio::io::AsyncWriteExt;
-use tokio::process::Command;
 
 /// Configuration for an external plugin
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -116,15 +116,93 @@ pub struct ExternalPluginConfig {
     pub enabled: bool,
 }
 
+/// Security configuration for plugin loading
+#[derive(Debug, Clone)]
+pub struct PluginSecurityConfig {
+    /// List of allowed command prefixes or exact command names
+    /// If empty, all commands are allowed (default behavior)
+    pub allowed_commands: Vec<String>,
+    /// Whether to allow absolute paths in plugin commands
+    pub allow_absolute_paths: bool,
+    /// Whether to allow relative paths in plugin commands
+    pub allow_relative_paths: bool,
+}
+
+impl Default for PluginSecurityConfig {
+    fn default() -> Self {
+        Self {
+            allowed_commands: Vec::new(),
+            allow_absolute_paths: true,
+            allow_relative_paths: false,
+        }
+    }
+}
+
 pub struct PluginLoader {
     loaded_plugins: HashMap<String, Arc<dyn Zenith>>,
+    security_config: PluginSecurityConfig,
 }
 
 impl PluginLoader {
     pub fn new() -> Self {
         Self {
             loaded_plugins: HashMap::new(),
+            security_config: PluginSecurityConfig::default(),
         }
+    }
+
+    pub fn with_security_config(security_config: PluginSecurityConfig) -> Self {
+        Self {
+            loaded_plugins: HashMap::new(),
+            security_config,
+        }
+    }
+
+    /// Validate that a command is allowed according to security configuration
+    fn validate_command_security(&self, command: &str) -> Result<()> {
+        let path = Path::new(command);
+
+        // Check if it's an absolute path
+        if path.is_absolute() && !self.security_config.allow_absolute_paths {
+            return Err(ZenithError::PluginValidationError {
+                name: "security".to_string(),
+                error: format!("Absolute paths are not allowed: {}", command),
+            });
+        }
+
+        // Check if it's a relative path
+        if !path.is_absolute()
+            && command.contains('/')
+            && !self.security_config.allow_relative_paths
+        {
+            return Err(ZenithError::PluginValidationError {
+                name: "security".to_string(),
+                error: format!("Relative paths are not allowed: {}", command),
+            });
+        }
+
+        // Check against allowed commands whitelist
+        if !self.security_config.allowed_commands.is_empty() {
+            let command_name = path.file_name().and_then(|n| n.to_str()).unwrap_or(command);
+
+            let is_allowed = self
+                .security_config
+                .allowed_commands
+                .iter()
+                .any(|allowed| allowed == command_name || command.starts_with(allowed));
+
+            if !is_allowed {
+                return Err(ZenithError::PluginValidationError {
+                    name: "security".to_string(),
+                    error: format!(
+                        "Command '{}' is not in the allowed list: {:?}",
+                        command, self.security_config.allowed_commands
+                    ),
+                });
+            }
+        }
+
+        Ok(())
     }
 
     /// Load plugins from a directory by scanning plugin configuration files
@@ -166,6 +244,9 @@ impl PluginLoader {
         config_path: P,
     ) -> Result<Arc<dyn Zenith>> {
         let config_path = config_path.as_ref();
+        let sanitized_path = sanitize_path_for_log(config_path);
+        info!("Loading plugin from: {}", sanitized_path);
+
         let config_content = fs::read_to_string(config_path).await?;
 
         // Try to parse as JSON first, then TOML
@@ -176,7 +257,13 @@ impl PluginLoader {
                 toml::from_str(&config_content)?
             };
 
+        debug!(
+            "Parsed plugin config: name={}, extensions={:?}",
+            config.name, config.extensions
+        );
+
         if !config.enabled {
+            warn!("Plugin '{}' is disabled, skipping", config.name);
             return Err(ZenithError::PluginDisabled { name: config.name });
         }
 
@@ -187,11 +274,16 @@ impl PluginLoader {
         let external_plugin =
             ExternalZenith::new(config.name, config.command, config.args, config.extensions);
 
+        info!("Successfully loaded plugin: {}", external_plugin.name());
         Ok(Arc::new(external_plugin))
     }
 
     /// Validate plugin configuration and check if the command exists and is executable
     async fn validate_plugin_config(&self, config: &ExternalPluginConfig) -> Result<()> {
+        // Security validation first
+        self.validate_command_security(&config.command)?;
+        info!("Validating plugin '{}'", config.name);
+
         // Check if the command exists
         let command_path = if Path::new(&config.command).exists() {
             config.command.clone()
@@ -209,6 +301,8 @@ impl PluginLoader {
             });
         };
 
+        debug!("Plugin '{}' command resolved", config.name);
+
         // Test if the command is executable by running a simple test
         // Add a simple test argument to verify the command works (e.g., --version or similar)
         // For many formatters, we can try a simple help or version flag
@@ -224,18 +318,27 @@ impl PluginLoader {
             if let Ok(status) = test_cmd.status().await {
                 if status.success() {
                     test_successful = true;
+                    debug!(
+                        "Plugin '{}' passed basic functionality test with arg: {}",
+                        config.name, test_arg
+                    );
                     break;
                 }
             }
         }
 
         if !test_successful {
+            warn!(
+                "Plugin '{}' command exists but failed basic functionality test",
+                config.name
+            );
             return Err(ZenithError::PluginValidationError {
                 name: config.name.clone(),
                 error: "Command exists but failed basic functionality test".to_string(),
             });
         }
 
+        info!("Plugin '{}' validation successful", config.name);
         Ok(())
     }
 
@@ -259,25 +362,6 @@ impl PluginLoader {
                 extensions: plugin.extensions().iter().map(|s| s.to_string()).collect(),
             })
             .collect()
-    }
-
-    /// Load a built-in plugin by name
-    pub fn load_builtin_plugin(&self, name: &str) -> Option<Arc<dyn Zenith>> {
-        match name {
-            "rust" => {
-                use crate::zeniths::impls::rust_zenith::RustZenith;
-                Some(Arc::new(RustZenith))
-            }
-            "python" => {
-                use crate::zeniths::impls::python_zenith::PythonZenith;
-                Some(Arc::new(PythonZenith))
-            }
-            "java" => {
-                use crate::zeniths::impls::java_zenith::JavaZenith;
-                Some(Arc::new(JavaZenith))
-            }
-            _ => None,
-        }
     }
 }
 
@@ -372,6 +456,11 @@ impl Zenith for ExternalZenith {
         _path: &std::path::Path,
         _config: &ZenithConfig,
     ) -> Result<Vec<u8>> {
+        debug!(
+            "Executing plugin '{}' with command: {} and args: {:?}",
+            self.name, self.command, self.args
+        );
+
         let mut cmd = Command::new(&self.command);
 
         // Add the configured arguments
@@ -383,36 +472,50 @@ impl Zenith for ExternalZenith {
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
 
-        let mut child = cmd.spawn().map_err(|e| ZenithError::PluginError {
-            name: self.name.clone(),
-            error: e.to_string(),
+        let mut child = cmd.spawn().map_err(|e| {
+            error!("Failed to spawn plugin '{}': {}", self.name, e);
+            ZenithError::PluginError {
+                name: self.name.clone(),
+                error: e.to_string(),
+            }
         })?;
 
         // Write content to stdin
         if let Some(mut stdin) = child.stdin.take() {
-            stdin
-                .write_all(content)
-                .await
-                .map_err(|e| ZenithError::PluginError {
+            stdin.write_all(content).await.map_err(|e| {
+                error!("Failed to write to plugin '{}' stdin: {}", self.name, e);
+                ZenithError::PluginError {
                     name: self.name.clone(),
                     error: e.to_string(),
-                })?;
+                }
+            })?;
             // Drop stdin to signal EOF
             drop(stdin);
         }
 
-        let output = child
-            .wait_with_output()
-            .await
-            .map_err(|e| ZenithError::PluginError {
+        let output = child.wait_with_output().await.map_err(|e| {
+            error!("Failed to wait for plugin '{}': {}", self.name, e);
+            ZenithError::PluginError {
                 name: self.name.clone(),
                 error: e.to_string(),
-            })?;
+            }
+        })?;
 
         if output.status.success() {
+            debug!(
+                "Plugin '{}' executed successfully, output size: {} bytes",
+                self.name,
+                output.stdout.len()
+            );
             Ok(output.stdout)
         } else {
             let stderr = String::from_utf8_lossy(&output.stderr);
+            error!(
+                "Plugin '{}' failed with exit code: {:?}, stderr: {}",
+                self.name,
+                output.status.code(),
+                stderr
+            );
             Err(ZenithError::PluginError {
                 name: self.name.clone(),
                 error: stderr.to_string(),

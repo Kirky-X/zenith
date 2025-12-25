@@ -1,3 +1,11 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
+//! Zenith 的配置管理模块。
+//! 负责加载、解析和合并来自不同源（默认值、文件、环境变量、项目级配置）的配置信息。
+
 pub mod cache;
 pub mod discovery;
 pub mod types;
@@ -10,38 +18,53 @@ use std::path::PathBuf;
 use self::discovery::discover_project_config;
 use std::path::Path;
 
+/// 加载 Zenith 配置。
+///
+/// # 参数
+///
+/// * `path` - 可选的配置文件路径。
+///
+/// # 返回值
+///
+/// 返回解析后的 `AppConfig` 结构体。
 pub fn load_config(path: Option<PathBuf>) -> Result<AppConfig> {
     load_config_with_project_discovery(path, None)
 }
 
-/// Load configuration with optional project-level configuration discovery
+/// 加载配置，并支持可选的项目级配置自动发现。
+///
+/// # 参数
+///
+/// * `app_config_path` - 应用级配置文件路径。
+/// * `file_path` - 正在处理的文件路径，用于向上查找项目配置。
 pub fn load_config_with_project_discovery(
     app_config_path: Option<PathBuf>,
     file_path: Option<&Path>,
 ) -> Result<AppConfig> {
     let mut builder = Config::builder();
 
-    // 1. Load defaults (handled by struct defaults)
+    // 1. 加载默认值 (由结构体的 Default 实现处理)
 
-    // 2. Load application-level config from file if provided, otherwise check default locations
+    // 2. 从提供的路径加载应用级配置，否则检查默认位置
     if let Some(p) = app_config_path {
         builder = builder.add_source(File::from(p).required(true));
     } else {
-        // Try default locations
+        // 尝试默认位置
         let default_paths = vec!["zenith.toml", ".config/zenith/zenith.toml"];
         for p in default_paths {
             builder = builder.add_source(File::with_name(p).required(false));
         }
     }
 
-    // 3. Load project-level configuration if a file path is provided
+    // 3. 如果提供了文件路径，则尝试发现项目级配置
     if let Some(file_path) = file_path {
         if let Some(project_config_path) = discover_project_config(file_path)? {
             builder = builder.add_source(File::from(project_config_path).required(false));
         }
     }
 
-    // 4. Load from Environment (highest priority)
+    // 4. 从环境变量加载 (最高优先级)
+    // 环境变量前缀为 ZENITH_，例如 ZENITH_GLOBAL_LOG_LEVEL
     builder = builder.add_source(Environment::with_prefix("ZENITH").separator("_"));
 
     let config = builder

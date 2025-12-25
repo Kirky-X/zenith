@@ -69,6 +69,7 @@ impl BatchOptimizer {
     }
 
     /// Split files into batches for batch-level processing
+    #[allow(dead_code)]
     pub fn split_into_batches(&self, files: Vec<PathBuf>) -> Vec<Vec<PathBuf>> {
         files
             .chunks(self.batch_size)
@@ -77,11 +78,13 @@ impl BatchOptimizer {
     }
 
     /// Get the configured batch size
+    #[allow(dead_code)]
     pub fn batch_size(&self) -> usize {
         self.batch_size
     }
 
     /// Get the configured number of workers
+    #[allow(dead_code)]
     pub fn workers(&self) -> usize {
         self.workers
     }

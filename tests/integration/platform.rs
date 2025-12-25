@@ -1,3 +1,8 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
 //! Cross-platform tests for the zenith application
 //! These tests verify that the application works correctly across different operating systems
 
@@ -151,7 +156,7 @@ fn test_file_operations_cross_platform() {
 #[tokio::test]
 async fn test_backup_cross_platform() {
     use tempfile::TempDir;
-    use zenith::storage::backup::BackupService;
+    use zenith::internal::BackupService;
 
     let temp_dir = TempDir::new().unwrap();
     let backup_dir = temp_dir.path().join("backups");
@@ -199,7 +204,7 @@ async fn test_backup_cross_platform() {
 fn test_memory_monitoring_cross_platform() {
     use std::sync::Arc;
     use zenith::config::types::AppConfig;
-    use zenith::services::formatter::ZenithService;
+    use zenith::internal::ZenithService;
     use zenith::zeniths::registry::ZenithRegistry;
 
     // Create a configuration with memory limits
@@ -208,10 +213,8 @@ fn test_memory_monitoring_cross_platform() {
 
     // Create services
     let registry = Arc::new(ZenithRegistry::new());
-    let backup_service = Arc::new(zenith::storage::backup::BackupService::new(
-        config.backup.clone(),
-    ));
-    let hash_cache = Arc::new(zenith::storage::cache::HashCache::new());
+    let backup_service = Arc::new(zenith::internal::BackupService::new(config.backup.clone()));
+    let hash_cache = Arc::new(zenith::internal::HashCache::new());
     let _service = ZenithService::new(config, registry, backup_service, hash_cache, false);
 
     // Service creation succeeded if we reach here

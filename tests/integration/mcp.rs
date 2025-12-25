@@ -1,10 +1,17 @@
+// Copyright (c) 2025 Kirky.X
+//
+// Licensed under the MIT License
+// See LICENSE file in the project root for full license information.
+
 use std::path::PathBuf;
 use std::sync::Arc;
 use zenith::config::types::{AppConfig, McpConfig, McpUser};
-use zenith::mcp::protocol::*;
-use zenith::mcp::server::McpServer;
-use zenith::storage::cache::HashCache;
+use zenith::internal::{HashCache, McpServer};
 use zenith::zeniths::registry::ZenithRegistry;
+use zenith::{
+    FileFormatResult, FormatParams, FormatResponseData, JsonRpcError, JsonRpcRequest,
+    JsonRpcResponse, RecoverParams, RecoverResponseData,
+};
 
 #[tokio::test]
 async fn test_jsonrpc_request_format() {
