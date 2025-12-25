@@ -95,7 +95,7 @@ mod tests {
         assert_eq!(external_plugin.extensions(), &["txt"]);
     }
 }
-use crate::core::types::ZenithConfig;
+use crate::config::types::ZenithConfig;
 use crate::plugins::types::PluginInfo;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

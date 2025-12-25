@@ -3,8 +3,8 @@
 
 use crate::common::create_temp_dir;
 use std::path::PathBuf;
+use zenith::config::types::ZenithConfig;
 use zenith::core::traits::Zenith;
-use zenith::core::types::ZenithConfig;
 use zenith::zeniths::impls::{
     prettier_zenith::PrettierZenith, python_zenith::PythonZenith, rust_zenith::RustZenith,
 };

@@ -1,5 +1,5 @@
+use zenith::config::types::ZenithConfig;
 use zenith::core::traits::Zenith;
-use zenith::core::types::ZenithConfig;
 use zenith::error::ZenithError;
 
 pub struct MockZenith {

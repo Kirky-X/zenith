@@ -331,6 +331,7 @@ fn test_zenith_format_with_workers() {
     format_cmd
         .arg("format")
         .arg(temp_dir.path())
+        .arg("--recursive")
         .arg("--workers")
         .arg("4");
     assert_command_success(format_cmd.assert());
@@ -340,6 +341,7 @@ fn test_zenith_format_with_workers() {
     check_cmd
         .arg("format")
         .arg(temp_dir.path())
+        .arg("--recursive")
         .arg("--workers")
         .arg("4")
         .arg("--check");

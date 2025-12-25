@@ -1,6 +1,6 @@
 use crate::config::cache::ConfigCache;
 use crate::config::types::AppConfig;
-use crate::core::types::{FormatResult, ZenithConfig};
+use crate::config::types::{FormatResult, ZenithConfig};
 use crate::error::{Result, ZenithError};
 use crate::services::batch::BatchOptimizer;
 use crate::storage::backup::BackupService;
@@ -12,6 +12,69 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::fs;
 use tokio::sync::Mutex;
+
+/// Check file permissions before read/write operations
+async fn check_file_permissions(path: &Path, operation: &str) -> Result<()> {
+    use tokio::fs::metadata;
+
+    let metadata = match metadata(path).await {
+        Ok(metadata) => metadata,
+        Err(e) => {
+            if let Some(parent) = path.parent() {
+                let parent_metadata =
+                    metadata(parent)
+                        .await
+                        .map_err(|_| ZenithError::PermissionDenied {
+                            path: path.to_path_buf(),
+                            reason: format!("Cannot access parent directory: {}", e),
+                        })?;
+
+                if parent_metadata.permissions().readonly() {
+                    return Err(ZenithError::PermissionDenied {
+                        path: path.to_path_buf(),
+                        reason: "Parent directory is read-only".to_string(),
+                    });
+                }
+                return Ok(());
+            } else {
+                return Err(ZenithError::PermissionDenied {
+                    path: path.to_path_buf(),
+                    reason: format!("Cannot access file: {}", e),
+                });
+            }
+        }
+    };
+
+    if operation == "write" && metadata.permissions().readonly() {
+        return Err(ZenithError::PermissionDenied {
+            path: path.to_path_buf(),
+            reason: "File is read-only".to_string(),
+        });
+    }
+
+    Ok(())
+}
+
+/// Check directory permissions for read access
+async fn check_directory_permissions(path: &Path) -> Result<()> {
+    use tokio::fs::metadata;
+
+    let metadata = metadata(path)
+        .await
+        .map_err(|e| ZenithError::PermissionDenied {
+            path: path.to_path_buf(),
+            reason: format!("Cannot access directory: {}", e),
+        })?;
+
+    if !metadata.is_dir() {
+        return Err(ZenithError::PermissionDenied {
+            path: path.to_path_buf(),
+            reason: "Path is not a directory".to_string(),
+        });
+    }
+
+    Ok(())
+}
 
 /// Zenith Service - Main formatting service that coordinates file processing
 pub struct ZenithService {
@@ -92,24 +155,15 @@ impl ZenithService {
             if path.is_file() {
                 files.push(path.to_path_buf());
             } else if path.is_dir() && self.config.global.recursive {
-                // 使用 ignore::WalkBuilder 支持 .gitignore
-                let walker = WalkBuilder::new(path)
-                    .hidden(true) // 跳过隐藏文件
-                    .git_ignore(true) // 遵循 .gitignore
-                    .build();
+                check_directory_permissions(path).await?;
+                let walker = WalkBuilder::new(path).hidden(true).git_ignore(true).build();
 
                 for entry in walker.filter_map(|e| e.ok()) {
                     if entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
                         files.push(entry.path().to_path_buf());
                     }
                 }
-            } else if !path.exists() {
-                // 如果路径不存在，返回错误
-                return Err(ZenithError::FileNotFound {
-                    path: PathBuf::from(path_str),
-                });
             } else {
-                // 路径存在但不是文件也不是目录（例如，它可能是一个符号链接指向不存在的文件）
                 return Err(ZenithError::FileNotFound {
                     path: PathBuf::from(path_str),
                 });
@@ -170,6 +224,11 @@ impl ZenithService {
                 return result;
             }
         };
+
+        if let Err(e) = check_file_permissions(&path, "read").await {
+            result.error = Some(e.to_string());
+            return result;
+        }
 
         // 使用HashCache检查文件是否需要处理
         if !self.check_mode && self.config.global.cache_enabled {
@@ -246,11 +305,14 @@ impl ZenithService {
                 if formatted != content {
                     result.changed = true;
                     if !self.check_mode {
+                        if let Err(e) = check_file_permissions(&path, "write").await {
+                            result.error = Some(e.to_string());
+                            return result;
+                        }
                         if let Err(e) = fs::write(&path, &formatted).await {
                             result.error = Some(format!("Write failed: {}", e));
                         } else {
                             result.success = true;
-                            // 更新HashCache中的文件状态
                             if self.config.global.cache_enabled {
                                 if let Ok(new_state) =
                                     self.hash_cache.compute_file_state(&path).await
@@ -260,13 +322,11 @@ impl ZenithService {
                             }
                         }
                     } else {
-                        // 检查模式下，内容不同即视为成功检测到变化
                         result.success = true;
                     }
                 } else {
                     result.success = true;
                     result.changed = false;
-                    // 如果文件未改变，但使用缓存，更新缓存状态
                     if !self.check_mode && self.config.global.cache_enabled {
                         if let Ok(state) = self.hash_cache.compute_file_state(&path).await {
                             let _ = self.hash_cache.update(path.clone(), state).await;

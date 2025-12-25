@@ -1,13 +1,23 @@
+use crate::config::discovery::discover_formatter_config;
+use crate::config::types::ZenithConfig;
 use crate::core::traits::Zenith;
-use crate::core::types::ZenithConfig;
-use crate::error::{Result, ZenithError};
+use crate::error::Result;
+use crate::utils::version;
+use crate::zeniths::common::StdioFormatter;
 use async_trait::async_trait;
 use std::path::Path;
-use std::process::Stdio;
-use tokio::io::AsyncWriteExt;
-use tokio::process::Command;
 
 pub struct RustZenith;
+
+const RUSTFMT_MIN_VERSION: &str = "1.0.0";
+
+impl RustZenith {
+    fn check_rustfmt_version() -> Result<()> {
+        let version_str = version::get_tool_version("rustfmt")?;
+        version::check_version("rustfmt", &version_str, RUSTFMT_MIN_VERSION)?;
+        Ok(())
+    }
+}
 
 #[async_trait]
 impl Zenith for RustZenith {
@@ -19,38 +29,22 @@ impl Zenith for RustZenith {
         &["rs"]
     }
 
-    async fn format(
-        &self,
-        content: &[u8],
-        _path: &Path,
-        _config: &ZenithConfig,
-    ) -> Result<Vec<u8>> {
-        // 调用 rustfmt，使用 --emit stdout 从标准输入读取
-        let mut child = Command::new("rustfmt")
-            .arg("--emit")
-            .arg("stdout")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-            .map_err(|_| ZenithError::ToolNotFound {
-                tool: "rustfmt".into(),
-            })?;
+    async fn format(&self, content: &[u8], path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
+        Self::check_rustfmt_version()?;
 
-        if let Some(mut stdin) = child.stdin.take() {
-            stdin.write_all(content).await.map_err(ZenithError::Io)?;
+        let mut extra_args = vec!["--emit".into(), "stdout".into()];
+
+        if let Some(config_path) = discover_formatter_config(path, "rust")? {
+            extra_args.push("--config-path".into());
+            extra_args.push(config_path.to_string_lossy().into());
         }
 
-        let output = child.wait_with_output().await.map_err(ZenithError::Io)?;
-
-        if output.status.success() {
-            Ok(output.stdout)
-        } else {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            Err(ZenithError::ZenithFailed {
-                name: "rustfmt".into(),
-                reason: stderr.to_string(),
-            })
-        }
+        let formatter = StdioFormatter {
+            tool_name: "rustfmt",
+            args: vec![],
+        };
+        formatter
+            .format_with_stdio(content, path, Some(extra_args))
+            .await
     }
 }

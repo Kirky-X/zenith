@@ -1,4 +1,4 @@
-use crate::core::types::ZenithConfig;
+use crate::config::types::ZenithConfig;
 use crate::error::Result;
 use async_trait::async_trait;
 use std::path::Path;

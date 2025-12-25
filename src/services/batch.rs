@@ -1,4 +1,4 @@
-use crate::core::types::FormatResult;
+use crate::config::types::FormatResult;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::Semaphore;

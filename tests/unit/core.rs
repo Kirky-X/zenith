@@ -214,7 +214,7 @@ async fn test_zenith_format_basic() {
     let formatter = crate::common::mocks::MockFormatter::new("test", &["txt"]);
     let content = b"test content";
     let path = std::path::Path::new("/tmp/test.txt");
-    let config = &zenith::core::types::ZenithConfig::default();
+    let config = &zenith::config::types::ZenithConfig::default();
 
     let result = formatter.format(content, path, config).await.unwrap();
     assert_eq!(result, content);

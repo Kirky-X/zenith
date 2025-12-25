@@ -62,6 +62,13 @@ pub enum ZenithError {
 
     #[error("UTF-8 conversion error: {0}")]
     Utf8Conversion(#[from] std::string::FromUtf8Error),
+
+    #[error("Version incompatible: {tool} requires {required}, but found {actual}")]
+    VersionIncompatible {
+        tool: String,
+        required: String,
+        actual: String,
+    },
 }
 
 pub type Result<T> = std::result::Result<T, ZenithError>;
@@ -134,5 +141,18 @@ mod tests {
         let path = PathBuf::from("../etc/passwd");
         let error = ZenithError::PathTraversal(path);
         assert!(format!("{}", error).contains("Path traversal attempt detected"));
+    }
+
+    #[test]
+    fn test_version_incompatible_error() {
+        let error = ZenithError::VersionIncompatible {
+            tool: "rustfmt".to_string(),
+            required: ">= 2.0.0".to_string(),
+            actual: "1.5.0".to_string(),
+        };
+        assert!(format!("{}", error).contains("Version incompatible"));
+        assert!(format!("{}", error).contains("rustfmt"));
+        assert!(format!("{}", error).contains(">= 2.0.0"));
+        assert!(format!("{}", error).contains("1.5.0"));
     }
 }
