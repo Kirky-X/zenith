@@ -1,105 +1,68 @@
 use crate::error::{Result, ZenithError};
+use crate::utils::directory::traverse_upwards;
 use std::path::{Path, PathBuf};
 
-/// Discover project-level configuration files by traversing up the directory tree
-/// from a given file path.
-pub fn discover_project_config(file_path: &Path) -> Result<Option<PathBuf>> {
-    let mut current_dir = file_path
-        .parent()
-        .ok_or_else(|| ZenithError::Config("Invalid file path".to_string()))?;
+const PROJECT_CONFIG_FILES: &[&str] = &[
+    ".zenith.toml",
+    "zenith.toml",
+    ".zenith.yaml",
+    "zenith.yaml",
+    ".zenith.json",
+    "zenith.json",
+    ".editorconfig",
+    ".prettierrc",
+    ".prettierrc.json",
+    ".prettierrc.yaml",
+    ".prettierrc.yml",
+    ".prettierrc.js",
+    ".eslintrc",
+    ".eslintrc.json",
+    ".eslintrc.yaml",
+    ".eslintrc.yml",
+    ".stylelintrc",
+    ".stylelintrc.json",
+    ".stylelintrc.yaml",
+    ".stylelintrc.yml",
+    ".clang-format",
+    ".clang-tidy",
+    ".rustfmt.toml",
+    "_clang-format",
+    "_clang-tidy",
+    ".gitattributes",
+];
 
-    // Common project configuration file names to look for
-    let config_files = [
-        // General configuration files
-        ".zenith.toml",
-        "zenith.toml",
-        ".zenith.yaml",
-        "zenith.yaml",
-        ".zenith.json",
-        "zenith.json",
-        // Formatter-specific configuration files
-        ".editorconfig",
-        ".prettierrc",
-        ".prettierrc.json",
-        ".prettierrc.yaml",
-        ".prettierrc.yml",
-        ".prettierrc.js",
-        ".eslintrc",
-        ".eslintrc.json",
-        ".eslintrc.yaml",
-        ".eslintrc.yml",
-        ".stylelintrc",
-        ".stylelintrc.json",
-        ".stylelintrc.yaml",
-        ".stylelintrc.yml",
-        ".clang-format",
-        ".clang-tidy",
-        ".rustfmt.toml",
-        "_clang-format",
-        "_clang-tidy",
-        ".gitattributes",
-    ];
-
-    // Traverse up the directory tree looking for config files
-    loop {
-        for config_file in &config_files {
-            let config_path = current_dir.join(config_file);
-            if config_path.exists() {
-                return Ok(Some(config_path));
-            }
-        }
-
-        // Move to parent directory
-        match current_dir.parent() {
-            Some(parent) => current_dir = parent,
-            None => break, // Reached root directory
-        }
-    }
-
-    Ok(None) // No config file found
-}
-
-/// Discover configuration file for a specific formatter by traversing up the directory tree
-pub fn discover_formatter_config(
-    file_path: &Path,
-    formatter_name: &str,
-) -> Result<Option<PathBuf>> {
-    let mut current_dir = file_path
-        .parent()
-        .ok_or_else(|| ZenithError::Config("Invalid file path".to_string()))?;
-
-    // Formatter-specific configuration files
-    let config_files = match formatter_name {
-        "rust" => &[".rustfmt.toml", "rustfmt.toml"][..],
+fn get_formatter_config_files(formatter_name: &str) -> &'static [&'static str] {
+    match formatter_name {
+        "rust" => &[".rustfmt.toml", "rustfmt.toml"],
         "javascript" | "typescript" | "json" | "html" | "css" | "less" | "scss" | "graphql" => &[
             ".prettierrc",
             ".prettierrc.json",
             ".prettierrc.yaml",
             ".prettierrc.yml",
             ".prettierrc.js",
-        ][..],
+        ],
         "python" => &[
             ".black",
             "pyproject.toml",
             "setup.cfg",
             ".flake8",
             "pycodestyle.cfg",
-        ][..],
-        "java" => &[".google-java-format", "google-java-format.properties"][..],
+        ],
+        "java" => &[".google-java-format", "google-java-format.properties"],
         "c" | "cpp" | "c++" => &[
             ".clang-format",
             "_clang-format",
             ".clang-tidy",
             "_clang-tidy",
-        ][..],
-        "shell" | "bash" => &[".shellcheckrc", "shell.nix"][..],
+        ],
+        "shell" | "bash" => &[".shellcheckrc", "shell.nix"],
         "go" => &[
             ".golangci.yml",
             ".golangci.yaml",
             "golangci.yml",
             "golangci.yaml",
-        ][..],
-        "docker" => &[".dockerignore", ".dive.yaml"][..],
+        ],
+        "docker" => &[".dockerignore", ".dive.yaml"],
         "markdown" => &[
             ".markdownlint.json",
             ".markdownlint.yaml",
@@ -109,7 +72,7 @@ pub fn discover_formatter_config(
             ".prettierrc.yaml",
             ".prettierrc.yml",
             ".prettierrc.js",
-        ][..],
+        ],
         "yaml" => &[
             ".yamllint",
             ".yamllint.yml",
@@ -119,28 +82,51 @@ pub fn discover_formatter_config(
             ".prettierrc.yaml",
             ".prettierrc.yml",
             ".prettierrc.js",
-        ][..],
-        "toml" => &[".taplo.toml", "taplo.toml"][..],
-        _ => &[], // Default to empty for unknown formatters
-    };
+        ],
+        "toml" => &[".taplo.toml", "taplo.toml"],
+        _ => &[],
+    }
+}
 
-    // Traverse up the directory tree looking for formatter-specific config files
-    loop {
-        for config_file in config_files {
-            let config_path = current_dir.join(config_file);
+pub fn discover_project_config(file_path: &Path) -> Result<Option<PathBuf>> {
+    let config_files = PROJECT_CONFIG_FILES.to_vec();
+    let start_dir = file_path
+        .parent()
+        .ok_or_else(|| ZenithError::Config("Invalid file path".to_string()))?;
+
+    traverse_upwards(start_dir, |dir| {
+        for config_file in &config_files {
+            let config_path = dir.join(config_file);
             if config_path.exists() {
-                return Ok(Some(config_path));
+                return Some(config_path);
             }
         }
+        None
+    })
+}
 
-        // Move to parent directory
-        match current_dir.parent() {
-            Some(parent) => current_dir = parent,
-            None => break, // Reached root directory
-        }
+pub fn discover_formatter_config(
+    file_path: &Path,
+    formatter_name: &str,
+) -> Result<Option<PathBuf>> {
+    let config_files = get_formatter_config_files(formatter_name);
+    if config_files.is_empty() {
+        return Ok(None);
     }
 
-    Ok(None) // No config file found
+    let start_dir = file_path
+        .parent()
+        .ok_or_else(|| ZenithError::Config("Invalid file path".to_string()))?;
+
+    traverse_upwards(start_dir, |dir| {
+        for config_file in config_files {
+            let config_path = dir.join(config_file);
+            if config_path.exists() {
+                return Some(config_path);
+            }
+        }
+        None
+    })
 }
 
 #[cfg(test)]
