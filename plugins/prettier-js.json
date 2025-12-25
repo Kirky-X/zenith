@@ -1,0 +1,7 @@
+{
+  "name": "prettier-js",
+  "command": "prettier",
+  "args": ["--stdin-filepath", "{filepath}", "--parser", "babel"],
+  "extensions": ["js", "jsx", "ts", "tsx"],
+  "enabled": true
+}
