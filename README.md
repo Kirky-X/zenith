@@ -157,7 +157,11 @@ Suitable for modern web development workflows:
 #### 🦀 Cargo Install
 
 ```bash
-cargo install --git https://github.com/Kirky-X/zenith.git
+# 1. Install cargo-binstall first (if not installed)
+cargo install cargo-binstall
+
+# 2. Install zenith using cargo-binstall
+cargo binstall zenith
 ```
 
 </td>
@@ -278,6 +282,61 @@ The MCP server supports API key authentication and role-based authorization.
 - `admin`: Full access to all MCP methods
 - `user`: Access only to `format` and `recover` methods
 - `readonly`: Read-only access to `format` method
+
+**JSON-RPC Configuration Examples**:
+
+**Format Request Example**:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "format",
+  "params": {
+    "paths": ["src/main.rs"],
+    "recursive": true,
+    "backup": true,
+    "workers": 4
+  }
+}
+```
+
+**Recover Request Example**:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "recover",
+  "params": {
+    "backup_id": "backup_20231223_142030",
+    "target": "src/"
+  }
+}
+```
+
+**Response Example (Success)**:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "total_files": 10,
+    "formatted_files": 8,
+    "failed_files": 0,
+    "backup_id": "backup_20231223_142030",
+    "duration_ms": 1250,
+    "results": [
+      {
+        "path": "src/main.rs",
+        "success": true,
+        "changed": true
+      }
+    ]
+  }
+}
+```
 
 **Usage**:
 ```bash
