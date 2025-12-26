@@ -8,6 +8,7 @@ use crate::core::traits::Zenith;
 use crate::error::{Result, ZenithError};
 use crate::zeniths::common::StdioFormatter;
 use async_trait::async_trait;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use std::io::Write;
 use std::path::Path;
@@ -40,6 +41,36 @@ const SUPPORTED_LANGUAGES: &[&str] = &[
     "shell",
     "powershell",
 ];
+
+static INLINE_CODE_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"`([^`]+)`"#).expect("Invalid regex pattern for inline code"));
+
+static TASK_LIST_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"(?m)^(\s*)(-\s+)\[(\s*)\]\s+(.+)$"#).expect("Invalid regex pattern for task lists"));
+
+static STRIKETHROUGH_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"~~([^~]+)~~").expect("Invalid regex pattern for strikethrough"));
+
+static LINK_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").expect("Invalid regex pattern for links"));
+
+static BOLD_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"\*\*([^*]+)\*\*").expect("Invalid regex pattern for bold"));
+
+static ITALIC_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"\*([^*]+)\*").expect("Invalid regex pattern for italic"));
+
+static BOLD_ITALIC_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"\*\*\*([^*]+)\*\*\*").expect("Invalid regex pattern for bold italic"));
+
+static HORIZONTAL_RULE_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"(?m)^(\s*)(-{3,}|\*{3,}|_{3,})\s*$").expect("Invalid regex pattern for horizontal rules"));
+
+static MULTI_LINE_CODE_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"(?s)```(\w+)\s*\n(.+?)\n```").expect("Invalid regex pattern for multi-line code blocks"));
+
+static SINGLE_LINE_CODE_PATTERN: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"(?s)```(\w+)\s+([^\n]+?)\s*```").expect("Invalid regex pattern for single-line code blocks"));
 
 #[async_trait]
 impl Zenith for MarkdownZenith {
@@ -354,10 +385,9 @@ fn parse_ordered_list(chars: &[char], i: usize) -> ParseResult {
 }
 
 fn format_inline_code(text: &str) -> String {
-    let pattern = Regex::new(r#"`([^`]+)`"#).unwrap();
     let mut result = text.to_string();
 
-    let replacements: Vec<(String, String)> = pattern
+    let replacements: Vec<(String, String)> = INLINE_CODE_PATTERN
         .captures_iter(&result)
         .filter_map(|cap| {
             let full_match = cap.get(0)?.as_str().to_string();
@@ -423,47 +453,36 @@ fn clean_inline_code(formatted: &str) -> String {
 }
 
 fn format_task_lists(text: &str) -> String {
-    let pattern = Regex::new(r#"(?m)^(\s*)(-\s+)\[(\s*)\]\s+(.+)$"#).unwrap();
-    pattern.replace_all(text, "${1}${2}[ ] ${4}").to_string()
+    TASK_LIST_PATTERN.replace_all(text, "${1}${2}[ ] ${4}").to_string()
 }
 
 fn format_strikethrough(text: &str) -> String {
-    let pattern = Regex::new(r"~~([^~]+)~~").unwrap();
-    pattern.replace_all(text, "~~$1~~").to_string()
+    STRIKETHROUGH_PATTERN.replace_all(text, "~~$1~~").to_string()
 }
 
 fn format_links_and_images(text: &str) -> String {
-    let link_pattern = Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").unwrap();
-    link_pattern.replace_all(text, "[$1]($2)").to_string()
+    LINK_PATTERN.replace_all(text, "[$1]($2)").to_string()
 }
 
 fn format_emphasis(text: &str) -> String {
-    let bold_pattern = Regex::new(r"\*\*([^*]+)\*\*").unwrap();
-    let italic_pattern = Regex::new(r"\*([^*]+)\*").unwrap();
-    let bold_italic_pattern = Regex::new(r"\*\*\*([^*]+)\*\*\*").unwrap();
-
     let mut result = text.to_string();
-    result = bold_italic_pattern
+    result = BOLD_ITALIC_PATTERN
         .replace_all(&result, "***$1***")
         .to_string();
-    result = bold_pattern.replace_all(&result, "**$1**").to_string();
-    result = italic_pattern.replace_all(&result, "*$1*").to_string();
+    result = BOLD_PATTERN.replace_all(&result, "**$1**").to_string();
+    result = ITALIC_PATTERN.replace_all(&result, "*$1*").to_string();
 
     result
 }
 
 fn format_horizontal_rules(text: &str) -> String {
-    let hr_pattern = Regex::new(r"(?m)^(\s*)(-{3,}|\*{3,}|_{3,})\s*$").unwrap();
-    hr_pattern.replace_all(text, "---").to_string()
+    HORIZONTAL_RULE_PATTERN.replace_all(text, "---").to_string()
 }
 
 fn format_rust_code_blocks(content: &str) -> String {
-    let multi_line_pattern = Regex::new(r"(?s)```(\w+)\s*\n(.+?)\n```").unwrap();
-    let single_line_pattern = Regex::new(r"(?s)```(\w+)\s+([^\n]+?)\s*```").unwrap();
-
     let mut result = content.to_string();
 
-    let replacements: Vec<(String, String, String)> = multi_line_pattern
+    let replacements: Vec<(String, String, String)> = MULTI_LINE_CODE_PATTERN
         .captures_iter(&result)
         .filter_map(|cap| {
             let lang = cap.get(1)?.as_str();
@@ -490,7 +509,7 @@ fn format_rust_code_blocks(content: &str) -> String {
         }
     }
 
-    let single_replacements: Vec<(String, String, String)> = single_line_pattern
+    let single_replacements: Vec<(String, String, String)> = SINGLE_LINE_CODE_PATTERN
         .captures_iter(&result)
         .filter_map(|cap| {
             let lang = cap.get(1)?.as_str();

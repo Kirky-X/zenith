@@ -211,6 +211,43 @@ impl PluginLoader {
         Ok(())
     }
 
+    /// Validate plugin arguments to prevent command injection
+    fn validate_plugin_arguments(&self, args: &[String]) -> Result<()> {
+        for arg in args {
+            // Check for potentially dangerous characters that could be used for command injection
+            if arg.contains(';') || arg.contains('|') || arg.contains('&') || arg.contains('$') {
+                return Err(ZenithError::PluginValidationError {
+                    name: "argument_security".to_string(),
+                    error: format!(
+                        "Potentially dangerous argument detected: '{}' (contains shell metacharacters)",
+                        arg
+                    ),
+                });
+            }
+
+            // Check for path traversal attempts
+            if arg.contains("..") || arg.contains('\x00') {
+                return Err(ZenithError::PluginValidationError {
+                    name: "argument_security".to_string(),
+                    error: format!(
+                        "Potentially dangerous argument detected: '{}' (path traversal or null byte)",
+                        arg
+                    ),
+                });
+            }
+
+            // Check for overly long arguments that could cause buffer overflow
+            if arg.len() > 1024 {
+                return Err(ZenithError::PluginValidationError {
+                    name: "argument_security".to_string(),
+                    error: format!("Argument too long: {} bytes (limit: 1024)", arg.len()),
+                });
+            }
+        }
+
+        Ok(())
+    }
+
     /// Load plugins from a directory by scanning plugin configuration files
     pub async fn load_plugins_from_dir<P: AsRef<Path>>(&mut self, dir: P) -> Result<()> {
         let dir = dir.as_ref();
@@ -335,6 +372,7 @@ impl PluginLoader {
     async fn validate_plugin_config(&self, config: &ExternalPluginConfig) -> Result<()> {
         // Security validation first
         self.validate_command_security(&config.command)?;
+        self.validate_plugin_arguments(&config.args)?;
         info!("Validating plugin '{}'", config.name);
 
         // Check if the command exists

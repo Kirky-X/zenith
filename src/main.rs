@@ -9,7 +9,7 @@
 use clap::Parser;
 use colored::*;
 use std::sync::Arc;
-use tracing::{error, info, Level};
+use tracing::{error, info, warn, Level};
 use zenith::config::load_config;
 use zenith::error::Result;
 use zenith::internal::{
@@ -70,7 +70,9 @@ async fn main() -> Result<()> {
     // 从配置目录加载外部插件
     let plugins_dir = std::path::Path::new(&config.global.config_dir).join("plugins");
     if let Err(e) = plugin_loader.load_plugins_from_dir(&plugins_dir).await {
-        eprintln!("加载外部插件失败: {}", e);
+        error!("加载外部插件失败: {}", e);
+    } else {
+        info!("外部插件加载完成，共 {} 个插件", plugin_loader.list_plugins().len());
     }
 
     // 初始化统一注册中心
@@ -191,17 +193,16 @@ async fn main() -> Result<()> {
             println!();
 
             if summary.missing_tools > 0 {
-                println!(
-                    "{}",
-                    format!(
-                        "警告: 缺失 {} 个工具。某些格式化功能可能无法正常工作。",
-                        summary.missing_tools
-                    )
-                    .yellow()
+                let msg = format!(
+                    "警告: 缺失 {} 个工具。某些格式化功能可能无法正常工作。",
+                    summary.missing_tools
                 );
+                warn!("{}", msg);
+                println!("{}", msg.yellow());
                 std::process::exit(1);
             } else {
                 println!("{}", "所有工具均可用！".green());
+                info!("环境检查完成，所有工具均可用");
             }
         }
         Commands::ListBackups => {
@@ -232,19 +233,35 @@ async fn main() -> Result<()> {
             }
         }
         Commands::Recover { backup_id, target } => {
+            info!("正在恢复备份 '{}'...", backup_id);
             let backup_service = BackupService::new(config.backup.clone());
             println!("正在恢复备份 '{}'...", backup_id);
             match backup_service.recover(&backup_id, target).await {
-                Ok(count) => println!("{}", format!("成功恢复 {} 个文件。", count).green()),
-                Err(e) => error!("恢复失败: {}", e),
+                Ok(count) => {
+                    let msg = format!("成功恢复 {} 个文件。", count);
+                    println!("{}", msg.green());
+                    info!("{}", msg);
+                }
+                Err(e) => {
+                    error!("恢复失败: {}", e);
+                    println!("{}", format!("恢复失败: {}", e).red());
+                }
             }
         }
         Commands::CleanBackups { days } => {
+            info!("正在清理 {} 天前的备份...", days);
             let backup_service = BackupService::new(config.backup.clone());
             println!("正在清理 {} 天前的备份...", days);
             match backup_service.clean_backups(days).await {
-                Ok(count) => println!("{}", format!("已移除 {} 个旧备份。", count).green()),
-                Err(e) => error!("清理失败: {}", e),
+                Ok(count) => {
+                    let msg = format!("已移除 {} 个旧备份。", count);
+                    println!("{}", msg.green());
+                    info!("{}", msg);
+                }
+                Err(e) => {
+                    error!("清理失败: {}", e);
+                    println!("{}", format!("清理失败: {}", e).red());
+                }
             }
         }
         Commands::Mcp { addr } => {
@@ -265,10 +282,9 @@ async fn main() -> Result<()> {
 
             match service.auto_rollback().await {
                 Ok(recovered_files) => {
-                    println!(
-                        "{}",
-                        format!("成功自动回滚 {} 个文件。", recovered_files.len()).green()
-                    );
+                    let msg = format!("成功自动回滚 {} 个文件。", recovered_files.len());
+                    println!("{}", msg.green());
+                    info!("{}", msg);
                     if !recovered_files.is_empty() {
                         println!("\n已恢复的文件:");
                         for file_path in recovered_files {
@@ -276,7 +292,10 @@ async fn main() -> Result<()> {
                         }
                     }
                 }
-                Err(e) => error!("自动回滚失败: {}", e),
+                Err(e) => {
+                    error!("自动回滚失败: {}", e);
+                    println!("{}", format!("自动回滚失败: {}", e).red());
+                }
             }
         }
     }

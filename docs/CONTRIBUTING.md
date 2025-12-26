@@ -1,28 +1,102 @@
-# Contributing to Zenith
+<div align="center">
 
-Thank you for your interest in contributing to Zenith! This document provides guidelines and instructions for contributing to the project.
+# 🤝 Contributing Guide
 
-## Table of Contents
+### Join Us in Building Something Great!
 
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Development Workflow](#development-workflow)
-4. [Coding Standards](#coding-standards)
-5. [Testing Guidelines](#testing-guidelines)
-6. [Documentation](#documentation)
-7. [Pull Request Process](#pull-request-process)
-8. [Release Process](#release-process)
+[🏠 Home](README.md) • [📖 Docs](docs/USER_GUIDE.md) • [💬 Discussions](../../discussions)
+
+---
+
+</div>
+
+## 🎯 Welcome Contributors!
+
+Thank you for your interest in contributing to **Project Name**! We're excited to have you here. Whether you're fixing a bug, adding a feature, improving documentation, or helping others, your contributions are valuable and appreciated.
+
+<div align="center">
+
+### 🌟 Ways to Contribute
+
+<table>
+<tr>
+<td width="25%" align="center">
+<img src="https://img.icons8.com/fluency/96/000000/code.png" width="64"><br>
+<b>Code</b><br>
+Fix bugs & add features
+</td>
+<td width="25%" align="center">
+<img src="https://img.icons8.com/fluency/96/000000/documentation.png" width="64"><br>
+<b>Documentation</b><br>
+Improve docs & guides
+</td>
+<td width="25%" align="center">
+<img src="https://img.icons8.com/fluency/96/000000/test-tube.png" width="64"><br>
+<b>Testing</b><br>
+Write tests & find bugs
+</td>
+<td width="25%" align="center">
+<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="64"><br>
+<b>Community</b><br>
+Help & support others
+</td>
+</tr>
+</table>
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Coding Standards](#coding-standards)
+- [Testing Guidelines](#testing-guidelines)
+- [Documentation](#documentation)
+- [Submitting Changes](#submitting-changes)
+- [Review Process](#review-process)
+- [Community](#community)
 
 ---
 
 ## Code of Conduct
 
-This project adheres to a code of conduct. By participating, you are expected to uphold this code.
+<div align="center">
 
-- Be respectful and inclusive
-- Provide constructive feedback
-- Focus on what is best for the community
-- Show empathy towards other community members
+### 🤗 Be Kind and Respectful
+
+</div>
+
+We are committed to providing a welcoming and inclusive environment. By participating, you agree to:
+
+<table>
+<tr>
+<td width="50%">
+
+**✅ DO**
+- Be respectful and considerate
+- Welcome newcomers
+- Accept constructive criticism
+- Focus on what's best for the community
+- Show empathy towards others
+
+</td>
+<td width="50%">
+
+**❌ DON'T**
+- Use offensive language
+- Harass or insult others
+- Publish private information
+- Make personal attacks
+- Disrupt discussions
+
+</td>
+</tr>
+</table>
+
+> 📜 **Full Code of Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ---
 
@@ -30,113 +104,190 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 ### Prerequisites
 
-- Rust 1.75 or later
-- Git
-- A code editor (VS Code recommended)
+Before you begin, ensure you have:
 
-### Setting Up Development Environment
+- ✅ **Git** - Version control
+- ✅ **Rust 1.75+** - Programming language
+- ✅ **Cargo** - Rust package manager
+- ✅ **IDE** - VS Code, IntelliJ, or similar
 
-1. **Fork and clone the repository:**
+<details>
+<summary><b>🔧 Setting Up Your Environment</b></summary>
+
+**1. Install Rust:**
 ```bash
-git clone https://github.com/YOUR_USERNAME/zenith.git
-cd zenith
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-2. **Add upstream remote:**
+**2. Install additional tools:**
 ```bash
-git remote add upstream https://github.com/user/zenith.git
+# Code formatter
+rustup component add rustfmt
+
+# Linter
+rustup component add clippy
+
+# Code coverage (optional)
+cargo install cargo-tarpaulin
 ```
 
-3. **Install development tools:**
+**3. Verify installation:**
 ```bash
-# Install Rust toolchain
-rustup install stable
-rustup default stable
-
-# Install development components
-rustup component add rustfmt clippy
-
-# Install pre-commit hooks (optional)
-cargo install cargo-pre-commit
+rustc --version
+cargo --version
 ```
 
-4. **Build the project:**
+</details>
+
+### Fork and Clone
+
+<table>
+<tr>
+<td width="50%">
+
+**1. Fork the Repository**
+
+Click the "Fork" button on GitHub
+
+</td>
+<td width="50%">
+
+**2. Clone Your Fork**
+
 ```bash
+git clone https://github.com/YOUR_USERNAME/project-name
+cd project-name
+```
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**3. Add Upstream Remote**
+
+```bash
+git remote add upstream \
+  https://github.com/ORIGINAL/project-name
+```
+
+</td>
+<td width="50%">
+
+**4. Verify Remotes**
+
+```bash
+git remote -v
+# origin    your-fork
+# upstream  original-repo
+```
+
+</td>
+</tr>
+</table>
+
+### Build and Test
+
+```bash
+# Build the project
 cargo build
-```
 
-5. **Run tests:**
-```bash
+# Run tests
 cargo test
+
+# Run with examples
+cargo run --example basic
 ```
 
-6. **Run the tool:**
-```bash
-cargo run -- format test.rs
-```
+✅ **Success!** You're ready to contribute!
 
 ---
 
 ## Development Workflow
 
-### Branch Naming
+<div align="center">
 
-Follow the Git workflow rules defined in the project:
+### 🔄 Standard Contribution Flow
 
-**Format:** `<type>/<ticket-id>-<description>`
+</div>
 
-**Types:** `feature/`, `bugfix/`, `hotfix/`, `release/`, `refactor/`, `docs/`
-
-**Examples:**
-- `feature/USER-123-add-authentication`
-- `bugfix/USER-456-fix-memory-leak`
-- `docs/USER-789-update-readme`
-
-### Commit Messages
-
-Follow the conventional commit format:
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-**Types:**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation
-- `style`: Code formatting
-- `refactor`: Refactoring
-- `test`: Testing
-
-**Example:**
-```
-feat(formatter): add support for Go language
-
-Implement Go formatter using gofmt. Add tests for
-Go file detection and formatting.
-
-Closes #123
+```mermaid
+graph LR
+    A[Fork Repo] --> B[Create Branch]
+    B --> C[Make Changes]
+    C --> D[Write Tests]
+    D --> E[Run Tests]
+    E --> F{Tests Pass?}
+    F -->|No| C
+    F -->|Yes| G[Commit]
+    G --> H[Push to Fork]
+    H --> I[Create PR]
+    I --> J[Code Review]
+    J --> K{Approved?}
+    K -->|Changes| C
+    K -->|Yes| L[Merge!]
+    
+    style A fill:#e1f5ff
+    style L fill:#4caf50
 ```
 
-### Development Cycle
+### Step-by-Step Guide
 
-1. **Create a feature branch:**
+#### 1️⃣ Create a Branch
+
 ```bash
-git checkout -b feature/USER-123-add-feature
+# Update your fork
+git fetch upstream
+git checkout main
+git merge upstream/main
+
+# Create feature branch
+git checkout -b feature/your-feature-name
+
+# Or for bug fixes
+git checkout -b fix/issue-123
 ```
 
-2. **Make your changes:**
-```bash
-# Edit files
-# Write tests
-# Update documentation
+**Branch Naming:**
+- `feature/` - New features
+- `fix/` - Bug fixes
+- `docs/` - Documentation
+- `test/` - Test improvements
+- `refactor/` - Code refactoring
+
+#### 2️⃣ Make Your Changes
+
+<table>
+<tr>
+<td width="50%">
+
+**Writing Code:**
+```rust
+// Add your implementation
+pub fn new_feature() -> Result<()> {
+    // Your code here
+    Ok(())
+}
 ```
 
-3. **Run checks locally:**
+</td>
+<td width="50%">
+
+**Adding Tests:**
+```rust
+#[test]
+fn test_new_feature() {
+    let result = new_feature();
+    assert!(result.is_ok());
+}
+```
+
+</td>
+</tr>
+</table>
+
+#### 3️⃣ Test Your Changes
+
 ```bash
 # Format code
 cargo fmt
@@ -144,367 +295,540 @@ cargo fmt
 # Run linter
 cargo clippy -- -D warnings
 
-# Run tests
-cargo test
+# Run all tests
+cargo test --all-features
 
-# Run benchmarks (if applicable)
-cargo bench
+# Run specific test
+cargo test test_new_feature
+
+# Check coverage (optional)
+cargo tarpaulin --out Html
 ```
 
-4. **Commit your changes:**
+#### 4️⃣ Commit Your Changes
+
+**Good Commit Messages:**
+
 ```bash
-git add .
-git commit -m "feat: add new feature"
+# Format: <type>(<scope>): <description>
+
+git commit -m "feat(encryption): add AES-256 support"
+git commit -m "fix(key-manager): resolve memory leak"
+git commit -m "docs(readme): update installation instructions"
+git commit -m "test(cipher): add edge case tests"
 ```
 
-5. **Push to your fork:**
+**Commit Types:**
+- `feat` - New feature
+- `fix` - Bug fix
+- `docs` - Documentation
+- `style` - Formatting
+- `refactor` - Code restructuring
+- `test` - Adding tests
+- `chore` - Maintenance
+
+<details>
+<summary><b>📝 Commit Message Template</b></summary>
+
+```
+<type>(<scope>): <short summary>
+
+<detailed description>
+
+<footer>
+```
+
+**Example:**
+```
+feat(api): add batch encryption support
+
+Implement batch processing for multiple encryption operations.
+This improves performance by 40% for bulk operations.
+
+Closes #123
+```
+
+</details>
+
+#### 5️⃣ Push to Your Fork
+
 ```bash
-git push origin feature/USER-123-add-feature
+git push origin feature/your-feature-name
 ```
 
-6. **Create a Pull Request**
+#### 6️⃣ Create Pull Request
+
+1. Go to your fork on GitHub
+2. Click "Compare & pull request"
+3. Fill in the PR template
+4. Link related issues
+5. Submit!
 
 ---
 
 ## Coding Standards
 
+<div align="center">
+
+### ✨ Write Clean, Maintainable Code
+
+</div>
+
 ### Rust Style Guide
 
-Follow the project's Rust style guide:
+Follow the [Rust Style Guide](https://rust-lang.github.io/api-guidelines/):
 
-- Use `rustfmt` for automatic formatting
-- Limit line width to 120 characters
-- Use 4-space indentation
+<table>
+<tr>
+<td width="50%">
 
-### Naming Conventions
+**✅ Good**
 
-- **Modules, functions, variables:** `snake_case`
-- **Types, traits:** `PascalCase`
-- **Constants, static variables:** `SCREAMING_SNAKE_CASE`
-- **Lifetime parameters:** `'a`, `'b`
+```rust
+// Descriptive names
+pub fn encrypt_data(
+    plaintext: &[u8],
+    key: &Key,
+) -> Result<Vec<u8>> {
+    // Implementation
+}
 
-### Code Quality
+// Proper error handling
+match operation() {
+    Ok(result) => result,
+    Err(e) => return Err(e),
+}
+```
 
-- Enable `clippy::all` and `clippy::pedantic`
-- Allow reasonable exceptions with `#[allow(clippy::...)]`
-- Write descriptive variable and function names
-- Add comments for complex logic
+</td>
+<td width="50%">
+
+**❌ Bad**
+
+```rust
+// Vague names
+pub fn enc(d: &[u8], k: &Key) 
+    -> Result<Vec<u8>> {
+    // Implementation
+}
+
+// Ignoring errors
+let result = operation().unwrap();
+```
+
+</td>
+</tr>
+</table>
+
+### Code Organization
+
+```
+src/
+├── lib.rs           # Public API
+├── core/            # Core functionality
+│   ├── mod.rs
+│   ├── engine.rs
+│   └── manager.rs
+├── algorithms/      # Algorithm implementations
+│   ├── mod.rs
+│   ├── aes.rs
+│   └── ecdsa.rs
+├── error.rs         # Error types
+└── utils/           # Utilities
+    ├── mod.rs
+    └── helpers.rs
+```
+
+### Documentation
+
+<details>
+<summary><b>📖 Documentation Standards</b></summary>
+
+**Every public item must have documentation:**
+
+```rust
+/// Encrypts data using the specified algorithm.
+///
+/// # Arguments
+///
+/// * `data` - The plaintext data to encrypt
+/// * `key` - The encryption key
+///
+/// # Returns
+///
+/// Returns the encrypted ciphertext on success.
+///
+/// # Errors
+///
+/// Returns `Error::EncryptionFailed` if encryption fails.
+///
+/// # Examples
+///
+/// ```
+/// use project_name::{encrypt, Key};
+///
+/// let key = Key::generate()?;
+/// let ciphertext = encrypt(b"secret", &key)?;
+/// ```
+pub fn encrypt(data: &[u8], key: &Key) -> Result<Vec<u8>> {
+    // Implementation
+}
+```
+
+</details>
 
 ### Error Handling
 
-- Use `Result<T, E>` for error handling
-- Implement `std::error::Error` for custom errors
-- Provide helpful error messages with context
-- Never use `panic!` in library code
+```rust
+// ✅ Use Result types
+pub fn fallible_operation() -> Result<Value, Error> {
+    // Implementation
+}
 
-### Ownership and Borrowing
+// ✅ Provide context
+Err(Error::EncryptionFailed {
+    reason: "Invalid key size",
+    context: format!("Expected {}, got {}", expected, actual),
+})
 
-- Favor borrowing over ownership transfer
-- Use `&` for immutable borrows and `&mut` for mutable borrows
-- Avoid unnecessary `.clone()`
-- Keep lifetime annotations simple
-
-### Concurrency
-
-- Use `Arc<T>` for sharing immutable data
-- Use `Arc<Mutex<T>>` or `Arc<RwLock<T>>` for sharing mutable data
-- Favor channels for inter-thread communication
-- Pay attention to `Send` and `Sync` trait constraints
-
-### Performance
-
-- Use `Vec::with_capacity()` to pre-allocate memory
-- Prefer iterator chains over loops
-- Use `&str` instead of `String` as function arguments
-- Use `#[inline]` for small, performance-critical functions
+// ❌ Don't panic in library code
+// panic!("Something went wrong");  // Bad!
+```
 
 ---
 
 ## Testing Guidelines
 
-### Test Coverage
+<div align="center">
 
-- Aim for >80% test coverage
-- Write unit tests for all public functions
-- Write integration tests for major features
-- Test edge cases and error conditions
+### 🧪 Test Everything!
 
-### Test Organization
+</div>
 
-```
-tests/
-├── core_components_test.rs  # Core functionality tests
-├── formatter_test.rs        # Formatter unit tests
-├── integration_test.rs      # Integration tests
-├── mcp_test.rs             # MCP interface tests
-└── cross_platform_test.rs  # Cross-platform tests
-```
+### Test Categories
+
+<table>
+<tr>
+<th>Type</th>
+<th>Purpose</th>
+<th>Location</th>
+</tr>
+<tr>
+<td><b>Unit Tests</b></td>
+<td>Test individual functions</td>
+<td><code>src/*.rs</code> (inline)</td>
+</tr>
+<tr>
+<td><b>Integration Tests</b></td>
+<td>Test public API</td>
+<td><code>tests/</code></td>
+</tr>
+<tr>
+<td><b>Doc Tests</b></td>
+<td>Test examples in docs</td>
+<td>Doc comments</td>
+</tr>
+<tr>
+<td><b>Benchmarks</b></td>
+<td>Performance tests</td>
+<td><code>benches/</code></td>
+</tr>
+</table>
 
 ### Writing Tests
 
-**Unit tests (in src/):**
+**Unit Test Example:**
+
 ```rust
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_function_name() {
-        let result = function_name();
-        assert_eq!(result, expected_value);
+    fn test_encrypt_decrypt() {
+        let key = Key::generate().unwrap();
+        let plaintext = b"Hello, World!";
+        
+        let ciphertext = encrypt(plaintext, &key).unwrap();
+        let decrypted = decrypt(&ciphertext, &key).unwrap();
+        
+        assert_eq!(plaintext, &decrypted[..]);
     }
 
     #[test]
-    fn test_error_case() {
-        let result = function_that_fails();
+    fn test_invalid_key() {
+        let result = encrypt(b"data", &InvalidKey);
         assert!(result.is_err());
     }
 }
 ```
 
-**Integration tests (in tests/):**
-```rust
-use zenith::config::types::AppConfig;
+**Integration Test Example:**
 
-#[tokio::test]
-async fn test_integration_scenario() {
-    let config = AppConfig::default();
-    let result = some_async_function(config).await;
-    assert!(result.is_ok());
+```rust
+// tests/integration_test.rs
+use project_name::{init, Cipher, KeyManager, Algorithm};
+
+#[test]
+fn test_full_workflow() {
+    init().unwrap();
+    
+    let km = KeyManager::new().unwrap();
+    let key_id = km.generate_key(Algorithm::AES256GCM).unwrap();
+    let cipher = Cipher::new(Algorithm::AES256GCM).unwrap();
+    
+    let plaintext = b"Integration test";
+    let ciphertext = cipher.encrypt(&km, &key_id, plaintext).unwrap();
+    let decrypted = cipher.decrypt(&km, &key_id, &ciphertext).unwrap();
+    
+    assert_eq!(plaintext, &decrypted[..]);
 }
 ```
 
-### Running Tests
+### Test Coverage
+
+**Aim for ≥90% coverage:**
 
 ```bash
-# Run all tests
-cargo test
+# Generate coverage report
+cargo tarpaulin --out Html --output-dir coverage
 
-# Run specific test
-cargo test test_function_name
-
-# Run tests with output
-cargo test -- --nocapture
-
-# Run tests in release mode (faster)
-cargo test --release
-```
-
-### Benchmarks
-
-```bash
-# Run benchmarks
-cargo bench
-
-# Run specific benchmark
-cargo bench --bench benchmark_name
+# View report
+open coverage/index.html
 ```
 
 ---
 
 ## Documentation
 
-### Code Documentation
+<div align="center">
 
-- Document all public APIs with `///` doc comments
-- Include examples in documentation
-- Document module-level behavior with `//!` comments
+### 📚 Documentation Matters!
 
-**Example:**
-```rust
-/// Formats a file using the appropriate formatter.
-///
-/// # Arguments
-///
-/// * `path` - Path to the file to format
-/// * `config` - Configuration options
-///
-/// # Returns
-///
-/// Returns `Ok(())` if formatting succeeded, `Err` otherwise.
-///
-/// # Examples
-///
-/// ```
-/// use zenith::format_file;
-/// let result = format_file("test.rs", &config);
-/// assert!(result.is_ok());
-/// ```
-pub async fn format_file(path: &str, config: &Config) -> Result<()> {
-    // Implementation
-}
-```
+</div>
 
-### API Documentation
+### What to Document
 
-Generate API documentation:
-```bash
-# Generate documentation
-cargo doc --open
+<table>
+<tr>
+<td width="50%">
 
-# Generate documentation for all dependencies
-cargo doc --open --all-features
-```
+**Code Documentation:**
+- ✅ Public functions
+- ✅ Public types
+- ✅ Complex algorithms
+- ✅ Non-obvious behavior
 
-### User Documentation
+</td>
+<td width="50%">
 
-- Keep README.md up to date
-- Update USE_GUIDE.md when adding features
-- Add examples for new functionality
+**User Documentation:**
+- ✅ README updates
+- ✅ User guide changes
+- ✅ API reference
+- ✅ Examples
 
-### Architecture Documentation
+</td>
+</tr>
+</table>
 
-- Update architecture diagrams when changing structure
-- Document design decisions in ARCHITECTURE.md
-- Keep task.md updated with current progress
+### Documentation Checklist
+
+- [ ] All public items have doc comments
+- [ ] Examples compile and run
+- [ ] README is updated (if needed)
+- [ ] CHANGELOG is updated
+- [ ] User guide reflects changes
+- [ ] Migration guide (for breaking changes)
 
 ---
 
-## Pull Request Process
+## Submitting Changes
 
-### Before Submitting
+<div align="center">
 
-1. **Run all checks:**
-```bash
-cargo fmt
-cargo clippy -- -D warnings
-cargo test
-```
+### 📤 Pull Request Process
 
-2. **Update documentation:**
-   - Update README.md if needed
-   - Update USE_GUIDE.md if adding user-facing features
-   - Add/update inline code documentation
-
-3. **Write a good PR description:**
-   - Describe the change
-   - Explain why it's needed
-   - List related issues
-   - Include screenshots if applicable
+</div>
 
 ### PR Template
 
-```markdown
-## Change Type
-- [ ] New Feature
-- [ ] Bug Fix
-- [ ] Refactor
-- [ ] Documentation
-- [ ] Performance
+<details>
+<summary><b>📋 Pull Request Template</b></summary>
 
+```markdown
 ## Description
-Brief description of purpose and content
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Documentation update
+- [ ] Performance improvement
+- [ ] Code refactoring
+
+## Changes Made
+- Change 1
+- Change 2
+- Change 3
 
 ## Testing
-- [ ] Unit tests passed
-- [ ] Integration tests passed
+- [ ] Unit tests pass
+- [ ] Integration tests pass
 - [ ] Manual testing completed
 
 ## Checklist
-- [ ] Follows project standards
-- [ ] Added necessary tests
-- [ ] Updated documentation
-- [ ] No breaking changes (or documented)
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Comments added for complex code
+- [ ] Documentation updated
+- [ ] No new warnings
+- [ ] Tests added/updated
 
-## Related Issue
+## Related Issues
 Closes #123
 ```
 
-### Review Process
+</details>
 
-1. **Automated checks:**
-   - CI must pass
-   - Code coverage must not decrease
-   - Clippy warnings must be addressed
+### PR Best Practices
 
-2. **Code review:**
-   - At least one approval required
-   - Address all review comments
-   - Keep PRs small and focused
+<table>
+<tr>
+<td width="50%">
 
-3. **Merge:**
-   - Squash merge for clean history
-   - Delete feature branch after merge
+**✅ Good PRs:**
+- Focused on single issue
+- Small, reviewable size
+- Clear description
+- Tests included
+- Documentation updated
+
+</td>
+<td width="50%">
+
+**❌ Avoid:**
+- Multiple unrelated changes
+- Huge diffs (>500 lines)
+- Missing context
+- No tests
+- Undocumented changes
+
+</td>
+</tr>
+</table>
 
 ---
 
-## Release Process
+## Review Process
 
-### Versioning
+<div align="center">
 
-Follow Semantic Versioning: `MAJOR.MINOR.PATCH`
+### 👀 What to Expect
 
-- **MAJOR**: Incompatible API changes
-- **MINOR**: Backward-compatible features
-- **PATCH**: Backward-compatible fixes
+</div>
 
-### Release Steps
+### Timeline
 
-1. **Update version in Cargo.toml:**
-```toml
-[package]
-name = "zenith"
-version = "1.1.0"
+```mermaid
+gantt
+    title PR Review Timeline
+    dateFormat  YYYY-MM-DD
+    section Review
+    Initial Review       :a1, 2024-01-01, 2d
+    Feedback Round 1     :a2, after a1, 3d
+    Feedback Round 2     :a3, after a2, 2d
+    Final Approval       :a4, after a3, 1d
+    Merge                :milestone, after a4, 0d
 ```
 
-2. **Update docs/CHANGELOG.md:**
-```markdown
-## [1.1.0] - 2024-01-15
+**Typical Timeline:**
+- 📧 Initial review: 1-3 days
+- 💬 Feedback rounds: 2-5 days each
+- ✅ Approval & merge: 1-2 days
 
-### Added
-- New feature A
-- New feature B
+### Review Criteria
 
-### Fixed
-- Bug fix C
+Reviewers will check:
 
-### Changed
-- Improvement D
-```
+- ✅ **Functionality**: Does it work as intended?
+- ✅ **Code Quality**: Is it clean and maintainable?
+- ✅ **Tests**: Are there adequate tests?
+- ✅ **Documentation**: Is it well documented?
+- ✅ **Performance**: Any performance impact?
+- ✅ **Security**: Any security concerns?
 
-3. **Tag the release:**
+### Responding to Feedback
+
 ```bash
-git tag -a v1.1.0 -m "Release v1.1.0"
-git push origin v1.1.0
+# Address feedback
+git add .
+git commit -m "Address review comments"
+git push origin feature/your-feature
+
+# PR automatically updates!
 ```
-
-4. **Create GitHub Release:**
-   - Go to Releases page
-   - Draft new release
-   - Attach release notes
-   - Upload binaries
-
-5. **Publish to crates.io:**
-```bash
-cargo publish
-```
-
-### Release Checklist
-
-- [ ] All tests passing
-- [ ] Documentation updated
-- [ ] docs/CHANGELOG.md updated
-- [ ] Version bumped
-- [ ] Tag created
-- [ ] GitHub release created
-- [ ] Published to crates.io
 
 ---
 
-## Getting Help
+## Community
 
-- **Documentation:** Check README.md and USE_GUIDE.md
-- **Issues:** Search existing issues or create a new one
-- **Discussions:** Ask questions in GitHub Discussions
-- **Discord:** Join our Discord server (link in README)
+<div align="center">
+
+### 💬 Connect With Us
+
+</div>
+
+<table>
+<tr>
+<td width="33%" align="center">
+<a href="../../discussions">
+<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="64"><br>
+<b>Discussions</b>
+</a><br>
+Q&A and ideas
+</td>
+<td width="33%" align="center">
+<a href="https://discord.gg/project">
+<img src="https://img.icons8.com/fluency/96/000000/discord-logo.png" width="64"><br>
+<b>Discord</b>
+</a><br>
+Live chat
+</td>
+<td width="33%" align="center">
+<a href="https://twitter.com/project">
+<img src="https://img.icons8.com/fluency/96/000000/twitter.png" width="64"><br>
+<b>Twitter</b>
+</a><br>
+Updates & news
+</td>
+</tr>
+</table>
+
+### Recognition
+
+We value all contributions! Contributors will be:
+
+- 🎖️ Listed in [CONTRIBUTORS.md](CONTRIBUTORS.md)
+- 🌟 Shown in README contributors section
+- 💝 Mentioned in release notes
 
 ---
 
-## Recognition
+<div align="center">
 
-Contributors will be recognized in:
-- README.md contributors list
-- Release notes
-- Annual contributor highlights
+## 🎉 Thank You!
 
-Thank you for contributing to Zenith! 🎉
+Your contributions make this project better for everyone.
+
+**Ready to contribute?** [Open your first issue](../../issues/new) or [start a discussion](../../discussions/new)!
+
+---
+
+**[🏠 Home](README.md)** • **[📖 Docs](docs/USER_GUIDE.md)** • **[💬 Chat](https://discord.gg/project)**
+
+Made with ❤️ by our amazing community
+
+[⬆ Back to Top](#-contributing-guide)
+
+</div>

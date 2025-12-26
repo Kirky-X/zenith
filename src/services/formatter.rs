@@ -244,8 +244,7 @@ impl ZenithService {
                     // 文件已改变，需要处理
                 }
                 Err(e) => {
-                    eprintln!("Warning: Failed to check file cache status: {}", e);
-                    // 继续处理，即使缓存检查失败
+                    tracing::warn!("Failed to check file cache status: {}", e);
                 }
             }
         }
@@ -286,11 +285,7 @@ impl ZenithService {
             match cache.get_config_for_file(&self.config, &path) {
                 Ok(config) => config,
                 Err(e) => {
-                    // 如果配置加载失败，记录警告但继续使用默认配置
-                    eprintln!(
-                        "Warning: Failed to load project config for {:?}: {}",
-                        path, e
-                    );
+                    tracing::warn!("Failed to load project config for {:?}: {}", path, e);
                     self.config.clone() // 使用应用级别的配置作为后备
                 }
             }
@@ -326,8 +321,13 @@ impl ZenithService {
                                 if let Ok(new_state) =
                                     self.hash_cache.compute_file_state(&path).await
                                 {
-                                    let _ = self.hash_cache.update(path.clone(), new_state).await;
-                                    tracing::debug!("Updated cache for {:?}", path);
+                                    if let Err(e) =
+                                        self.hash_cache.update(path.clone(), new_state).await
+                                    {
+                                        tracing::warn!("Failed to update cache for {:?}: {}", path, e);
+                                    } else {
+                                        tracing::debug!("Updated cache for {:?}", path);
+                                    }
                                 }
                             }
                         }
@@ -340,7 +340,9 @@ impl ZenithService {
                     tracing::debug!("No changes needed for {:?}", path);
                     if !self.check_mode && self.config.global.cache_enabled {
                         if let Ok(state) = self.hash_cache.compute_file_state(&path).await {
-                            let _ = self.hash_cache.update(path.clone(), state).await;
+                            if let Err(e) = self.hash_cache.update(path.clone(), state).await {
+                                tracing::warn!("Failed to update cache for {:?}: {}", path, e);
+                            }
                         }
                     }
                 }
