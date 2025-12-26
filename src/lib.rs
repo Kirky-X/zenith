@@ -36,11 +36,24 @@ pub mod internal {
     pub use crate::storage::backup::BackupService;
     pub use crate::storage::cache::HashCache;
     pub use crate::utils::environment::EnvironmentChecker;
-    pub use crate::zeniths::impls::{
-        c_zenith::ClangZenith, ini_zenith::IniZenith, java_zenith::JavaZenith,
-        markdown_zenith::MarkdownZenith, prettier_zenith::PrettierZenith,
-        python_zenith::PythonZenith, rust_zenith::RustZenith, shell_zenith::ShellZenith,
-        toml_zenith::TomlZenith,
-    };
     pub use crate::zeniths::registry::ZenithRegistry;
+
+    #[cfg(feature = "c")]
+    pub use crate::zeniths::impls::c_zenith::ClangZenith;
+    #[cfg(feature = "ini")]
+    pub use crate::zeniths::impls::ini_zenith::IniZenith;
+    #[cfg(feature = "java")]
+    pub use crate::zeniths::impls::java_zenith::JavaZenith;
+    #[cfg(feature = "markdown")]
+    pub use crate::zeniths::impls::markdown_zenith::MarkdownZenith;
+    #[cfg(feature = "prettier")]
+    pub use crate::zeniths::impls::prettier_zenith::PrettierZenith;
+    #[cfg(feature = "python")]
+    pub use crate::zeniths::impls::python_zenith::PythonZenith;
+    #[cfg(feature = "rust")]
+    pub use crate::zeniths::impls::rust_zenith::RustZenith;
+    #[cfg(feature = "shell")]
+    pub use crate::zeniths::impls::shell_zenith::ShellZenith;
+    #[cfg(feature = "toml")]
+    pub use crate::zeniths::impls::toml_zenith::TomlZenith;
 }

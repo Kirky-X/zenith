@@ -13,11 +13,29 @@ use tracing::{error, info, Level};
 use zenith::config::load_config;
 use zenith::error::Result;
 use zenith::internal::{
-    BackupService, ClangZenith, Cli, Commands, EnvironmentChecker, HashCache, IniZenith,
-    JavaZenith, MarkdownZenith, McpServer, PluginLoader, PrettierZenith, PythonZenith, RustZenith,
-    ShellZenith, TomlZenith, ZenithRegistry, ZenithService,
+    BackupService, Cli, Commands, EnvironmentChecker, HashCache, McpServer, PluginLoader,
+    ZenithRegistry, ZenithService,
 };
 use zenith::plugins::loader::PluginSecurityConfig;
+
+#[cfg(feature = "c")]
+use zenith::internal::ClangZenith;
+#[cfg(feature = "ini")]
+use zenith::internal::IniZenith;
+#[cfg(feature = "java")]
+use zenith::internal::JavaZenith;
+#[cfg(feature = "markdown")]
+use zenith::internal::MarkdownZenith;
+#[cfg(feature = "prettier")]
+use zenith::internal::PrettierZenith;
+#[cfg(feature = "python")]
+use zenith::internal::PythonZenith;
+#[cfg(feature = "rust")]
+use zenith::internal::RustZenith;
+#[cfg(feature = "shell")]
+use zenith::internal::ShellZenith;
+#[cfg(feature = "toml")]
+use zenith::internal::TomlZenith;
 
 /// 程序的入口点。
 ///
@@ -59,14 +77,31 @@ async fn main() -> Result<()> {
     let registry = Arc::new(ZenithRegistry::new());
 
     // 注册内置插件 (Built-in Zeniths)
+    #[cfg(feature = "rust")]
     registry.register(Arc::new(RustZenith));
+
+    #[cfg(feature = "python")]
     registry.register(Arc::new(PythonZenith));
+
+    #[cfg(feature = "markdown")]
     registry.register(Arc::new(MarkdownZenith));
+
+    #[cfg(feature = "prettier")]
     registry.register(Arc::new(PrettierZenith));
+
+    #[cfg(feature = "c")]
     registry.register(Arc::new(ClangZenith));
+
+    #[cfg(feature = "java")]
     registry.register(Arc::new(JavaZenith));
+
+    #[cfg(feature = "ini")]
     registry.register(Arc::new(IniZenith));
+
+    #[cfg(feature = "toml")]
     registry.register(Arc::new(TomlZenith));
+
+    #[cfg(feature = "shell")]
     registry.register(Arc::new(ShellZenith));
 
     // 注册已加载的外部插件

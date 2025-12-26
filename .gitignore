@@ -8,6 +8,7 @@ Cargo.lock
 .DS_Store
 .trae
 .idea
+temp/
 docs/prd.md
 docs/tdd.md
 docs/test.md

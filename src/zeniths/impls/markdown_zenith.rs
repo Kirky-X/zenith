@@ -313,10 +313,10 @@ fn parse_list(chars: &[char], i: usize) -> ParseResult {
         || list_text.trim().starts_with('*')
         || list_text.trim().starts_with('+')
     {
-        result.push_str(&list_text.trim());
+        result.push_str(list_text.trim());
     } else {
         result.push_str("- ");
-        result.push_str(&list_text.trim());
+        result.push_str(list_text.trim());
     }
 
     ParseResult {
@@ -584,7 +584,7 @@ fn process_table(table_text: &str, result: &mut String) {
         return;
     }
 
-    while cells.last().map_or(false, |s| s.is_empty()) {
+    while cells.last().is_some_and(|s| s.is_empty()) {
         cells.pop();
     }
 
@@ -592,7 +592,7 @@ fn process_table(table_text: &str, result: &mut String) {
         return;
     }
 
-    let first_is_empty = cells.first().map_or(false, |s| s.is_empty());
+    let first_is_empty = cells.first().is_some_and(|s| s.is_empty());
     let start_idx = if first_is_empty { 1 } else { 0 };
     let data_cells: Vec<String> = cells[start_idx..].to_vec();
 
@@ -614,8 +614,8 @@ fn process_table(table_text: &str, result: &mut String) {
 
     let mut separator_end = header_end;
     let mut found_non_separator = false;
-    for idx in header_end..data_cells.len() {
-        if is_separator_cell(&data_cells[idx]) {
+    for (idx, cell) in data_cells.iter().enumerate().skip(header_end) {
+        if is_separator_cell(cell) {
             if !found_non_separator {
                 separator_end = idx + 1;
             }
