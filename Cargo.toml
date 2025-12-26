@@ -5,7 +5,7 @@
 
 [package]
 name = "zenith"
-version = "1.0.1"
+version = "0.1.0"
 edition = "2021"
 description = "A multi-language code formatter with backup capabilities"
 authors = ["Zenith Team"]
