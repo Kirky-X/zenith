@@ -1,0 +1,21 @@
+[format]
+target = "auto"
+
+[language.rust]
+enabled = true
+formatter = "rustfmt"
+
+[language.python]
+enabled = true
+formatter = "black"
+
+[language.json]
+enabled = true
+formatter = "prettier"
+
+[backup]
+enabled = true
+algorithm = "blake3"
+
+[cache]
+enabled = true

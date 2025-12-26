@@ -1,0 +1,110 @@
+[format]
+target = "auto"
+dry_run = false
+recursive = true
+ignore = ["target/", "node_modules/"]
+
+[language.rust]
+enabled = true
+formatter = "rustfmt"
+extensions = ["rs"]
+config_path = "~/.config/zenith/rustfmt.toml"
+
+[language.python]
+enabled = true
+formatter = "black"
+extensions = ["py"]
+config_path = null
+
+[language.javascript]
+enabled = true
+formatter = "prettier"
+extensions = ["js", "ts", "jsx", "tsx"]
+config_path = null
+
+[language.json]
+enabled = true
+formatter = "prettier"
+extensions = ["json"]
+config_path = null
+
+[language.yaml]
+enabled = true
+formatter = "yapf"
+extensions = ["yaml", "yml"]
+config_path = null
+
+[language.xml]
+enabled = true
+formatter = "xmllint"
+extensions = ["xml"]
+config_path = null
+
+[language.go]
+enabled = true
+formatter = "gofmt"
+extensions = ["go"]
+config_path = null
+
+[language.sql]
+enabled = true
+formatter = "sqlfluff"
+extensions = ["sql"]
+config_path = null
+
+[language.css]
+enabled = true
+formatter = "prettier"
+extensions = ["css", "scss", "sass"]
+config_path = null
+
+[language.html]
+enabled = true
+formatter = "prettier"
+extensions = ["html", "htm"]
+config_path = null
+
+[language.markdown]
+enabled = true
+formatter = "prettier"
+extensions = ["md"]
+config_path = null
+
+[language.typescript]
+enabled = true
+formatter = "prettier"
+extensions = ["ts", "tsx"]
+config_path = null
+
+[language.vue]
+enabled = true
+formatter = "prettier"
+extensions = ["vue"]
+config_path = null
+
+[language.svelte]
+enabled = true
+formatter = "prettier"
+extensions = ["svelte"]
+config_path = null
+
+[backup]
+enabled = true
+algorithm = "blake3"
+directory = ".zenith_backup"
+max_backups = 10
+
+[cache]
+enabled = true
+algorithm = "blake3"
+directory = ".zenith_cache"
+max_size_mb = 100
+
+[logging]
+level = "info"
+format = "json"
+output = "stdout"
+
+[mcp]
+enabled = false
+server_name = "zenith"

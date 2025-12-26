@@ -1,0 +1,14 @@
+{
+    "project": "medium_project",
+    "version": "1.0.0",
+    "authors": ["Alice", "Bob"],
+    "dependencies": {
+        "library_a": "^1.0.0",
+        "library_b": "^2.0.0"
+    },
+    "settings": {
+        "debug": true,
+        "max_connections": 100,
+        "timeout": 30.5
+    }
+}

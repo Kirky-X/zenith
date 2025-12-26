@@ -1,0 +1,89 @@
+[project]
+name = "large_project"
+version = "2.0.0"
+description = "A comprehensive project with multiple modules and services"
+
+[authors]
+primary = "Alice Johnson <alice@example.com>"
+secondary = ["Bob Smith <bob@example.com>", "Carol Williams <carol@example.com>"]
+
+[organization]
+name = "TechCorp"
+departments = ["engineering", "design", "operations"]
+
+[database.primary]
+host = "db.primary.internal"
+port = 5432
+name = "app_production"
+pool_size = 20
+ssl_mode = "require"
+
+[database.replica]
+host = "db.replica.internal"
+port = 5432
+name = "app_production"
+pool_size = 10
+ssl_mode = "require"
+
+[cache.redis]
+host = "redis.internal"
+port = 6379
+db = 0
+password = null
+
+[services.api-gateway]
+instances = 3
+cpu = "500m"
+memory = "512Mi"
+health_check_path = "/health"
+readiness_probe = "/ready"
+
+[services.auth-service]
+instances = 2
+cpu = "250m"
+memory = "256Mi"
+jwt_secret = "your-secret-here"
+token_expiry_hours = 24
+
+[features.authentication]
+enabled = true
+methods = ["jwt", "oauth2"]
+jwt_algorithm = "HS256"
+
+[features.authorization]
+enabled = true
+rbac_enabled = true
+policy_path = "/etc/policies"
+
+[features.logging]
+level = "info"
+format = "json"
+outputs = ["stdout", "file"]
+file_path = "/var/log/app.log"
+
+[features.metrics]
+enabled = true
+endpoint = "/metrics"
+port = 9090
+
+[features.queue]
+enabled = true
+provider = "rabbitmq"
+exchange = "app_events"
+
+[backup]
+enabled = true
+schedule = "0 2 * * *"
+retention_days = 30
+compression = true
+
+[security]
+encryption_at_rest = true
+audit_logging = true
+max_login_attempts = 5
+lockout_duration_minutes = 30
+
+[monitoring]
+alert_email = "alerts@techcorp.com"
+pagerduty_key = null
+slack_webhook = "https://hooks.slack.com/services/xxx"

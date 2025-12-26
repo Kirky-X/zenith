@@ -1,0 +1,10 @@
+{
+    "name": "product",
+    "price": 99.99,
+    "in_stock": true,
+    "tags": [
+        "electronics",
+        "sale",
+        "featured"
+    ]
+}

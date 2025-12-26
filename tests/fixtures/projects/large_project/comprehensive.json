@@ -1,0 +1,92 @@
+{
+    "project": {
+        "name": "large_project",
+        "version": "2.0.0",
+        "description": "A comprehensive project with multiple modules and services"
+    },
+    "authors": [
+        {
+            "name": "Alice Johnson",
+            "email": "alice@example.com",
+            "role": "lead-developer"
+        },
+        {
+            "name": "Bob Smith",
+            "email": "bob@example.com",
+            "role": "backend-developer"
+        },
+        {
+            "name": "Carol Williams",
+            "email": "carol@example.com",
+            "role": "frontend-developer"
+        }
+    ],
+    "organization": {
+        "name": "TechCorp",
+        "departments": ["engineering", "design", "operations"]
+    },
+    "configuration": {
+        "database": {
+            "primary": {
+                "host": "db.primary.internal",
+                "port": 5432,
+                "name": "app_production",
+                "pool_size": 20
+            },
+            "replica": {
+                "host": "db.replica.internal",
+                "port": 5432,
+                "name": "app_production",
+                "pool_size": 10
+            }
+        },
+        "cache": {
+            "redis": {
+                "host": "redis.internal",
+                "port": 6379,
+                "db": 0
+            }
+        },
+        "services": [
+            {
+                "name": "api-gateway",
+                "instances": 3,
+                "resources": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                }
+            },
+            {
+                "name": "auth-service",
+                "instances": 2,
+                "resources": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                }
+            }
+        ],
+        "features": {
+            "authentication": true,
+            "authorization": true,
+            "logging": {
+                "level": "info",
+                "outputs": ["stdout", "file"]
+            },
+            "metrics": {
+                "enabled": true,
+                "endpoint": "/metrics"
+            }
+        }
+    },
+    "dependencies": {
+        "internal": {
+            "shared-utils": "^3.0.0",
+            "common-types": "^2.0.0"
+        },
+        "external": {
+            "async-trait": "0.1",
+            "tokio": { "version": "1.0", "features": ["full"] },
+            "serde": { "version": "1.0", "features": ["derive"] }
+        }
+    }
+}
