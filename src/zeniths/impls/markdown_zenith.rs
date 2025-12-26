@@ -16,9 +16,29 @@ use std::process::{Command, Stdio};
 pub struct MarkdownZenith;
 
 const SUPPORTED_LANGUAGES: &[&str] = &[
-    "rust", "python", "javascript", "typescript", "js", "ts", "go",
-    "java", "c", "cpp", "csharp", "ruby", "php", "swift", "kotlin",
-    "sql", "html", "css", "json", "yaml", "bash", "shell", "powershell",
+    "rust",
+    "python",
+    "javascript",
+    "typescript",
+    "js",
+    "ts",
+    "go",
+    "java",
+    "c",
+    "cpp",
+    "csharp",
+    "ruby",
+    "php",
+    "swift",
+    "kotlin",
+    "sql",
+    "html",
+    "css",
+    "json",
+    "yaml",
+    "bash",
+    "shell",
+    "powershell",
 ];
 
 #[async_trait]
@@ -70,7 +90,10 @@ fn preprocess_extremely_compressed(content: &[u8]) -> String {
     while i < chars.len() {
         stall_count += 1;
         if stall_count > MAX_STALL {
-            eprintln!("[WARN] Detected potential infinite loop in preprocessing at position {}", i);
+            eprintln!(
+                "[WARN] Detected potential infinite loop in preprocessing at position {}",
+                i
+            );
             break;
         }
 
@@ -121,8 +144,7 @@ fn is_blockquote_start(chars: &[char], i: usize) -> bool {
 }
 
 fn is_unordered_list_start(chars: &[char], i: usize) -> bool {
-    (chars[i] == '-' || chars[i] == '*' || chars[i] == '+') &&
-    (i == 0 || chars[i - 1] == ' ')
+    (chars[i] == '-' || chars[i] == '*' || chars[i] == '+') && (i == 0 || chars[i - 1] == ' ')
 }
 
 fn is_ordered_list_start(chars: &[char], i: usize) -> bool {
@@ -163,8 +185,9 @@ fn parse_header(chars: &[char], mut i: usize) -> ParseResult {
         if chars[next_pos] == '>' && (next_pos == 0 || chars[next_pos - 1] == ' ') {
             break;
         }
-        if (chars[next_pos] == '-' || chars[next_pos] == '*' || chars[next_pos] == '+') &&
-           (next_pos == 0 || chars[next_pos - 1] == ' ') {
+        if (chars[next_pos] == '-' || chars[next_pos] == '*' || chars[next_pos] == '+')
+            && (next_pos == 0 || chars[next_pos - 1] == ' ')
+        {
             break;
         }
         next_pos += 1;
@@ -275,7 +298,8 @@ fn parse_list(chars: &[char], i: usize) -> ParseResult {
         for item in items {
             let trimmed = item.trim();
             if !trimmed.is_empty() {
-                if trimmed.starts_with('-') || trimmed.starts_with('*') || trimmed.starts_with('+') {
+                if trimmed.starts_with('-') || trimmed.starts_with('*') || trimmed.starts_with('+')
+                {
                     result.push_str(trimmed);
                     result.push('\n');
                 } else if !trimmed.is_empty() {
@@ -285,7 +309,10 @@ fn parse_list(chars: &[char], i: usize) -> ParseResult {
                 }
             }
         }
-    } else if list_text.trim().starts_with('-') || list_text.trim().starts_with('*') || list_text.trim().starts_with('+') {
+    } else if list_text.trim().starts_with('-')
+        || list_text.trim().starts_with('*')
+        || list_text.trim().starts_with('+')
+    {
         result.push_str(&list_text.trim());
     } else {
         result.push_str("- ");
@@ -359,18 +386,28 @@ fn format_inline_code(text: &str) -> String {
 
 fn detect_inline_language(code: &str) -> &'static str {
     let trimmed = code.trim();
-    if trimmed.starts_with("fn ") || trimmed.starts_with("let ") ||
-       trimmed.starts_with("impl ") || trimmed.starts_with("struct ") ||
-       trimmed.starts_with("enum ") || trimmed.starts_with("trait ") {
+    if trimmed.starts_with("fn ")
+        || trimmed.starts_with("let ")
+        || trimmed.starts_with("impl ")
+        || trimmed.starts_with("struct ")
+        || trimmed.starts_with("enum ")
+        || trimmed.starts_with("trait ")
+    {
         return "rust";
     }
-    if trimmed.starts_with("def ") || trimmed.starts_with("class ") ||
-       trimmed.starts_with("import ") || trimmed.starts_with("from ") {
+    if trimmed.starts_with("def ")
+        || trimmed.starts_with("class ")
+        || trimmed.starts_with("import ")
+        || trimmed.starts_with("from ")
+    {
         return "python";
     }
-    if trimmed.starts_with("function ") || trimmed.starts_with("const ") ||
-       trimmed.starts_with("let ") || trimmed.starts_with("var ") ||
-       trimmed.contains("=>") {
+    if trimmed.starts_with("function ")
+        || trimmed.starts_with("const ")
+        || trimmed.starts_with("let ")
+        || trimmed.starts_with("var ")
+        || trimmed.contains("=>")
+    {
         return "javascript";
     }
     ""
@@ -406,7 +443,9 @@ fn format_emphasis(text: &str) -> String {
     let bold_italic_pattern = Regex::new(r"\*\*\*([^*]+)\*\*\*").unwrap();
 
     let mut result = text.to_string();
-    result = bold_italic_pattern.replace_all(&result, "***$1***").to_string();
+    result = bold_italic_pattern
+        .replace_all(&result, "***$1***")
+        .to_string();
     result = bold_pattern.replace_all(&result, "**$1**").to_string();
     result = italic_pattern.replace_all(&result, "*$1*").to_string();
 
@@ -617,7 +656,11 @@ fn process_table(table_text: &str, result: &mut String) {
     }
 
     let data_start = separator_end;
-    let remaining_cells: Vec<String> = data_cells[data_start..].iter().filter(|s| !s.is_empty()).cloned().collect();
+    let remaining_cells: Vec<String> = data_cells[data_start..]
+        .iter()
+        .filter(|s| !s.is_empty())
+        .cloned()
+        .collect();
     let total_data_cells = remaining_cells.len();
     let full_rows = total_data_cells / num_cols;
 
@@ -635,4 +678,3 @@ fn process_table(table_text: &str, result: &mut String) {
         result.push('\n');
     }
 }
-
