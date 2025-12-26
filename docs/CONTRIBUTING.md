@@ -12,7 +12,7 @@
 
 ## 🎯 Welcome Contributors!
 
-Thank you for your interest in contributing to **Project Name**! We're excited to have you here. Whether you're fixing a bug, adding a feature, improving documentation, or helping others, your contributions are valuable and appreciated.
+Thank you for your interest in contributing to **Zenith**! We're excited to have you here. Whether you're fixing a bug, adding a new formatter, improving documentation, or helping others, your contributions are valuable and appreciated.
 
 <div align="center">
 
@@ -23,7 +23,7 @@ Thank you for your interest in contributing to **Project Name**! We're excited t
 <td width="25%" align="center">
 <img src="https://img.icons8.com/fluency/96/000000/code.png" width="64"><br>
 <b>Code</b><br>
-Fix bugs & add features
+Fix bugs & add formatters
 </td>
 <td width="25%" align="center">
 <img src="https://img.icons8.com/fluency/96/000000/documentation.png" width="64"><br>
@@ -155,8 +155,8 @@ Click the "Fork" button on GitHub
 **2. Clone Your Fork**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/project-name
-cd project-name
+git clone https://github.com/YOUR_USERNAME/zenith
+cd zenith
 ```
 
 </td>
@@ -168,7 +168,7 @@ cd project-name
 
 ```bash
 git remote add upstream \
-  https://github.com/ORIGINAL/project-name
+  https://github.com/ORIGINAL/zenith
 ```
 
 </td>
@@ -196,7 +196,7 @@ cargo build
 cargo test
 
 # Run with examples
-cargo run --example basic
+cargo run -- format --help
 ```
 
 ✅ **Success!** You're ready to contribute!
@@ -249,11 +249,12 @@ git checkout -b fix/issue-123
 ```
 
 **Branch Naming:**
-- `feature/` - New features
+- `feature/` - New formatters or features
 - `fix/` - Bug fixes
 - `docs/` - Documentation
 - `test/` - Test improvements
 - `refactor/` - Code refactoring
+- `zenith/` - New language zenith implementations
 
 #### 2️⃣ Make Your Changes
 
@@ -261,12 +262,30 @@ git checkout -b fix/issue-123
 <tr>
 <td width="50%">
 
-**Writing Code:**
+**Writing a new Zenith:**
 ```rust
-// Add your implementation
-pub fn new_feature() -> Result<()> {
-    // Your code here
-    Ok(())
+use async_trait::async_trait;
+use std::path::Path;
+
+#[async_trait]
+impl super::Zenith for MyZenith {
+    fn name(&self) -> &str {
+        "my-formatter"
+    }
+
+    fn extensions(&self) -> &[&str] {
+        &["myext"]
+    }
+
+    async fn format(
+        &self,
+        content: &[u8],
+        path: &Path,
+        config: &ZenithConfig,
+    ) -> Result<Vec<u8>> {
+        // Your formatting logic
+        Ok(content.to_vec())
+    }
 }
 ```
 
@@ -275,10 +294,17 @@ pub fn new_feature() -> Result<()> {
 
 **Adding Tests:**
 ```rust
-#[test]
-fn test_new_feature() {
-    let result = new_feature();
-    assert!(result.is_ok());
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_rust_code() {
+        let input = b"fn hello(){println!(\"Hi\");}";
+        let zenith = RustZenith::default();
+        let result = zenith.format(input, Path::new("test.rs"), &ZenithConfig::default());
+        assert!(result.is_ok());
+    }
 }
 ```
 
@@ -299,7 +325,7 @@ cargo clippy -- -D warnings
 cargo test --all-features
 
 # Run specific test
-cargo test test_new_feature
+cargo test test_format_rust_code
 
 # Check coverage (optional)
 cargo tarpaulin --out Html
@@ -312,14 +338,15 @@ cargo tarpaulin --out Html
 ```bash
 # Format: <type>(<scope>): <description>
 
-git commit -m "feat(encryption): add AES-256 support"
-git commit -m "fix(key-manager): resolve memory leak"
-git commit -m "docs(readme): update installation instructions"
-git commit -m "test(cipher): add edge case tests"
+git commit -m "feat(rust): add support for Rust 2024 edition"
+git commit -m "fix(cache): resolve memory leak in HashCache"
+git commit -m "docs(contributing): update branch naming conventions"
+git commit -m "test(zenith): add edge case tests for Python formatter"
+git commit -m "refactor(batch): improve batch processing performance"
 ```
 
 **Commit Types:**
-- `feat` - New feature
+- `feat` - New formatter or feature
 - `fix` - Bug fix
 - `docs` - Documentation
 - `style` - Formatting
@@ -340,10 +367,11 @@ git commit -m "test(cipher): add edge case tests"
 
 **Example:**
 ```
-feat(api): add batch encryption support
+feat(java): add support for Java record formatting
 
-Implement batch processing for multiple encryption operations.
-This improves performance by 40% for bulk operations.
+Implement formatting support for Java 16+ record types.
+This includes proper indentation and spacing for record
+declarations, component annotations, and derive clauses.
 
 Closes #123
 ```
@@ -386,17 +414,18 @@ Follow the [Rust Style Guide](https://rust-lang.github.io/api-guidelines/):
 
 ```rust
 // Descriptive names
-pub fn encrypt_data(
-    plaintext: &[u8],
-    key: &Key,
+pub async fn format_file(
+    &self,
+    content: &[u8],
+    path: &Path,
 ) -> Result<Vec<u8>> {
     // Implementation
 }
 
 // Proper error handling
-match operation() {
-    Ok(result) => result,
-    Err(e) => return Err(e),
+match self.process_content(content).await {
+    Ok(formatted) => Ok(formatted),
+    Err(e) => return Err(ZenithError::FormatFailed(e)),
 }
 ```
 
@@ -407,13 +436,13 @@ match operation() {
 
 ```rust
 // Vague names
-pub fn enc(d: &[u8], k: &Key) 
+pub async fn fmt(c: &[u8], p: &Path) 
     -> Result<Vec<u8>> {
     // Implementation
 }
 
 // Ignoring errors
-let result = operation().unwrap();
+let result = self.process(c).await.unwrap();
 ```
 
 </td>
@@ -425,18 +454,47 @@ let result = operation().unwrap();
 ```
 src/
 ├── lib.rs           # Public API
-├── core/            # Core functionality
+├── main.rs          # CLI entrypoint
+├── cli/             # CLI commands
 │   ├── mod.rs
-│   ├── engine.rs
-│   └── manager.rs
-├── algorithms/      # Algorithm implementations
+│   └── commands.rs
+├── core/            # Core traits and types
 │   ├── mod.rs
-│   ├── aes.rs
-│   └── ecdsa.rs
-├── error.rs         # Error types
+│   └── traits.rs    # Zenith trait definition
+├── zeniths/         # Formatter implementations
+│   ├── mod.rs
+│   ├── registry.rs  # ZenithRegistry
+│   └── impls/       # Concrete implementations
+│       ├── mod.rs
+│       ├── rust_zenith.rs
+│       ├── python_zenith.rs
+│       ├── markdown_zenith.rs
+│       └── ...
+├── config/          # Configuration management
+│   ├── mod.rs
+│   ├── types.rs
+│   ├── discovery.rs
+│   └── cache.rs
+├── services/        # Business logic
+│   ├── mod.rs
+│   ├── formatter.rs
+│   └── batch.rs
+├── storage/         # Storage and caching
+│   ├── mod.rs
+│   ├── backup.rs
+│   └── cache.rs
+├── mcp/             # MCP server
+│   ├── mod.rs
+│   ├── server.rs
+│   └── protocol.rs
+├── plugins/         # Plugin system
+│   ├── mod.rs
+│   ├── loader.rs
+│   └── types.rs
 └── utils/           # Utilities
     ├── mod.rs
-    └── helpers.rs
+    ├── path.rs
+    └── environment.rs
 ```
 
 ### Documentation
@@ -447,31 +505,39 @@ src/
 **Every public item must have documentation:**
 
 ```rust
-/// Encrypts data using the specified algorithm.
+/// Formats Rust source code using rustfmt.
+///
+/// This implementation leverages the rustfmt library to provide
+/// consistent formatting for Rust files. It supports all rustfmt
+/// configuration options through the ZenithConfig.
 ///
 /// # Arguments
 ///
-/// * `data` - The plaintext data to encrypt
-/// * `key` - The encryption key
+/// * `content` - The raw Rust source code bytes
+/// * `path` - Path to the source file (used for .rustfmt.toml lookup)
+/// * `config` - Formatting configuration
 ///
 /// # Returns
 ///
-/// Returns the encrypted ciphertext on success.
+/// Returns the formatted source code on success.
 ///
 /// # Errors
 ///
-/// Returns `Error::EncryptionFailed` if encryption fails.
+/// Returns `ZenithError::FormatterUnavailable` if rustfmt is not installed.
 ///
 /// # Examples
 ///
 /// ```
-/// use project_name::{encrypt, Key};
+/// use zenith::zeniths::RustZenith;
+/// use zenith::ZenithConfig;
 ///
-/// let key = Key::generate()?;
-/// let ciphertext = encrypt(b"secret", &key)?;
+/// let formatter = RustZenith::default();
+/// let code = b"fn hello(){println!(\"world\");}";
+/// let result = formatter.format(code, std::path::Path::new("test.rs"), &ZenithConfig::default());
 /// ```
-pub fn encrypt(data: &[u8], key: &Key) -> Result<Vec<u8>> {
-    // Implementation
+pub struct RustZenith {
+    config_path: Option<PathBuf>,
+    use_default: bool,
 }
 ```
 
@@ -481,14 +547,15 @@ pub fn encrypt(data: &[u8], key: &Key) -> Result<Vec<u8>> {
 
 ```rust
 // ✅ Use Result types
-pub fn fallible_operation() -> Result<Value, Error> {
+pub async fn format(&self, content: &[u8]) -> Result<Vec<u8>> {
     // Implementation
 }
 
 // ✅ Provide context
-Err(Error::EncryptionFailed {
-    reason: "Invalid key size",
-    context: format!("Expected {}, got {}", expected, actual),
+Err(ZenithError::FormatterFailed {
+    formatter: self.name().to_string(),
+    reason: format!("Unsupported extension: {}", ext),
+    source: Some(e),
 })
 
 // ❌ Don't panic in library code
@@ -515,23 +582,19 @@ Err(Error::EncryptionFailed {
 </tr>
 <tr>
 <td><b>Unit Tests</b></td>
-<td>Test individual functions</td>
-<td><code>src/*.rs</code> (inline)</td>
+<td>Test individual functions</td><td><code>src/*.rs</code> (inline)</td>
 </tr>
 <tr>
 <td><b>Integration Tests</b></td>
-<td>Test public API</td>
-<td><code>tests/</code></td>
+<td>Test public API</td><td><code>tests/</code></td>
 </tr>
 <tr>
 <td><b>Doc Tests</b></td>
-<td>Test examples in docs</td>
-<td>Doc comments</td>
+<td>Test examples in docs</td><td>Doc comments</td>
 </tr>
 <tr>
 <td><b>Benchmarks</b></td>
-<td>Performance tests</td>
-<td><code>benches/</code></td>
+<td>Performance tests</td><td><code>benches/</code></td>
 </tr>
 </table>
 
@@ -545,20 +608,26 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_encrypt_decrypt() {
-        let key = Key::generate().unwrap();
-        let plaintext = b"Hello, World!";
+    fn test_python_zenith_format() {
+        let zenith = PythonZenith::default();
+        let input = b"def  hello(  ):\n    pass";
         
-        let ciphertext = encrypt(plaintext, &key).unwrap();
-        let decrypted = decrypt(&ciphertext, &key).unwrap();
+        let result = zenith.format(
+            input,
+            Path::new("test.py"),
+            &ZenithConfig::default(),
+        );
         
-        assert_eq!(plaintext, &decrypted[..]);
+        assert!(result.is_ok());
+        let output = String::from_utf8(result.unwrap()).unwrap();
+        assert!(output.contains("def hello():"));
     }
 
     #[test]
-    fn test_invalid_key() {
-        let result = encrypt(b"data", &InvalidKey);
-        assert!(result.is_err());
+    fn test_unsupported_extension() {
+        let registry = ZenithRegistry::default();
+        let result = registry.get_by_extension("xyz");
+        assert!(result.is_none());
     }
 }
 ```
@@ -567,21 +636,20 @@ mod tests {
 
 ```rust
 // tests/integration_test.rs
-use project_name::{init, Cipher, KeyManager, Algorithm};
+use zenith::{ZenithService, AppConfig};
 
 #[test]
-fn test_full_workflow() {
-    init().unwrap();
+fn test_full_format_workflow() {
+    let config = AppConfig::default();
+    let service = ZenithService::new(config);
     
-    let km = KeyManager::new().unwrap();
-    let key_id = km.generate_key(Algorithm::AES256GCM).unwrap();
-    let cipher = Cipher::new(Algorithm::AES256GCM).unwrap();
+    let temp_dir = tempfile::tempdir().unwrap();
+    let file_path = temp_dir.path().join("test.py");
+    std::fs::write(&file_path, b"print(  'hello'  )").unwrap();
     
-    let plaintext = b"Integration test";
-    let ciphertext = cipher.encrypt(&km, &key_id, plaintext).unwrap();
-    let decrypted = cipher.decrypt(&km, &key_id, &ciphertext).unwrap();
-    
-    assert_eq!(plaintext, &decrypted[..]);
+    let results = service.format_paths(vec![file_path.to_string()]).unwrap();
+    assert_eq!(results.len(), 1);
+    assert!(results[0].success);
 }
 ```
 
@@ -616,7 +684,7 @@ open coverage/index.html
 **Code Documentation:**
 - ✅ Public functions
 - ✅ Public types
-- ✅ Complex algorithms
+- ✅ Formatter implementations
 - ✅ Non-obvious behavior
 
 </td>
@@ -662,7 +730,7 @@ Brief description of changes
 
 ## Type of Change
 - [ ] Bug fix
-- [ ] New feature
+- [ ] New feature (formatter/plugin/config)
 - [ ] Documentation update
 - [ ] Performance improvement
 - [ ] Code refactoring
@@ -756,7 +824,7 @@ Reviewers will check:
 - ✅ **Tests**: Are there adequate tests?
 - ✅ **Documentation**: Is it well documented?
 - ✅ **Performance**: Any performance impact?
-- ✅ **Security**: Any security concerns?
+- ✅ **Compatibility**: Does it follow existing patterns?
 
 ### Responding to Feedback
 
@@ -789,14 +857,14 @@ git push origin feature/your-feature
 Q&A and ideas
 </td>
 <td width="33%" align="center">
-<a href="https://discord.gg/project">
+<a href="https://discord.gg/zenith">
 <img src="https://img.icons8.com/fluency/96/000000/discord-logo.png" width="64"><br>
 <b>Discord</b>
 </a><br>
 Live chat
 </td>
 <td width="33%" align="center">
-<a href="https://twitter.com/project">
+<a href="https://twitter.com/zenith">
 <img src="https://img.icons8.com/fluency/96/000000/twitter.png" width="64"><br>
 <b>Twitter</b>
 </a><br>
@@ -825,10 +893,8 @@ Your contributions make this project better for everyone.
 
 ---
 
-**[🏠 Home](README.md)** • **[📖 Docs](docs/USER_GUIDE.md)** • **[💬 Chat](https://discord.gg/project)**
+**[🏠 Home](README.md)** • **[📖 Docs](docs/USER_GUIDE.md)** • **[💬 Chat](https://discord.gg/zenith)**
 
 Made with ❤️ by our amazing community
 
 [⬆ Back to Top](#-contributing-guide)
-
-</div>

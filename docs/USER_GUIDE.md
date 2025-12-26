@@ -1,8 +1,8 @@
 <div align="center">
 
-# 📖 User Guide
+# 📖 Zenith User Guide
 
-### Complete Guide to Using Project Name
+### Complete Guide to Using Zenith
 
 [🏠 Home](../README.md) • [📚 Docs](README.md) • [🎯 Examples](../examples/) • [❓ FAQ](FAQ.md)
 
@@ -66,9 +66,9 @@ Master the details
 </tr>
 </table>
 
-**Project Name** is designed to help you accomplish [primary goal]. This guide will walk you through everything from basic setup to advanced usage patterns.
+**Zenith** is a high-performance, multi-language code formatter with automatic backup and one-click recovery. This guide will walk you through everything from basic setup to advanced usage patterns.
 
-> 💡 **Tip**: This guide assumes basic knowledge of [prerequisite]. If you're new to [topic], check out our [Beginner's Tutorial](TUTORIALS.md) first.
+> 💡 **Tip**: This guide assumes basic knowledge of command-line tools. If you're new to code formatters, check out our [Quick Start](#first-steps) section first.
 
 ---
 
@@ -92,8 +92,8 @@ Before you begin, ensure you have the following installed:
 
 **Optional**
 - 🔧 IDE with Rust support
+- 🔧 Formatter tools (rustfmt, ruff, prettier, etc.)
 - 🔧 Docker (for containerized deployment)
-- 🔧 [Additional tool]
 
 </td>
 </tr>
@@ -130,15 +130,10 @@ git --version
 <tr>
 <td width="50%">
 
-**📦 Using Cargo (Recommended)**
+**📦 Using Cargo Install (Recommended)**
 
 ```bash
-# Add to Cargo.toml
-[dependencies]
-project-name = "1.0"
-
-# Or install via command
-cargo add project-name
+cargo install --git https://github.com/Kirky-X/zenith.git
 ```
 
 </td>
@@ -147,8 +142,8 @@ cargo add project-name
 **🐙 From Source**
 
 ```bash
-git clone https://github.com/user/project-name
-cd project-name
+git clone https://github.com/Kirky-X/zenith.git
+cd zenith
 cargo build --release
 ```
 
@@ -159,61 +154,63 @@ cargo build --release
 <details>
 <summary><b>🌐 Other Installation Methods</b></summary>
 
-**Using Docker**
+**Quick Install Script (Linux/macOS)**
 ```bash
-docker pull project-name:latest
-docker run -it project-name
+curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
 ```
 
-**Using Homebrew (macOS)**
-```bash
-brew install project-name
-```
-
-**Using Chocolatey (Windows)**
+**Windows (PowerShell)**
 ```powershell
-choco install project-name
+iwr -useb https://raw.githubusercontent.com/Kirky-X/zenith/main/install.ps1 | iex
+```
+
+**Pre-compiled Binaries**
+1. Visit [Releases](https://github.com/Kirky-X/zenith/releases)
+2. Download the binary for your platform
+3. Extract and add to PATH:
+
+```bash
+tar -xzf zenith-v0.1.0-linux-x86_64.tar.gz
+sudo mv zenith /usr/local/bin/
 ```
 
 </details>
 
 ### First Steps
 
-Let's verify your installation with a simple "Hello World":
+Let's verify your installation:
 
-```rust
-use project_name::*;
+```bash
+# Check version
+zenith --version
+# Output: zenith 0.1.0
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize the library
-    init()?;
-    
-    println!("✅ Project Name is ready!");
-    
-    Ok(())
-}
+# Show help
+zenith --help
+# Show all available commands
+
+# Initialize configuration
+zenith init
+
+# Check environment
+zenith doctor
 ```
 
 <details>
-<summary><b>🎬 Run the Example</b></summary>
+<summary><b>🎬 Quick Start Example</b></summary>
 
 ```bash
-# Create a new project
-cargo new hello-project
-cd hello-project
+# Format a single file
+zenith format src/main.rs
 
-# Add dependency
-cargo add project-name
+# Format a directory
+zenith format src/
 
-# Copy the code above to src/main.rs
+# Format recursively
+zenith format ./ --recursive
 
-# Run it!
-cargo run
-```
-
-**Expected Output:**
-```
-✅ Project Name is ready!
+# Check mode (no changes)
+zenith format src/ --check
 ```
 
 </details>
@@ -222,7 +219,7 @@ cargo run
 
 ## Core Concepts
 
-Understanding these core concepts will help you use the library effectively.
+Understanding these core concepts will help you use Zenith effectively.
 
 <div align="center">
 
@@ -232,13 +229,14 @@ Understanding these core concepts will help you use the library effectively.
 
 ```mermaid
 graph TD
-    A[Your Application] --> B[Core API]
-    B --> C[Component 1]
-    B --> D[Component 2]
-    B --> E[Component 3]
-    C --> F[Backend]
-    D --> F
-    E --> F
+    A[Your Project] --> B[Zenith CLI]
+    B --> C[Formatter Registry]
+    B --> D[Backup Manager]
+    B --> E[Cache System]
+    C --> F[Language Formatters]
+    C --> G[Plugin System]
+    D --> H[Backup Storage]
+    E --> I[Cache Storage]
     
     style A fill:#e1f5ff
     style B fill:#81d4fa
@@ -246,67 +244,91 @@ graph TD
     style D fill:#4fc3f7
     style E fill:#4fc3f7
     style F fill:#29b6f6
+    style G fill:#29b6f6
+    style H fill:#29b6f6
+    style I fill:#29b6f6
 ```
 
-### 1️⃣ Concept One: [Name]
+### 1️⃣ Formatter Registry
 
-**What it is:** Brief description of the concept.
+**What it is:** A centralized registry that manages all supported code formatters.
 
-**Why it matters:** Explanation of importance.
+**Why it matters:** Provides unified interface for different language formatters with automatic detection.
+
+**Key Features:**
+- ✅ Automatic language detection
+- ✅ Plugin-based architecture
+- ✅ 14+ language support
 
 **Example:**
-```rust
-// Demonstration code
-let example = ConceptOne::new();
+```bash
+# Auto-detect and format
+zenith format src/main.rs
+
+# Force specific formatter
+zenith format src/main.py --formatter ruff
 ```
 
 <details>
 <summary><b>📚 Learn More</b></summary>
 
-Detailed explanation of the concept, including:
-- How it works internally
-- When to use it
-- Common pitfalls
-- Related concepts
+The formatter registry:
+- Automatically detects file type by extension
+- Loads appropriate formatter based on configuration
+- Supports plugin system for custom formatters
+- Falls back to built-in formatters when external tools unavailable
 
 </details>
 
-### 2️⃣ Concept Two: [Name]
+### 2️⃣ Backup System
 
-**What it is:** Brief description.
+**What it is:** Automatic backup system that preserves original code before formatting.
+
+**Why it matters:** Provides safety net for accidental formatting or unwanted changes.
 
 **Key Features:**
-- ✅ Feature A
-- ✅ Feature B
-- ✅ Feature C
+- ✅ Automatic backups before formatting
+- ✅ Versioned backup storage
+- ✅ One-click recovery
+- ✅ Configurable retention
 
 **Example:**
-```rust
-let concept = ConceptTwo::builder()
-    .option_a(value)
-    .option_b(value)
-    .build()?;
+```bash
+# Automatic backup is enabled by default
+zenith format src/
+
+# List available backups
+zenith list-backups
+
+# Restore from backup
+zenith recover backup_20231223_142030
 ```
 
-### 3️⃣ Concept Three: [Name]
+### 3️⃣ Cache System
+
+**What it is:** Intelligent caching system that tracks file changes and avoids reformatting unchanged files.
+
+**Why it matters:** Significantly improves performance for large projects by skipping already-formatted files.
 
 <table>
 <tr>
 <td width="50%">
 
-**Traditional Approach**
-```rust
-// Old way
-let result = old_method(data);
+**Without Cache**
+```bash
+# Re-formats all files every time
+zenith format ./ --recursive
+# Time: 10s (all files)
 ```
 
 </td>
 <td width="50%">
 
-**Our Approach**
-```rust
-// Better way
-let result = new_method(data)?;
+**With Cache**
+```bash
+# Only reformats changed files
+zenith format ./ --recursive
+# Time: 1s (only changed files)
 ```
 
 </td>
@@ -319,29 +341,22 @@ let result = new_method(data)?;
 
 ### Initialization
 
-Every application must initialize the library before use:
+Every project should initialize Zenith configuration:
 
-```rust
-use project_name::{init, Config};
+```bash
+# Simple initialization
+zenith init
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Simple initialization
-    init()?;
-    
-    // Or with custom config
-    let config = Config::default();
-    init_with_config(config)?;
-    
-    Ok(())
-}
+# Overwrite existing configuration
+zenith init --force
 ```
 
 <div align="center">
 
 | Method | Use Case | Performance | Complexity |
 |--------|----------|-------------|------------|
-| `init()` | Quick start, development | ⚡ Fast | 🟢 Simple |
-| `init_with_config()` | Production, custom needs | ⚡⚡ Optimized | 🟡 Moderate |
+| `init()` | Quick start, new projects | ⚡ Fast | 🟢 Simple |
+| `init --force` | Reset configuration | ⚡ Fast | 🟢 Simple |
 
 </div>
 
@@ -350,23 +365,65 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 <details open>
 <summary><b>⚙️ Configuration Options</b></summary>
 
-```rust
-use project_name::Config;
+**Configuration File Location:**
 
-let config = Config::builder()
-    // Feature toggles
-    .enable_feature_a(true)
-    .enable_feature_b(false)
-    
-    // Performance settings
-    .thread_pool_size(4)
-    .cache_size(1024)
-    
-    // Logging
-    .log_level("info")
-    .log_file("/var/log/app.log")
-    
-    .build()?;
+Zenith looks for configuration files in the following order (first found wins):
+1. `./zenith.toml` (current directory)
+2. `~/.config/zenith/config.toml` (user config)
+3. `/etc/zenith/config.toml` (system config)
+
+**Create `zenith.toml`:**
+
+```toml
+[global]
+backup_enabled = true
+log_level = "info"
+recursive = true
+cache_enabled = true
+config_dir = ".zenith"
+
+[zeniths.rust]
+enabled = true
+config_path = ".rustfmt.toml"
+use_default = true
+
+[zeniths.python]
+enabled = true
+config_path = "pyproject.toml"
+use_default = true
+
+[zeniths.markdown]
+enabled = true
+use_default = true
+
+[zeniths.json]
+enabled = true
+
+[concurrency]
+workers = 8
+batch_size = 100
+
+[backup]
+dir = ".zenith_backup"
+retention_days = 7
+
+[limits]
+max_file_size_mb = 10
+max_memory_mb = 512
+
+[mcp]
+enabled = false
+host = "127.0.0.1"
+port = 9000
+auth_enabled = false
+api_key = null
+allowed_origins = ["*"]
+users = []
+
+[security]
+allowed_plugin_commands = []
+allow_absolute_paths = false
+allow_relative_paths = false
 ```
 
 </details>
@@ -379,22 +436,10 @@ let config = Config::builder()
 <th>Description</th>
 </tr>
 <tr>
-<td><code>enable_feature_a</code></td>
+<td><code>backup_enabled</code></td>
 <td>bool</td>
 <td>true</td>
-<td>Enable feature A functionality</td>
-</tr>
-<tr>
-<td><code>thread_pool_size</code></td>
-<td>usize</td>
-<td>4</td>
-<td>Number of worker threads</td>
-</tr>
-<tr>
-<td><code>cache_size</code></td>
-<td>usize</td>
-<td>1024</td>
-<td>Cache size in MB</td>
+<td>Enable automatic backups before formatting</td>
 </tr>
 <tr>
 <td><code>log_level</code></td>
@@ -402,13 +447,45 @@ let config = Config::builder()
 <td>"info"</td>
 <td>Logging verbosity (debug/info/warn/error)</td>
 </tr>
+<tr>
+<td><code>recursive</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Process directories recursively</td>
+</tr>
+<tr>
+<td><code>cache_enabled</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Enable caching for performance</td>
+</tr>
+<tr>
+<td><code>workers</code></td>
+<td>usize</td>
+<td>8</td>
+<td>Number of concurrent workers</td>
+</tr>
 </table>
+
+**Environment Variables:**
+
+Override configuration with environment variables:
+
+```bash
+export ZENITH_WORKERS=16
+export ZENITH_LOG_LEVEL=debug
+export ZENITH_NO_BACKUP=false
+export ZENITH_RECURSIVE=true
+export ZENITH_CACHE_ENABLED=true
+export ZENITH_BACKUP_DIR=".zenith_backup"
+export ZENITH_MCP_ENABLED=true
+```
 
 ### Basic Operations
 
 <div align="center">
 
-#### 📝 CRUD Operations
+#### 📝 Core Operations
 
 </div>
 
@@ -416,30 +493,34 @@ let config = Config::builder()
 <tr>
 <td width="50%">
 
-**Create**
-```rust
-let item = Item::new("name", data)?;
-item.save()?;
-```
+**Format Files**
+```bash
+# Single file
+zenith format src/main.rs
 
-**Read**
-```rust
-let item = Item::load("id")?;
-println!("Data: {:?}", item.data());
+# Directory
+zenith format src/
+
+# Recursively
+zenith format ./ --recursive
+
+# Check mode
+zenith format src/ --check
 ```
 
 </td>
 <td width="50%">
 
-**Update**
-```rust
-item.set_data(new_data)?;
-item.save()?;
-```
+**Backup Operations**
+```bash
+# List backups
+zenith list-backups
 
-**Delete**
-```rust
-item.delete()?;
+# Restore backup
+zenith recover backup_id
+
+# Clean old backups
+zenith clean-backups --days 7
 ```
 
 </td>
@@ -447,34 +528,23 @@ item.delete()?;
 </table>
 
 <details>
-<summary><b>🎯 Complete Example</b></summary>
+<summary><b>🎯 Complete Workflow Example</b></summary>
 
-```rust
-use project_name::{init, Item};
+```bash
+# 1. Initialize project
+zenith init
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    init()?;
-    
-    // Create
-    let mut item = Item::new("user-123", b"user data")?;
-    item.save()?;
-    println!("✅ Created item: {}", item.id());
-    
-    // Read
-    let loaded = Item::load("user-123")?;
-    println!("📖 Loaded: {:?}", loaded.data());
-    
-    // Update
-    loaded.set_data(b"updated data")?;
-    loaded.save()?;
-    println!("✏️ Updated item");
-    
-    // Delete
-    loaded.delete()?;
-    println!("🗑️ Deleted item");
-    
-    Ok(())
-}
+# 2. Check environment
+zenith doctor
+
+# 3. Format project
+zenith format ./ --recursive
+
+# 4. List changes
+zenith list-backups
+
+# 5. If issues, recover
+zenith recover backup_20231223_142030
 ```
 
 </details>
@@ -487,29 +557,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 For production environments, you'll want fine-grained control:
 
-```rust
-use project_name::{Config, PerformanceProfile};
+```bash
+# High performance settings
+zenith format ./ --recursive --workers 32 --verbose
 
-let config = Config::builder()
-    // Production settings
-    .environment("production")
-    .performance_profile(PerformanceProfile::HighThroughput)
-    
-    // Security
-    .enable_encryption(true)
-    .key_rotation_interval(Duration::from_secs(86400))
-    
-    // Monitoring
-    .enable_metrics(true)
-    .metrics_endpoint("http://metrics.example.com")
-    
-    // Resilience
-    .retry_policy(RetryPolicy::exponential_backoff())
-    .timeout(Duration::from_secs(30))
-    
-    .build()?;
+# Disable backup for CI
+zenith format ./ --recursive --no-backup
 
-init_with_config(config)?;
+# Selective formatting
+zenith format src/ --exclude target --exclude node_modules
 ```
 
 <details>
@@ -524,28 +580,21 @@ init_with_config(config)?;
 <th>Memory</th>
 </tr>
 <tr>
-<td><b>LowLatency</b></td>
-<td>Real-time apps</td>
-<td>Medium</td>
-<td>⚡ Very Low</td>
-<td>High</td>
-</tr>
-<tr>
-<td><b>HighThroughput</b></td>
-<td>Batch processing</td>
-<td>⚡ Very High</td>
-<td>Medium</td>
-<td>Medium</td>
-</tr>
-<tr>
-<td><b>Balanced</b></td>
+<td><b>Default</b></td>
 <td>General purpose</td>
 <td>High</td>
 <td>Low</td>
 <td>Medium</td>
 </tr>
 <tr>
-<td><b>LowMemory</b></td>
+<td><b>High Throughput</b></td>
+<td>Large projects</td>
+<td>⚡ Very High</td>
+<td>Medium</td>
+<td>High</td>
+</tr>
+<tr>
+<td><b>Low Memory</b></td>
 <td>Resource-constrained</td>
 <td>Low</td>
 <td>Medium</td>
@@ -563,57 +612,35 @@ init_with_config(config)?;
 
 </div>
 
-**1. Connection Pooling**
+**1. Increase Workers**
 
-```rust
-let config = Config::builder()
-    .connection_pool_size(20)
-    .connection_pool_timeout(Duration::from_secs(5))
-    .build()?;
+```bash
+# For large projects
+zenith format ./ --recursive --workers 32
 ```
 
-**2. Batch Operations**
+**2. Disable Cache for One-off**
 
-<table>
-<tr>
-<td width="50%">
-
-❌ **Inefficient**
-```rust
-for item in items {
-    process_one(item)?;
-}
+```bash
+ZENITH_CACHE_ENABLED=false zenith format ./ --recursive
 ```
 
-</td>
-<td width="50%">
+**3. Batch Processing Configuration**
 
-✅ **Efficient**
-```rust
-process_batch(&items)?;
+```toml
+[concurrency]
+workers = 16
+batch_size = 200
 ```
 
-</td>
-</tr>
-</table>
+**4. Selective Formatting**
 
-**3. Caching**
+```bash
+# Only specific file types
+zenith format $(find ./ -name "*.rs" -o -name "*.py")
 
-```rust
-use project_name::cache::Cache;
-
-let cache = Cache::builder()
-    .max_size(10_000)
-    .ttl(Duration::from_secs(3600))
-    .build()?;
-
-// Use cache
-if let Some(value) = cache.get("key")? {
-    return Ok(value);
-}
-
-let value = expensive_operation()?;
-cache.set("key", value.clone())?;
+# Exclude directories
+zenith format ./ --recursive --exclude target --exclude node_modules
 ```
 
 ### Error Handling
@@ -624,52 +651,26 @@ cache.set("key", value.clone())?;
 
 </div>
 
-```rust
-use project_name::{Error, ErrorKind};
+```bash
+# Check for issues
+zenith doctor
 
-fn handle_operation() -> Result<(), Error> {
-    match risky_operation() {
-        Ok(result) => {
-            println!("Success: {:?}", result);
-            Ok(())
-        }
-        Err(e) => {
-            match e.kind() {
-                ErrorKind::NotFound => {
-                    println!("⚠️ Resource not found, creating new...");
-                    create_resource()?;
-                    Ok(())
-                }
-                ErrorKind::PermissionDenied => {
-                    eprintln!("❌ Access denied");
-                    Err(e)
-                }
-                ErrorKind::Timeout => {
-                    println!("⏱️ Timeout, retrying...");
-                    retry_operation()?;
-                    Ok(())
-                }
-                _ => {
-                    eprintln!("❌ Unexpected error: {}", e);
-                    Err(e)
-                }
-            }
-        }
-    }
-}
+# Enable verbose logging
+zenith format ./ --recursive --verbose
+
+# Set log level
+ZENITH_LOG_LEVEL=debug zenith format ./ --recursive
 ```
 
 <details>
-<summary><b>📋 Error Types</b></summary>
+<summary><b>📋 Common Error Messages</b></summary>
 
-| Error Type | Description | Recovery Strategy |
-|------------|-------------|-------------------|
-| `NotFound` | Resource doesn't exist | Create or use default |
-| `AlreadyExists` | Duplicate resource | Use existing or update |
-| `PermissionDenied` | Access violation | Request permissions |
-| `Timeout` | Operation took too long | Retry with backoff |
-| `InvalidInput` | Bad parameters | Validate and retry |
-| `InternalError` | System failure | Log and alert |
+| Error | Description | Solution |
+|-------|-------------|----------|
+| `Formatter not found` | Missing formatter tool | Run `zenith doctor` and install missing tools |
+| `Permission denied` | File access issue | Check file permissions or use sudo |
+| `Backup directory full` | Disk space issue | Run `zenith clean-backups --days 7` |
+| `Configuration error` | Invalid config | Check `zenith.toml` syntax |
 
 </details>
 
@@ -690,25 +691,21 @@ fn handle_operation() -> Result<(), Error> {
 <td width="50%">
 
 **Initialize Early**
-```rust
-fn main() {
-    // Initialize at the start
-    project_name::init().unwrap();
-    
-    // Then use the library
-    do_work();
-}
+```bash
+# Initialize at project start
+zenith init
+
+# Then customize configuration
+# Edit zenith.toml as needed
 ```
 
 </td>
 <td width="50%">
 
-**Use Builder Pattern**
-```rust
-let config = Config::builder()
-    .option_a(value)
-    .option_b(value)
-    .build()?;
+**Use Check Mode in CI**
+```bash
+# In CI pipelines
+zenith format ./ --recursive --check
 ```
 
 </td>
@@ -716,24 +713,19 @@ let config = Config::builder()
 <tr>
 <td width="50%">
 
-**Handle Errors Properly**
-```rust
-match operation() {
-    Ok(result) => process(result),
-    Err(e) => handle_error(e),
-}
+**Keep Backups Enabled**
+```toml
+[global]
+backup_enabled = true
 ```
 
 </td>
 <td width="50%">
 
-**Clean Up Resources**
-```rust
-{
-    let resource = acquire()?;
-    use_resource(&resource)?;
-    // Auto-cleanup on scope exit
-}
+**Regular Cleanup**
+```bash
+# Clean old backups monthly
+zenith clean-backups --days 30
 ```
 
 </td>
@@ -746,25 +738,25 @@ match operation() {
 <tr>
 <td width="50%">
 
-**Don't Ignore Errors**
-```rust
-// ❌ Bad
-let _ = operation();
+**Don't Disable Backup in Production**
+```toml
+# ❌ Bad
+backup_enabled = false
 
-// ✅ Good
-operation()?;
+# ✅ Good
+backup_enabled = true
 ```
 
 </td>
 <td width="50%">
 
-**Don't Block Async Context**
-```rust
-// ❌ Bad (in async fn)
-thread::sleep(duration);
+**Don't Use Debug Mode in Production**
+```bash
+# ❌ Bad
+ZENITH_LOG_LEVEL=debug zenith format ./
 
-// ✅ Good
-tokio::time::sleep(duration).await;
+# ✅ Good
+ZENITH_LOG_LEVEL=info zenith format ./
 ```
 
 </td>
@@ -773,73 +765,121 @@ tokio::time::sleep(duration).await;
 
 ### 💡 Tips and Tricks
 
-> **🔥 Performance Tip**: Enable release mode optimizations for production:
+> **🔥 Performance Tip**: Use `--workers` to match your CPU cores:
 > ```bash
-> cargo build --release
+> zenith format ./ --workers $(nproc)
 > ```
 
-> **🔒 Security Tip**: Never hardcode sensitive data:
-> ```rust
-> // ❌ Bad
-> let api_key = "sk-1234567890";
+> **🔒 Security Tip**: Don't commit zenith.toml with sensitive API keys:
+> ```toml
+> # ❌ Bad
+> api_key = "secret-key"
 > 
-> // ✅ Good
-> let api_key = env::var("API_KEY")?;
+> # ✅ Good (use environment variable)
+> api_key = "${ZENITH_API_KEY}"
 > ```
 
-> **📊 Monitoring Tip**: Enable metrics in production:
-> ```rust
-> Config::builder().enable_metrics(true).build()?
+> **📊 Monitoring Tip**: Enable verbose logging for debugging:
+> ```bash
+> zenith format ./ --verbose
 > ```
 
 ---
 
 ## Common Patterns
 
-### Pattern 1: Request-Response
+### Pattern 1: Pre-commit Hooks
 
-```rust
-use project_name::{Request, Response};
-
-fn handle_request(req: Request) -> Result<Response, Error> {
-    // Validate
-    req.validate()?;
-    
-    // Process
-    let data = process(req.data())?;
-    
-    // Respond
-    Ok(Response::success(data))
-}
+**Using pre-commit:**
+```yaml
+repos:
+  - repo: local
+    hooks:
+      - id: zenith
+        name: Zenith Format
+        entry: zenith format
+        language: system
+        pass_filenames: true
 ```
 
-### Pattern 2: Worker Pool
-
-```rust
-use project_name::WorkerPool;
-
-let pool = WorkerPool::new(4)?;
-
-for task in tasks {
-    pool.execute(move || {
-        process_task(task)
-    })?;
-}
-
-pool.wait_completion()?;
+**Using Git hooks directly:**
+```bash
+cat > .git/hooks/pre-commit << 'EOF'
+#!/bin/bash
+zenith format $(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(rs|py|js|ts|json|yaml|yml|toml|md|sh)$')
+git add -u
+EOF
+chmod +x .git/hooks/pre-commit
 ```
 
-### Pattern 3: Pipeline
+### Pattern 2: CI/CD Integration
 
-```rust
-use project_name::Pipeline;
+**GitHub Actions:**
+```yaml
+name: Format Check
 
-let result = Pipeline::new()
-    .add_stage(validate)
-    .add_stage(transform)
-    .add_stage(process)
-    .add_stage(store)
-    .execute(input)?;
+on: [push, pull_request]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Zenith
+        run: curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
+      - name: Check formatting
+        run: zenith format ./ --recursive --check
+```
+
+**GitLab CI:**
+```yaml
+format:
+  stage: test
+  script:
+    - curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
+    - zenith format ./ --recursive --check
+```
+
+### Pattern 3: Git Integration
+
+**Format staged files:**
+```bash
+zenith format $(git diff --cached --name-only --diff-filter=ACM)
+```
+
+**Format changed files:**
+```bash
+zenith format $(git diff --name-only --diff-filter=ACM)
+```
+
+**Format files in last commit:**
+```bash
+zenith format $(git diff HEAD~1 --name-only)
+```
+
+### Pattern 4: MCP Server
+
+**Start MCP Server:**
+```bash
+zenith mcp
+zenith mcp --addr 127.0.0.1:9000
+```
+
+**API Request:**
+```bash
+curl -X POST http://127.0.0.1:9000 \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "format",
+    "params": {
+      "paths": ["src/main.rs"],
+      "recursive": false,
+      "backup": true
+    }
+  }'
 ```
 
 ---
@@ -847,52 +887,60 @@ let result = Pipeline::new()
 ## Troubleshooting
 
 <details>
-<summary><b>❓ Problem: Initialization fails with "already initialized"</b></summary>
+<summary><b>❓ Problem: Formatter not found</b></summary>
 
 **Solution:**
-```rust
-// Check if already initialized
-if !project_name::is_initialized() {
-    project_name::init()?;
-}
+```bash
+zenith doctor
+# Install missing formatters:
+rustup component add rustfmt
+pip install ruff
+npm install -g prettier
 ```
 
 </details>
 
 <details>
-<summary><b>❓ Problem: Performance is slower than expected</b></summary>
-
-**Diagnosis:**
-1. Enable debug logging
-2. Check configuration settings
-3. Profile your application
+<summary><b>❓ Problem: Permission denied</b></summary>
 
 **Solution:**
-```rust
-// Use performance profile
-let config = Config::builder()
-    .performance_profile(PerformanceProfile::HighThroughput)
-    .build()?;
+```bash
+# Use sudo or fix permissions
+sudo zenith format /etc/config/file.conf
+# Or:
+chmod +w /path/to/file
 ```
 
 </details>
 
 <details>
-<summary><b>❓ Problem: Memory usage is high</b></summary>
+<summary><b>❓ Problem: Backup directory full</b></summary>
 
 **Solution:**
-```rust
-// Reduce cache size
-let config = Config::builder()
-    .cache_size(512)  // Reduce from default
-    .build()?;
+```bash
+# Clean old backups
+zenith clean-backups --days 7
+```
+
+</details>
+
+<details>
+<summary><b>❓ Problem: Slow performance</b></summary>
+
+**Diagnosis & Solution:**
+```bash
+# Increase workers
+zenith format ./ --recursive --workers 32
+
+# Or disable cache temporarily
+ZENITH_CACHE_ENABLED=false zenith format ./ --recursive
 ```
 
 </details>
 
 <div align="center">
 
-**💬 Still need help?** [Open an issue](../../issues) or [join our Discord](https://discord.gg/project)
+**💬 Still need help?** [Open an issue](https://github.com/Kirky-X/zenith/issues) or [join our Discussions](https://github.com/Kirky-X/zenith/discussions)
 
 </div>
 
@@ -909,18 +957,18 @@ let config = Config::builder()
 <table>
 <tr>
 <td width="33%" align="center">
-<a href="TUTORIALS.md">
+<a href="ARCHITECTURE.md">
 <img src="https://img.icons8.com/fluency/96/000000/graduation-cap.png" width="64"><br>
-<b>📚 Tutorials</b>
+<b>📚 Architecture</b>
 </a><br>
-Step-by-step learning
+Understand the design
 </td>
 <td width="33%" align="center">
-<a href="ADVANCED.md">
+<a href="CONTRIBUTING.md">
 <img src="https://img.icons8.com/fluency/96/000000/settings.png" width="64"><br>
-<b>🔧 Advanced Topics</b>
+<b>🔧 Contributing</b>
 </a><br>
-Deep dive into features
+Help improve Zenith
 </td>
 <td width="33%" align="center">
 <a href="../examples/">
@@ -936,10 +984,10 @@ Real-world code samples
 
 <div align="center">
 
-**[📖 API Reference](https://docs.rs/project-name)** • **[❓ FAQ](FAQ.md)** • **[🐛 Report Issue](../../issues)**
+**[📖 API Reference](https://docs.rs/zenith)** • **[❓ FAQ](FAQ.md)** • **[🐛 Report Issue](https://github.com/Kirky-X/zenith/issues)**
 
-Made with ❤️ by the Project Team
+Made with ❤️ by Kirky-X
 
-[⬆ Back to Top](#-user-guide)
+[⬆ Back to Top](#-zenith-user-guide)
 
 </div>

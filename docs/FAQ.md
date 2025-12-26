@@ -4,7 +4,7 @@
 
 ### Quick Answers to Common Questions
 
-[🏠 Home](../README.md) • [📖 User Guide](USER_GUIDE.md) • [🐛 Troubleshooting](TROUBLESHOOTING.md)
+[🏠 Home](../README.md) • [📖 User Guide](USER_GUIDE.md) • [🐛 Report Issue](https://github.com/Kirky-X/zenith/issues)
 
 ---
 
@@ -27,75 +27,89 @@
 
 <div align="center">
 
-### 🤔 About the Project
+### 🤔 About Zenith
 
 </div>
 
 <details>
-<summary><b>❓ What is Project Name?</b></summary>
+<summary><b>❓ What is Zenith?</b></summary>
 
 <br>
 
-**Project Name** is a [brief description of what your project does]. It provides:
+**Zenith** is a high-performance, multi-language code formatter with automatic backup and one-click recovery. It provides:
 
-- ✅ Feature 1
-- ✅ Feature 2
-- ✅ Feature 3
+- ✅ **14+ Language Support** - Rust, Python, Markdown, JSON, TOML, Shell, C, Java, INI, and more
+- ✅ **Intelligent Caching** - Skips already-formatted files for faster processing
+- ✅ **Automatic Backups** - Preserves original code before formatting
+- ✅ **MCP Server** - Model Context Protocol server for AI integration
+- ✅ **Plugin System** - Extensible architecture for custom formatters
 
-It's designed for [target audience] who need [primary use case].
+It's designed for developers who need a reliable, fast, and safe code formatting solution.
 
 **Learn more:** [User Guide](USER_GUIDE.md)
 
 </details>
 
 <details>
-<summary><b>❓ Why should I use this instead of alternatives?</b></summary>
+<summary><b>❓ Why should I use Zenith instead of alternatives?</b></summary>
 
 <br>
 
 <table>
 <tr>
 <th>Feature</th>
-<th>Project Name</th>
-<th>Alternative A</th>
-<th>Alternative B</th>
+<th>Zenith</th>
+<th>Prettier</th>
+<th>rustfmt</th>
+</tr>
+<tr>
+<td>Multi-language Support</td>
+<td>✅ 14+ languages</td>
+<td>✅ 10+ languages</td>
+<td>❌ Rust only</td>
 </tr>
 <tr>
 <td>Performance</td>
-<td>⚡⚡⚡</td>
+<td>⚡⚡⚡ Async + Cache</td>
 <td>⚡⚡</td>
-<td>⚡</td>
+<td>⚡⚡</td>
 </tr>
 <tr>
-<td>Security</td>
-<td>🔒🔒🔒</td>
-<td>🔒🔒</td>
-<td>🔒🔒</td>
+<td>Automatic Backup</td>
+<td>✅ Built-in</td>
+<td>❌</td>
+<td>❌</td>
 </tr>
 <tr>
-<td>Ease of Use</td>
-<td>✅ Simple</td>
-<td>⚠️ Complex</td>
-<td>✅ Simple</td>
+<td>Smart Caching</td>
+<td>✅ Intelligent</td>
+<td>❌</td>
+<td>❌</td>
 </tr>
 <tr>
-<td>Documentation</td>
-<td>📚 Extensive</td>
-<td>📄 Basic</td>
-<td>📚 Good</td>
+<td>MCP Integration</td>
+<td>✅ Native support</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Rust Implementation</td>
+<td>✅ Native</td>
+<td>❌ Node.js</td>
+<td>✅ Native</td>
 </tr>
 </table>
 
 **Key Advantages:**
-- 🚀 Better performance through [optimization technique]
-- 🔒 Enhanced security with [security feature]
-- 💡 Simpler API design
-- 📖 Comprehensive documentation
+- 🚀 **Fast** - Built in Rust with async/await and intelligent caching
+- 🔒 **Safe** - Automatic backups before formatting, one-click recovery
+- 🧩 **Extensible** - Plugin system for custom formatters
+- 🤖 **AI-Ready** - MCP server for AI assistant integration
 
 </details>
 
 <details>
-<summary><b>❓ Is this production-ready?</b></summary>
+<summary><b>❓ Is Zenith production-ready?</b></summary>
 
 <br>
 
@@ -106,21 +120,21 @@ It's designed for [target audience] who need [primary use case].
 <td width="50%">
 
 **What's Ready:**
-- ✅ Core functionality stable
-- ✅ Comprehensive testing
-- ✅ Security audited
-- ✅ Performance optimized
-- ✅ Well documented
+- ✅ Core formatting functionality stable
+- ✅ 14+ language formatters available
+- ✅ Backup and recovery system
+- ✅ MCP server for AI integration
+- ✅ Comprehensive configuration options
 
 </td>
 <td width="50%">
 
 **Maturity Indicators:**
-- 📊 95%+ test coverage
-- 🏢 Used in production by X companies
-- 👥 Y+ active users
-- 📝 Z+ GitHub stars
-- 🔄 Regular updates
+- 📊 Well-tested Rust codebase
+- 🔄 Active development
+- 📝 MIT Licensed
+- 👥 Open source on GitHub
+- 🐛 Issue tracking and support
 
 </td>
 </tr>
@@ -170,12 +184,6 @@ It's designed for [target audience] who need [primary use case].
 <td>✅ Fully Supported</td>
 <td>Windows 10+</td>
 </tr>
-<tr>
-<td><b>WebAssembly</b></td>
-<td>wasm32</td>
-<td>🚧 Experimental</td>
-<td>Coming in v0.3</td>
-</tr>
 </table>
 
 </details>
@@ -193,62 +201,91 @@ It's designed for [target audience] who need [primary use case].
 
 ✅ **Native Support**
 
-Full API access
-
-</td>
-<td width="33%" align="center">
-
-**☕ Java**
-
-✅ **JNI Bindings**
-
-Core features available
+Full support with rustfmt
 
 </td>
 <td width="33%" align="center">
 
 **🐍 Python**
 
-✅ **PyO3 Bindings**
+✅ **Native Support**
 
-Core features available
+Full support with ruff
+
+</td>
+<td width="33%" align="center">
+
+**📝 Markdown**
+
+✅ **Native Support**
+
+Built-in formatter
 
 </td>
 </tr>
 <tr>
 <td width="33%" align="center">
 
+**📋 JSON/TOML**
+
+✅ **Native Support**
+
+Built-in formatters
+
+</td>
+<td width="33%" align="center">
+
+**🔧 Shell**
+
+✅ **Native Support**
+
+sh/bash formatting
+
+</td>
+<td width="33%" align="center">
+
 **©️ C/C++**
 
-✅ **FFI Available**
+✅ **Native Support**
 
-C-compatible API
+With clang-format
+
+</td>
+</tr>
+<tr>
+<td width="33%" align="center">
+
+**☕ Java**
+
+✅ **Native Support**
+
+Java formatting
 
 </td>
 <td width="33%" align="center">
 
-**🌐 JavaScript**
+**⚙️ INI**
 
-🚧 **Planned**
+✅ **Native Support**
 
-Via WebAssembly
+INI file formatting
 
 </td>
 <td width="33%" align="center">
 
-**⚡ Go**
+**🎨 Prettier**
 
-📋 **Considering**
+🚧 **Plugin**
 
-Community request
+Via external integration
 
 </td>
 </tr>
 </table>
 
 **Documentation:**
-- [Rust API](https://docs.rs/project-name)
-- [FFI Guide](FFI_GUIDE.md)
+- [User Guide](USER_GUIDE.md#core-concepts)
+- [Examples](../examples/)
 
 </details>
 
@@ -263,40 +300,44 @@ Community request
 </div>
 
 <details>
-<summary><b>❓ How do I install this?</b></summary>
+<summary><b>❓ How do I install Zenith?</b></summary>
 
 <br>
 
-**For Rust Projects:**
-
-```toml
-[dependencies]
-project-name = "1.0"
-```
-
-Or using cargo:
+**Using Cargo Install (Recommended):**
 
 ```bash
-cargo add project-name
+cargo install --git https://github.com/Kirky-X/zenith.git
 ```
 
 **From Source:**
 
 ```bash
-git clone https://github.com/user/project-name
-cd project-name
+git clone https://github.com/Kirky-X/zenith.git
+cd zenith
 cargo build --release
+```
+
+**Quick Install Script (Linux/macOS):**
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
+```
+
+**Windows (PowerShell):**
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/Kirky-X/zenith/main/install.ps1 | iex
 ```
 
 **Verification:**
 
-```rust
-use project_name;
+```bash
+zenith --version
+# Output: zenith 0.1.0
 
-fn main() {
-    project_name::init().unwrap();
-    println!("✅ Installation successful!");
-}
+zenith doctor
+# Checks environment and dependencies
 ```
 
 **See also:** [Installation Guide](USER_GUIDE.md#installation)
@@ -339,83 +380,107 @@ fn main() {
 </table>
 
 **Optional:**
-- 🔧 C compiler (for FFI bindings)
+- 🔧 Formatter tools (rustfmt, ruff, clang-format) for specific languages
 - 🐳 Docker (for containerized deployment)
 
 </details>
 
 <details>
-<summary><b>❓ I'm getting compilation errors, what should I do?</b></summary>
+<summary><b>❓ How do I configure Zenith?</b></summary>
 
 <br>
 
-**Common Solutions:**
+**Initialize Configuration:**
 
-1. **Update Rust toolchain:**
-   ```bash
-   rustup update stable
-   ```
+```bash
+zenith init
+```
 
-2. **Clean build artifacts:**
-   ```bash
-   cargo clean
-   cargo build
-   ```
+**Create `zenith.toml`:**
 
-3. **Check Rust version:**
-   ```bash
-   rustc --version
-   # Should be 1.75.0 or higher
-   ```
+```toml
+[global]
+backup_enabled = true
+log_level = "info"
+recursive = true
+cache_enabled = true
+config_dir = ".zenith"
 
-4. **Verify dependencies:**
-   ```bash
-   cargo tree
-   ```
+[zeniths.rust]
+enabled = true
+config_path = ".rustfmt.toml"
+use_default = true
 
-**Still having issues?**
-- 📝 Check [Troubleshooting Guide](TROUBLESHOOTING.md)
-- 🐛 [Open an issue](../../issues) with error details
+[zeniths.python]
+enabled = true
+config_path = "pyproject.toml"
+use_default = true
+
+[concurrency]
+workers = 8
+batch_size = 100
+
+[backup]
+dir = ".zenith_backup"
+retention_days = 7
+
+[mcp]
+enabled = false
+host = "127.0.0.1"
+port = 9000
+auth_enabled = false
+```
+
+**Environment Variables:**
+
+```bash
+export ZENITH_WORKERS=16
+export ZENITH_LOG_LEVEL=debug
+export ZENITH_NO_BACKUP=false
+export ZENITH_RECURSIVE=true
+```
+
+**See also:** [Configuration Guide](USER_GUIDE.md#configuration)
 
 </details>
 
 <details>
-<summary><b>❓ Can I use this with Docker?</b></summary>
+<summary><b>❓ Can I use Zenith in CI/CD?</b></summary>
 
 <br>
 
-**Yes!** Here's a sample Dockerfile:
-
-```dockerfile
-FROM rust:1.75-slim as builder
-
-WORKDIR /app
-COPY . .
-RUN cargo build --release
-
-FROM debian:bookworm-slim
-COPY --from=builder /app/target/release/app /usr/local/bin/
-
-CMD ["app"]
-```
-
-**Docker Compose:**
+**Yes!** Here's how to integrate with GitHub Actions:
 
 ```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - RUST_LOG=info
+name: Format Check
+
+on: [push, pull_request]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Zenith
+        run: curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
+      - name: Check formatting
+        run: zenith format ./ --recursive --check
 ```
 
-**Pre-built Images:**
-```bash
-docker pull ghcr.io/user/project-name:latest
+**GitLab CI:**
+
+```yaml
+format:
+  stage: test
+  script:
+    - curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
+    - zenith format ./ --recursive --check
 ```
+
+**Best Practices:**
+- Use `--check` mode in CI to validate without modifying files
+- Enable backups in production for safety
+- Use caching for faster CI runs
 
 </details>
 
@@ -425,221 +490,253 @@ docker pull ghcr.io/user/project-name:latest
 
 <div align="center">
 
-### 💡 Working with the API
+### 💡 Working with Zenith
 
 </div>
 
 <details>
-<summary><b>❓ How do I get started with basic usage?</b></summary>
+<summary><b>❓ How do I format code with Zenith?</b></summary>
 
 <br>
 
-**5-Minute Quick Start:**
+**Basic Usage:**
 
-```rust
-use project_name::{init, Cipher, KeyManager, Algorithm};
+```bash
+# Format a single file
+zenith format src/main.rs
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // 1. Initialize
-    init()?;
-    
-    // 2. Create key manager
-    let km = KeyManager::new()?;
-    
-    // 3. Generate a key
-    let key_id = km.generate_key(Algorithm::AES256GCM)?;
-    
-    // 4. Create cipher
-    let cipher = Cipher::new(Algorithm::AES256GCM)?;
-    
-    // 5. Encrypt data
-    let plaintext = b"Hello, World!";
-    let ciphertext = cipher.encrypt(&km, &key_id, plaintext)?;
-    
-    // 6. Decrypt
-    let decrypted = cipher.decrypt(&km, &key_id, &ciphertext)?;
-    
-    assert_eq!(plaintext, &decrypted[..]);
-    println!("✅ Success!");
-    
-    Ok(())
-}
+# Format a directory
+zenith format src/
+
+# Format recursively
+zenith format ./ --recursive
+
+# Check mode (dry-run, no changes)
+zenith format src/ --check
+
+# Disable backup for faster operation
+zenith format ./ --recursive --no-backup
+
+# Specify number of workers
+zenith format ./ --workers 16
 ```
 
-**Next Steps:**
-- 📖 [User Guide](USER_GUIDE.md)
-- 💻 [More Examples](../examples/)
+**Initialize Project:**
 
-</details>
+```bash
+# Simple initialization
+zenith init
 
-<details>
-<summary><b>❓ What algorithms are supported?</b></summary>
+# Overwrite existing configuration
+zenith init --force
 
-<br>
-
-<div align="center">
-
-### 🔐 Supported Algorithms
-
-</div>
-
-**Symmetric Encryption:**
-- ✅ AES-128-GCM
-- ✅ AES-192-GCM
-- ✅ AES-256-GCM
-- ✅ SM4-GCM (Chinese standard)
-
-**Asymmetric Signatures:**
-- ✅ ECDSA-P256/P384/P521
-- ✅ RSA-2048/3072/4096
-- ✅ Ed25519
-- ✅ SM2 (Chinese standard)
-
-**Hash Functions:**
-- ✅ SHA-256/384/512
-- ✅ SHA3-256/384/512
-- ✅ SM3 (Chinese standard)
-
-**Key Derivation:**
-- ✅ HKDF
-- ✅ PBKDF2
-- ✅ Argon2id
-
-**See also:** [Algorithm Details](API_REFERENCE.md#algorithms)
-
-</details>
-
-<details>
-<summary><b>❓ Can I use multiple keys simultaneously?</b></summary>
-
-<br>
-
-**Yes!** The KeyManager handles multiple keys:
-
-```rust
-use project_name::{KeyManager, Algorithm};
-
-let km = KeyManager::new()?;
-
-// Generate multiple keys
-let key1 = km.generate_key_with_alias(
-    Algorithm::AES256GCM,
-    "database-encryption"
-)?;
-
-let key2 = km.generate_key_with_alias(
-    Algorithm::AES256GCM,
-    "file-encryption"
-)?;
-
-let key3 = km.generate_key_with_alias(
-    Algorithm::ECDSAP256,
-    "api-signing"
-)?;
-
-// Use different keys for different purposes
-let db_cipher = Cipher::new(Algorithm::AES256GCM)?;
-let file_cipher = Cipher::new(Algorithm::AES256GCM)?;
-let signer = Cipher::new(Algorithm::ECDSAP256)?;
-
-// Each operation uses its dedicated key
-let encrypted_db = db_cipher.encrypt(&km, &key1, data1)?;
-let encrypted_file = file_cipher.encrypt(&km, &key2, data2)?;
-let signature = signer.sign(&km, &key3, message)?;
+# Check environment
+zenith doctor
 ```
 
-**Benefits:**
-- 🔒 Key separation for different use cases
-- 🎯 Better security through isolation
-- 📊 Easier audit and access control
+**Backup and Recovery:**
+
+```bash
+# List available backups
+zenith list-backups
+
+# Restore from backup
+zenith recover backup_20231223_142030
+
+# Clean old backups
+zenith clean-backups --days 7
+```
+
+**See also:** [User Guide](USER_GUIDE.md#basic-operations)
 
 </details>
 
 <details>
-<summary><b>❓ How do I handle errors properly?</b></summary>
+<summary><b>❓ What is the MCP server and how do I use it?</b></summary>
 
 <br>
 
-**Recommended Pattern:**
+**MCP (Model Context Protocol)** enables AI assistants to interact with Zenith.
+
+**Start MCP Server:**
+
+```bash
+zenith mcp
+zenith mcp --addr 127.0.0.1:9000
+```
+
+**API Request:**
+
+```bash
+curl -X POST http://127.0.0.1:9000 \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "format",
+    "params": {
+      "paths": ["src/main.rs"],
+      "recursive": false,
+      "backup": true
+    }
+  }'
+```
+
+**Configuration:**
+
+```toml
+[mcp]
+enabled = true
+host = "127.0.0.1"
+port = 9000
+auth_enabled = false
+api_key = null
+allowed_origins = ["*"]
+```
+
+**Use Cases:**
+- AI-assisted code formatting
+- Automated code review workflows
+- IDE integration via MCP protocol
+
+</details>
+
+<details>
+<summary><b>❓ How does the backup system work?</b></summary>
+
+<br>
+
+**Automatic Backups:**
+
+Zenith automatically creates backups before formatting files.
+
+```toml
+[backup]
+dir = ".zenith_backup"
+retention_days = 7
+```
+
+**Backup Commands:**
+
+```bash
+# List all backups
+zenith list-backups
+
+# Restore from specific backup
+zenith recover backup_20231223_142030
+
+# Clean backups older than 7 days
+zenith clean-backups --days 7
+
+# Auto rollback to latest backup
+zenith auto-rollback
+```
+
+**Backup Structure:**
+
+```
+.zenith_backup/
+├── backup_20231223_142030/
+│   ├── src_main.rs
+│   └── src_lib.rs
+├── backup_20231223_143000/
+│   └── src_main.rs
+```
+
+</details>
+
+<details>
+<summary><b>❓ How does the caching system improve performance?</b></summary>
+
+<br>
+
+**How It Works:**
+
+Zenith tracks file hashes and skips already-formatted files.
+
+```toml
+[global]
+cache_enabled = true
+```
+
+**Performance Comparison:**
+
+<table>
+<tr>
+<td width="50%">
+
+**Without Cache**
+```bash
+zenith format ./ --recursive
+# Time: 10s (all files)
+```
+
+</td>
+<td width="50%">
+
+**With Cache**
+```bash
+zenith format ./ --recursive
+# Time: 1s (only changed files)
+```
+
+</td>
+</tr>
+</table>
+
+**Cache Management:**
+
+- Cache is automatic - no manual intervention needed
+- Cache invalidates when file content changes
+- Disable with `ZENITH_CACHE_ENABLED=false` if needed
+
+</details>
+
+<details>
+<summary><b>❓ How do I add custom formatters via plugins?</b></summary>
+
+<br>
+
+**Plugin System:**
+
+Zenith supports custom formatters through its plugin architecture.
+
+**Create Custom Zenith:**
 
 ```rust
-use project_name::{Error, ErrorKind};
+use zenith::core::traits::Zenith;
 
-fn process_data() -> Result<(), Error> {
-    match risky_operation() {
-        Ok(result) => {
-            println!("✅ Success: {:?}", result);
-            Ok(())
-        }
-        Err(e) => {
-            match e.kind() {
-                ErrorKind::KeyNotFound => {
-                    // Recoverable: create new key
-                    println!("⚠️ Key not found, generating new one");
-                    let key = generate_key()?;
-                    Ok(())
-                }
-                ErrorKind::Timeout => {
-                    // Recoverable: retry
-                    println!("⏱️ Timeout, retrying...");
-                    retry_with_backoff()?;
-                    Ok(())
-                }
-                ErrorKind::PermissionDenied => {
-                    // Not recoverable
-                    eprintln!("❌ Access denied");
-                    Err(e)
-                }
-                _ => {
-                    // Log and propagate
-                    eprintln!("❌ Unexpected error: {}", e);
-                    Err(e)
-                }
-            }
-        }
+pub struct CustomZenith;
+
+impl Zenith for CustomZenith {
+    fn name(&self) -> &'static str {
+        "custom"
+    }
+    
+    fn extensions(&self) -> &'static [&'static str] {
+        &["custom"]
+    }
+    
+    fn format(
+        &self,
+        content: &str,
+        config: Option<&str>,
+    ) -> Result<String, Box<dyn std::error::Error>> {
+        // Your formatting logic
+        Ok(formatted_content)
     }
 }
 ```
 
-**Error Types:**
-- [Error Reference](API_REFERENCE.md#error-handling)
+**Security Configuration:**
 
-</details>
-
-<details>
-<summary><b>❓ Is there async/await support?</b></summary>
-
-<br>
-
-**Current Status:** 🚧 **Planned for v0.3**
-
-**Workaround for now:**
-
-```rust
-use tokio::task;
-
-async fn async_encrypt() -> Result<Vec<u8>, Error> {
-    let result = task::spawn_blocking(|| {
-        // Synchronous operation
-        let km = KeyManager::new()?;
-        let cipher = Cipher::new(Algorithm::AES256GCM)?;
-        // ... encrypt ...
-        Ok(ciphertext)
-    }).await??;
-    
-    Ok(result)
-}
+```toml
+[security]
+allowed_plugin_commands = ["custom-formatter"]
+allow_absolute_paths = false
+allow_relative_paths = false
 ```
-
-**Future API (planned):**
-
-```rust
-// Coming in v0.3
-let cipher = AsyncCipher::new(Algorithm::AES256GCM)?;
-let ciphertext = cipher.encrypt_async(&km, &key_id, data).await?;
-```
-
-**Track progress:** [Issue #123](../../issues/123)
 
 </details>
 
@@ -649,151 +746,108 @@ let ciphertext = cipher.encrypt_async(&km, &key_id, data).await?;
 
 <div align="center">
 
-### ⚡ Speed and Optimization
+### ⚡ Optimization
 
 </div>
 
 <details>
-<summary><b>❓ How fast is it?</b></summary>
+<summary><b>❓ How can I optimize Zenith for large projects?</b></summary>
 
 <br>
 
-**Benchmark Results:**
-
-<table>
-<tr>
-<th>Operation</th>
-<th>Throughput</th>
-<th>Latency (P50)</th>
-<th>Latency (P99)</th>
-</tr>
-<tr>
-<td>AES-256-GCM Encrypt</td>
-<td>500 MB/s</td>
-<td>0.5 ms</td>
-<td>2 ms</td>
-</tr>
-<tr>
-<td>ECDSA-P256 Sign</td>
-<td>10K ops/s</td>
-<td>0.1 ms</td>
-<td>0.5 ms</td>
-</tr>
-<tr>
-<td>SHA-256 Hash</td>
-<td>1 GB/s</td>
-<td>0.05 ms</td>
-<td>0.2 ms</td>
-</tr>
-</table>
-
-**Run benchmarks yourself:**
+**Increase Workers:**
 
 ```bash
-cargo bench
+# Match CPU cores
+zenith format ./ --workers $(nproc)
+
+# For very large projects
+zenith format ./ --workers 32
 ```
 
-**Comparison with alternatives:** [Performance Guide](PERFORMANCE.md)
+**Configuration:**
 
-</details>
+```toml
+[concurrency]
+workers = 16
+batch_size = 200
+```
 
-<details>
-<summary><b>❓ How can I improve performance?</b></summary>
+**Disable Backup for CI:**
 
-<br>
+```bash
+zenith format ./ --recursive --no-backup
+```
 
-**Optimization Tips:**
+**Selective Formatting:**
 
-1. **Enable Release Mode:**
-   ```bash
-   cargo build --release
-   ```
+```bash
+# Only specific file types
+zenith format $(find ./ -name "*.rs" -o -name "*.py")
 
-2. **Use Appropriate Algorithm:**
-   ```rust
-   // For throughput
-   Algorithm::AES128GCM  // Faster
-   
-   // For security
-   Algorithm::AES256GCM  // More secure
-   ```
+# Exclude directories
+zenith format ./ --recursive --exclude target --exclude node_modules
+```
 
-3. **Batch Operations:**
-   ```rust
-   // ❌ Inefficient
-   for item in items {
-       process_one(item)?;
-   }
-   
-   // ✅ Efficient
-   process_batch(&items)?;
-   ```
-
-4. **Configure Thread Pool:**
-   ```rust
-   let config = Config::builder()
-       .thread_pool_size(8)  // Match CPU cores
-       .build()?;
-   ```
-
-5. **Enable Hardware Acceleration:**
-   ```toml
-   [features]
-   default = ["hw-accel"]
-   ```
-
-**More tips:** [Performance Guide](PERFORMANCE.md)
-
-</details>
-
-<details>
-<summary><b>❓ What's the memory usage like?</b></summary>
-
-<br>
-
-**Typical Memory Usage:**
+**Performance Profiles:**
 
 <table>
 <tr>
-<th>Scenario</th>
-<th>Memory Usage</th>
-<th>Notes</th>
+<th>Profile</th>
+<th>Use Case</th>
+<th>Throughput</th>
+<th>Memory</th>
 </tr>
 <tr>
-<td>Basic initialization</td>
-<td>~10 MB</td>
-<td>Minimum overhead</td>
+<td><b>Default</b></td>
+<td>General purpose</td>
+<td>High</td>
+<td>Medium</td>
 </tr>
 <tr>
-<td>With 100 keys</td>
-<td>~50 MB</td>
-<td>~0.4 MB per key</td>
+<td><b>High Throughput</b></td>
+<td>Large projects</td>
+<td>⚡ Very High</td>
+<td>High</td>
 </tr>
 <tr>
-<td>With caching (1 GB cache)</td>
-<td>~1 GB</td>
-<td>Configurable</td>
-</tr>
-<tr>
-<td>High-throughput mode</td>
-<td>~200 MB</td>
-<td>Extra buffers</td>
+<td><b>Low Memory</b></td>
+<td>Resource-constrained</td>
+<td>Low</td>
+<td>⚡ Very Low</td>
 </tr>
 </table>
 
-**Reduce Memory Usage:**
+</details>
 
-```rust
-let config = Config::builder()
-    .cache_size(256)      // Reduce cache
-    .performance_profile(PerformanceProfile::LowMemory)
-    .build()?;
+<details>
+<summary><b>❓ What are the best practices for performance?</b></summary>
+
+<br>
+
+**✅ DO's:**
+
+- Use `--workers` to match your CPU cores
+- Enable caching for repeated formatting
+- Use `--check` mode in CI pipelines
+- Exclude build directories (`target`, `node_modules`)
+- Keep backups enabled for safety
+
+**❌ DON'Ts:**
+
+- Don't use debug logging in production
+- Don't disable caching for small projects
+- Don't format entire filesystem without recursion control
+
+**Tips:**
+
+```bash
+# Check performance with verbose logging
+zenith format ./ --verbose
+
+# Monitor with debug level
+ZENITH_LOG_LEVEL=debug zenith format ./
 ```
-
-**Memory Safety:**
-- ✅ Automatic cleanup with `zeroize`
-- ✅ Memory locking for sensitive data
-- ✅ No memory leaks (verified with Valgrind)
 
 </details>
 
@@ -803,16 +857,21 @@ let config = Config::builder()
 
 <div align="center">
 
-### 🔒 Security Features
+### 🔒 Security Best Practices
 
 </div>
 
 <details>
-<summary><b>❓ Is this secure?</b></summary>
+<summary><b>❓ Is Zenith safe to use?</b></summary>
 
 <br>
 
-**Yes!** Security is our top priority.
+**Yes!** Zenith is designed with safety in mind:
+
+- ✅ **Automatic Backups** - Original code preserved before formatting
+- ✅ **One-Click Recovery** - Easily restore from backups
+- ✅ **Sandboxed Plugins** - Plugin security configuration
+- ✅ **Safe Defaults** - Backup enabled by default
 
 **Security Features:**
 
@@ -820,142 +879,90 @@ let config = Config::builder()
 <tr>
 <td width="50%">
 
-**Implementation**
-- ✅ Memory-safe (Rust)
-- ✅ Audited crypto libraries
-- ✅ Constant-time operations
-- ✅ Secure random generation
+**Code Safety:**
+- Automatic backups before formatting
+- Dry-run mode (`--check`) available
+- Versioned backup storage
+- Configurable retention policy
 
 </td>
 <td width="50%">
 
-**Protections**
-- ✅ Buffer overflow protection
-- ✅ Side-channel resistance
-- ✅ Memory wiping (zeroize)
-- ✅ Memory locking (mlock)
+**Plugin Security:**
+- Command whitelisting
+- Path access control
+- Secure defaults
+- Audit logging
 
 </td>
 </tr>
 </table>
 
-**Compliance:**
-- 🏅 FIPS 140-3 Level 1 (planned)
-- 🏅 Chinese standards (SM2/SM3/SM4)
-
-**Audits:**
-- ✅ Internal security review
-- 🚧 Third-party audit (Q2 2025)
-
-**More details:** [Security Guide](SECURITY.md)
-
 </details>
 
 <details>
-<summary><b>❓ How do I report security vulnerabilities?</b></summary>
+<summary><b>❓ How do I secure the MCP server?</b></summary>
 
 <br>
 
-**Please report security issues responsibly:**
+**Enable Authentication:**
 
-1. **DO NOT** create public GitHub issues
-2. **Email:** security@example.com
-3. **Include:**
-   - Description of the vulnerability
-   - Steps to reproduce
-   - Potential impact
-   - Suggested fix (if any)
-
-**Response Timeline:**
-- 📧 Initial response: 24 hours
-- 🔍 Assessment: 72 hours
-- 🔧 Fix (if valid): 7-30 days
-- 📢 Public disclosure: After fix released
-
-**Security Policy:** [SECURITY.md](../SECURITY.md)
-
-</details>
-
-<details>
-<summary><b>❓ What about key storage?</b></summary>
-
-<br>
-
-**Key Storage Options:**
-
-<table>
-<tr>
-<th>Method</th>
-<th>Security</th>
-<th>Use Case</th>
-</tr>
-<tr>
-<td><b>In-Memory</b></td>
-<td>🔒 Good</td>
-<td>Development, testing</td>
-</tr>
-<tr>
-<td><b>File-based</b></td>
-<td>🔒🔒 Better</td>
-<td>Single-server deployment</td>
-</tr>
-<tr>
-<td><b>HSM</b></td>
-<td>🔒🔒🔒 Best</td>
-<td>Production (coming soon)</td>
-</tr>
-</table>
-
-**Best Practices:**
-
-```rust
-// 1. Use memory locking
-let config = Config::builder()
-    .enable_memory_locking(true)
-    .build()?;
-
-// 2. Set appropriate permissions
-use std::fs;
-fs::set_permissions("keys/", 0o600)?;
-
-// 3. Encrypt keys at rest
-let encrypted_key = encrypt_key(key, master_key)?;
+```toml
+[mcp]
+enabled = true
+auth_enabled = true
+api_key = "${ZENITH_API_KEY}"
+allowed_origins = ["https://your-domain.com"]
 ```
 
-**Planned Features:**
-- 🚧 HSM integration (PKCS#11)
-- 🚧 Cloud KMS support (AWS, Azure, GCP)
-- 🚧 Hardware security module
+**Use Environment Variables:**
+
+```bash
+export ZENITH_API_KEY="your-secure-api-key"
+```
+
+**Don't commit API keys:**
+
+```toml
+# ❌ Bad - exposes API key
+api_key = "secret-key"
+
+# ✅ Good - uses environment variable
+api_key = "${ZENITH_API_KEY}"
+```
+
+**Security Recommendations:**
+- Always enable authentication in production
+- Use strong API keys
+- Restrict allowed origins
+- Monitor MCP server access
 
 </details>
 
 <details>
-<summary><b>❓ Are there any known vulnerabilities?</b></summary>
+<summary><b>❓ How do I handle sensitive files?</b></summary>
 
 <br>
 
-**Current Status:** ✅ **No known vulnerabilities**
+**Exclude Sensitive Files:**
 
-**How we maintain security:**
+```bash
+# Exclude specific directories
+zenith format ./ --exclude .env --exclude secrets --exclude credentials
+```
 
-1. **Dependency Scanning:**
-   ```bash
-   cargo audit
-   ```
+**Configuration:**
 
-2. **Regular Updates:**
-   - Weekly dependency updates
-   - Security patches within 48 hours
+```toml
+[limits]
+max_file_size_mb = 10
+```
 
-3. **Testing:**
-   - Fuzz testing
-   - Static analysis
-   - Security-focused code review
-
-**Stay Informed:**
-- 🔔 Watch this repository
-- 📬 Subscribe to [security mailing list](mailto:security-subscribe@example.com)
-- 📰 Check [security advisories](../../security/advisories)
+**Best Practices:**
+- Don't format files containing secrets
+- Use `.gitignore` to exclude sensitive directories
+- Review changes before committing
+- Use backup system for safety
 
 </details>
 
@@ -970,118 +977,153 @@ let encrypted_key = encrypt_key(key, master_key)?;
 </div>
 
 <details>
-<summary><b>❓ I'm getting "AlreadyInitialized" error</b></summary>
+<summary><b>❓ Formatter not found</b></summary>
 
 <br>
 
-**Problem:**
-```
-Error: AlreadyInitialized
-```
-
-**Cause:** Calling `init()` multiple times.
+**Problem:** Missing formatter tool for a specific language.
 
 **Solution:**
 
-```rust
-// Check before initializing
-if !project_name::is_initialized() {
-    project_name::init()?;
-}
-
-// Or use a once_cell
-use once_cell::sync::Lazy;
-
-static INIT: Lazy<()> = Lazy::new(|| {
-    project_name::init().expect("Initialization failed");
-});
-
-fn main() {
-    Lazy::force(&INIT);
-    // ... rest of code
-}
-```
-
-</details>
-
-<details>
-<summary><b>❓ Getting "KeyNotFound" errors</b></summary>
-
-<br>
-
-**Problem:**
-```
-Error: KeyNotFound("key-123")
-```
-
-**Common Causes:**
-
-1. **Key was never generated:**
-   ```rust
-   // Generate the key first
-   let key_id = km.generate_key(Algorithm::AES256GCM)?;
-   ```
-
-2. **Wrong key ID:**
-   ```rust
-   // Check key ID spelling
-   let key_id = "user-key-123";  // Make sure this matches
-   ```
-
-3. **Key was deleted:**
-   ```rust
-   // List available keys
-   let keys = km.list_keys()?;
-   println!("Available keys: {:?}", keys);
-   ```
-
-**Debug Tips:**
-```rust
-// Enable debug logging
-env::set_var("RUST_LOG", "debug");
-env_logger::init();
-```
-
-</details>
-
-<details>
-<summary><b>❓ Performance is slower than expected</b></summary>
-
-<br>
-
-**Checklist:**
-
-- [ ] Are you running in release mode?
-  ```bash
-  cargo run --release
-  ```
-
-- [ ] Have you configured thread pool size?
-  ```rust
-  Config::builder().thread_pool_size(num_cpus::get()).build()?
-  ```
-
-- [ ] Is hardware acceleration enabled?
-  ```toml
-  [features]
-  default = ["hw-accel"]
-  ```
-
-- [ ] Are you using batch operations?
-  ```rust
-  process_batch(&items)?  // Better than loop
-  ```
-
-**Profiling:**
 ```bash
-cargo flamegraph
+# Check environment
+zenith doctor
+
+# Install missing formatters:
+# Rust
+rustup component add rustfmt
+
+# Python
+pip install ruff
+
+# C/C++
+apt install clang-format
+
+# Prettier
+npm install -g prettier
 ```
 
-**More help:** [Performance Guide](PERFORMANCE.md)
+**Configure external formatters:**
+
+```toml
+[zeniths.python]
+enabled = true
+config_path = "pyproject.toml"
+```
 
 </details>
 
-**More issues?** Check [Troubleshooting Guide](TROUBLESHOOTING.md)
+<details>
+<summary><b>❓ Permission denied</b></summary>
+
+<br>
+
+**Problem:** File access issues.
+
+**Solution:**
+
+```bash
+# Check file permissions
+ls -la path/to/file
+
+# Fix permissions
+chmod +w path/to/file
+
+# Or use sudo (caution)
+sudo zenith format /etc/config/file.conf
+```
+
+**Note:** Be careful with sudo - only use when necessary.
+
+</details>
+
+<details>
+<summary><b>❓ Backup directory full</b></summary>
+
+<br>
+
+**Problem:** Disk space issues from backups.
+
+**Solution:**
+
+```bash
+# Clean old backups
+zenith clean-backups --days 7
+
+# Or manually remove
+rm -rf .zenith_backup/*
+
+# Configure retention
+[backup]
+retention_days = 3
+```
+
+</details>
+
+<details>
+<summary><b>❓ Slow performance</b></summary>
+
+<br>
+
+**Problem:** Formatting takes too long.
+
+**Diagnosis & Solution:**
+
+```bash
+# Increase workers
+zenith format ./ --recursive --workers 32
+
+# Disable cache temporarily
+ZENITH_CACHE_ENABLED=false zenith format ./ --recursive
+
+# Exclude build directories
+zenith format ./ --recursive --exclude target --exclude node_modules
+
+# Check with verbose mode
+zenith format ./ --verbose
+```
+
+**Performance Tips:**
+- Match workers to CPU cores
+- Enable caching for repeated runs
+- Exclude build and dependency directories
+- Use selective formatting for large projects
+
+</details>
+
+<details>
+<summary><b>❓ Configuration errors</b></summary>
+
+<br>
+
+**Problem:** Invalid configuration file.
+
+**Solution:**
+
+```bash
+# Validate configuration
+zenith doctor
+
+# Check config syntax
+cat zenith.toml
+
+# Reset to defaults
+zenith init --force
+```
+
+**Common Issues:**
+- Invalid TOML syntax
+- Missing required fields
+- Invalid enum values
+- File path issues
+
+</details>
+
+<div align="center">
+
+**💬 Still need help?** [Open an issue](https://github.com/Kirky-X/zenith/issues) or [join our Discussions](https://github.com/Kirky-X/zenith/discussions)
+
+</div>
 
 ---
 
@@ -1089,7 +1131,7 @@ cargo flamegraph
 
 <div align="center">
 
-### 🤝 Join the Community
+### 🤝 Help Improve Zenith
 
 </div>
 
@@ -1100,129 +1142,58 @@ cargo flamegraph
 
 **Ways to Contribute:**
 
-<table>
-<tr>
-<td width="50%">
-
-**Code Contributions**
-- 🐛 Fix bugs
-- ✨ Add features
-- 📝 Improve documentation
-- ✅ Write tests
-
-</td>
-<td width="50%">
-
-**Non-Code Contributions**
-- 📖 Write tutorials
-- 🎨 Design assets
-- 🌍 Translate docs
-- 💬 Answer questions
-
-</td>
-</tr>
-</table>
+- 🐛 **Bug Reports** - Report issues on GitHub
+- 💡 **Feature Requests** - Suggest new features
+- 📝 **Documentation** - Improve docs and guides
+- 🔧 **Code Contributions** - Submit pull requests
+- 🧪 **Testing** - Help test new features
 
 **Getting Started:**
 
-1. 🍴 Fork the repository
-2. 🌱 Create a branch
-3. ✏️ Make changes
-4. ✅ Add tests
-5. 📤 Submit PR
+```bash
+# Fork the repository
+git clone https://github.com/YOUR-USERNAME/zenith.git
+cd zenith
 
-**Guidelines:** [CONTRIBUTING.md](../CONTRIBUTING.md)
+# Create a feature branch
+git checkout -b feature/amazing-feature
 
-</details>
+# Make changes and test
+cargo test
 
-<details>
-<summary><b>❓ I found a bug, what should I do?</b></summary>
-
-<br>
-
-**Before Reporting:**
-
-1. ✅ Check [existing issues](../../issues)
-2. ✅ Try the latest version
-3. ✅ Check [troubleshooting guide](TROUBLESHOOTING.md)
-
-**Creating a Good Bug Report:**
-
-```markdown
-### Description
-Clear description of the bug
-
-### Steps to Reproduce
-1. Step one
-2. Step two
-3. See error
-
-### Expected Behavior
-What should happen
-
-### Actual Behavior
-What actually happens
-
-### Environment
-- OS: Ubuntu 22.04
-- Rust version: 1.75.0
-- Project version: 1.0.0
-
-### Additional Context
-Any other relevant information
+# Submit pull request
+git push origin feature/amazing-feature
 ```
 
-**Submit:** [Create Issue](../../issues/new)
+**See also:** [CONTRIBUTING.md](../CONTRIBUTING.md)
 
 </details>
 
 <details>
-<summary><b>❓ Where can I get help?</b></summary>
+<summary><b>❓ What coding standards does Zenith follow?</b></summary>
 
 <br>
 
-<div align="center">
+**Rust Standards:**
 
-### 💬 Support Channels
+- Follow [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
+- Use `rustfmt` for formatting
+- Enable `clippy::all` and `clippy::pedantic`
+- Write documentation for public APIs
+- Add tests for new functionality
 
-</div>
+**Code Style:**
 
-<table>
-<tr>
-<td width="33%" align="center">
+```bash
+# Format code
+cargo fmt
 
-**🐛 Issues**
+# Run lints
+cargo clippy
 
-[GitHub Issues](../../issues)
-
-Bug reports & features
-
-</td>
-<td width="33%" align="center">
-
-**💬 Discussions**
-
-[GitHub Discussions](../../discussions)
-
-Q&A and ideas
-
-</td>
-<td width="33%" align="center">
-
-**💡 Discord**
-
-[Join Server](https://discord.gg/project)
-
-Live chat
-
-</td>
-</tr>
-</table>
-
-**Response Times:**
-- 🐛 Critical bugs: 24 hours
-- 🔧 Feature requests: 1 week
-- 💬 Questions: 2-3 days
+# Run tests
+cargo test
+```
 
 </details>
 
@@ -1232,70 +1203,53 @@ Live chat
 
 <div align="center">
 
-### 📄 License Information
+### 📜 License Information
 
 </div>
 
 <details>
-<summary><b>❓ What license is this under?</b></summary>
+<summary><b>❓ What license is Zenith under?</b></summary>
 
 <br>
 
-**Dual License:**
-
-<table>
-<tr>
-<td width="50%" align="center">
-
 **MIT License**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE-MIT)
+Zenith is licensed under the MIT License. This is a permissive license that allows:
 
-**Permissions:**
 - ✅ Commercial use
 - ✅ Modification
 - ✅ Distribution
 - ✅ Private use
+- ✅ Sublicensing
 
-</td>
-<td width="50%" align="center">
+**Required:**
+- Include copyright notice
+- Include license notice
 
-**Apache License 2.0**
+**No Liability:**
+- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](../LICENSE-APACHE)
-
-**Permissions:**
-- ✅ Commercial use
-- ✅ Modification
-- ✅ Distribution
-- ✅ Patent grant
-
-</td>
-</tr>
-</table>
-
-**You can choose either license for your use.**
+**Full License:** See [LICENSE](../LICENSE) file for details.
 
 </details>
 
 <details>
-<summary><b>❓ Can I use this in commercial projects?</b></summary>
+<summary><b>❓ Can I use Zenith in my commercial project?</b></summary>
 
 <br>
 
-**Yes!** Both MIT and Apache 2.0 licenses allow commercial use.
+**Yes!** The MIT License allows commercial use:
 
-**What you need to do:**
-1. ✅ Include the license text
-2. ✅ Include copyright notice
-3. ✅ State any modifications
+- ✅ Use Zenith in commercial products
+- ✅ Modify Zenith for your needs
+- ✅ Distribute modified versions
+- ✅ No attribution required (but appreciated)
 
-**What you DON'T need to do:**
-- ❌ Share your source code
-- ❌ Open source your project
-- ❌ Pay royalties
-
-**Questions?** Contact: legal@example.com
+**Example Commercial Use:**
+- Internal company tooling
+- SaaS products
+- Open-source libraries
+- Closed-source applications
 
 </details>
 
@@ -1303,36 +1257,9 @@ Live chat
 
 <div align="center">
 
-### 🎯 Still Have Questions?
+**[📖 User Guide](USER_GUIDE.md)** • **[🏠 Home](../README.md)** • **[🐛 Report Issue](https://github.com/Kirky-X/zenith/issues)**
 
-<table>
-<tr>
-<td width="33%" align="center">
-<a href="../../issues">
-<img src="https://img.icons8.com/fluency/96/000000/bug.png" width="48"><br>
-<b>Open an Issue</b>
-</a>
-</td>
-<td width="33%" align="center">
-<a href="../../discussions">
-<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="48"><br>
-<b>Start a Discussion</b>
-</a>
-</td>
-<td width="33%" align="center">
-<a href="mailto:support@example.com">
-<img src="https://img.icons8.com/fluency/96/000000/email.png" width="48"><br>
-<b>Email Us</b>
-</a>
-</td>
-</tr>
-</table>
-
----
-
-**[📖 User Guide](USER_GUIDE.md)** • **[🔧 API Docs](https://docs.rs/project-name)** • **[🏠 Home](../README.md)**
-
-Made with ❤️ by the Documentation Team
+Made with ❤️ by Kirky-X
 
 [⬆ Back to Top](#-frequently-asked-questions-faq)
 

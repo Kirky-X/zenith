@@ -2,9 +2,9 @@
 
 # 🏗️ Architecture Design
 
-### Technical Architecture & Design Decisions
+### Zenith 代码格式化工具架构设计
 
-[🏠 Home](../README.md) • [📖 User Guide](USER_GUIDE.md) • [🔧 API Docs](https://docs.rs/project-name)
+[🏠 Home](../README.md) • [📖 User Guide](USER_GUIDE.md) • [🔧 API Docs](API_REFERENCE.md)
 
 ---
 
@@ -61,11 +61,11 @@ Clean, documented code
 ### Design Principles
 
 > 🎯 **Simplicity First**: Keep the API simple and intuitive
-> 
+>
 > 🔒 **Security by Design**: Build security into every layer
-> 
+>
 > ⚡ **Performance by Default**: Optimize for the common case
-> 
+>
 > 🧩 **Modularity**: Components should be independent and composable
 
 ---
@@ -81,65 +81,83 @@ Clean, documented code
 ```mermaid
 graph TB
     subgraph "Application Layer"
-        A[User Application]
+        CLI[CLI Command Handler]
+        MCP[MCP Protocol Handler]
     end
     
     subgraph "API Layer"
-        B[Public API]
-        C[Builder API]
-        D[FFI Layer]
+        Service[ZenithService]
+        PluginLoader[Plugin Loader]
     end
     
     subgraph "Core Layer"
-        E[Core Engine]
-        F[Algorithm Manager]
-        G[Key Manager]
-        H[Policy Engine]
+        Registry[ZenithRegistry]
+        Traits[Core Traits]
     end
     
-    subgraph "Provider Layer"
-        I[Crypto Provider]
-        J[Storage Provider]
-        K[Audit Provider]
+    subgraph "Zenith Layer"
+        Rust[Rust Zenith]
+        Python[Python Zenith]
+        Java[Java Zenith]
+        C[C Zenith]
+        Markdown[Markdown Zenith]
+        Shell[Shell Zenith]
+        TOML[TOML Zenith]
+        INI[INI Zenith]
+        Prettier[Prettier Zenith]
     end
     
     subgraph "Infrastructure"
-        L[(Database)]
-        M[File System]
-        N[Audit Log]
+        Backup[Backup Service]
+        Cache[Hash Cache]
+        Config[Config System]
     end
     
-    A --> B
-    A --> C
-    A --> D
+    CLI --> Service
+    MCP --> Service
+    Service --> Registry
+    Service --> PluginLoader
+    Registry --> Traits
+    PluginLoader --> Rust
+    PluginLoader --> Python
+    PluginLoader --> Java
+    PluginLoader --> C
+    PluginLoader --> Markdown
+    PluginLoader --> Shell
+    PluginLoader --> TOML
+    PluginLoader --> INI
+    PluginLoader --> Prettier
+    Registry --> Rust
+    Registry --> Python
+    Registry --> Java
+    Registry --> C
+    Registry --> Markdown
+    Registry --> Shell
+    Registry --> TOML
+    Registry --> INI
+    Registry --> Prettier
+    Service --> Backup
+    Service --> Cache
+    Service --> Config
     
-    B --> E
-    C --> E
-    D --> E
-    
-    E --> F
-    E --> G
-    E --> H
-    
-    F --> I
-    G --> J
-    H --> K
-    
-    I --> L
-    J --> M
-    K --> N
-    
-    style A fill:#e1f5ff
-    style B fill:#b3e5fc
-    style C fill:#b3e5fc
-    style D fill:#b3e5fc
-    style E fill:#81d4fa
-    style F fill:#4fc3f7
-    style G fill:#4fc3f7
-    style H fill:#4fc3f7
-    style I fill:#29b6f6
-    style J fill:#29b6f6
-    style K fill:#29b6f6
+    style CLI fill:#e1f5ff
+    style MCP fill:#e1f5ff
+    style Service fill:#b3e5fc
+    style PluginLoader fill:#b3e5fc
+    style Registry fill:#81d4fa
+    style Traits fill:#81d4fa
+    style Rust fill:#4fc3f7
+    style Python fill:#4fc3f7
+    style Java fill:#4fc3f7
+    style C fill:#4fc3f7
+    style Markdown fill:#4fc3f7
+    style Shell fill:#4fc3f7
+    style TOML fill:#4fc3f7
+    style INI fill:#4fc3f7
+    style Prettier fill:#4fc3f7
+    style Backup fill:#29b6f6
+    style Cache fill:#29b6f6
+    style Config fill:#29b6f6
 ```
 
 ### Layer Responsibilities
@@ -153,32 +171,32 @@ graph TB
 </tr>
 <tr>
 <td><b>Application</b></td>
-<td>User-facing code</td>
-<td>Business logic, workflows</td>
+<td>User-facing interfaces</td>
+<td>CLI, MCP Protocol</td>
 <td>API Layer</td>
 </tr>
 <tr>
 <td><b>API</b></td>
-<td>Public interface</td>
-<td>API handlers, validators</td>
+<td>Public service interface</td>
+<td>ZenithService, PluginLoader</td>
 <td>Core Layer</td>
 </tr>
 <tr>
 <td><b>Core</b></td>
-<td>Business logic</td>
-<td>Engine, managers, policies</td>
-<td>Provider Layer</td>
+<td>Business logic core</td>
+<td>ZenithRegistry, Zenith Trait</td>
+<td>Zenith Layer</td>
 </tr>
 <tr>
-<td><b>Provider</b></td>
-<td>Implementation adapters</td>
-<td>Crypto, storage, audit</td>
+<td><b>Zenith</b></td>
+<td>Formatter implementations</td>
+<td>RustZenith, PythonZenith, etc.</td>
 <td>Infrastructure</td>
 </tr>
 <tr>
 <td><b>Infrastructure</b></td>
-<td>Low-level resources</td>
-<td>DB, filesystem, logs</td>
+<td>Support services</td>
+<td>Backup, Cache, Config</td>
 <td>None</td>
 </tr>
 </table>
@@ -187,50 +205,57 @@ graph TB
 
 ## Component Design
 
-### 1️⃣ Core Engine
+### 1️⃣ ZenithService
 
 <details open>
 <summary><b>🔧 Component Overview</b></summary>
 
-The Core Engine is the heart of the system, coordinating all operations.
+ZenithService 是核心格式化服务，协调所有文件处理操作。
 
 ```rust
-pub struct CoreEngine {
-    algorithm_manager: Arc<AlgorithmManager>,
-    key_manager: Arc<KeyManager>,
-    policy_engine: Arc<PolicyEngine>,
-    config: Config,
+pub struct ZenithService {
+    pub config: AppConfig,
+    registry: Arc<ZenithRegistry>,
+    backup_service: Arc<BackupService>,
+    config_cache: Arc<Mutex<ConfigCache>>,
+    hash_cache: Arc<HashCache>,
+    check_mode: bool,
 }
 
-impl CoreEngine {
-    pub fn new(config: Config) -> Result<Self> {
-        // Initialize managers
-        let algorithm_manager = Arc::new(AlgorithmManager::new()?);
-        let key_manager = Arc::new(KeyManager::new()?);
-        let policy_engine = Arc::new(PolicyEngine::new()?);
-        
-        Ok(Self {
-            algorithm_manager,
-            key_manager,
-            policy_engine,
+impl ZenithService {
+    pub fn new(
+        config: AppConfig,
+        registry: Arc<ZenithRegistry>,
+        backup_service: Arc<BackupService>,
+        hash_cache: Arc<HashCache>,
+        check_mode: bool,
+    ) -> Self {
+        Self {
             config,
-        })
+            registry,
+            backup_service,
+            config_cache: Arc::new(Mutex::new(ConfigCache::new())),
+            hash_cache,
+            check_mode,
+        }
     }
     
-    pub fn process(&self, request: Request) -> Result<Response> {
-        // 1. Validate request
-        self.policy_engine.validate(&request)?;
-        
-        // 2. Get algorithm
-        let algorithm = self.algorithm_manager.get(request.algorithm())?;
-        
-        // 3. Get key
-        let key = self.key_manager.get(request.key_id())?;
-        
-        // 4. Execute operation
-        let result = algorithm.execute(&key, request.data())?;
-        
-        Ok(Response::new(result))
+    pub async fn format_paths(&self, paths: Vec<String>) -> Result<Vec<FormatResult>> {
+        // 1. 收集文件
+        // 2. 初始化备份
+        // 3. 使用批处理优化器进行并发处理
+        // 4. 返回处理结果
+    }
+    
+    pub async fn process_file(&self, root: PathBuf, path: PathBuf) -> FormatResult {
+        // 1. 检查文件权限
+        // 2. 使用HashCache检查是否需要处理
+        // 3. 读取文件内容
+        // 4. 执行备份
+        // 5. 获取项目配置
+        // 6. 调用对应的Zenith进行格式化
+        // 7. 写入格式化结果
+        // 8. 更新缓存
     }
 }
 ```
@@ -238,99 +263,121 @@ impl CoreEngine {
 </details>
 
 **Responsibilities:**
-- 📌 Request orchestration
-- 📌 Component coordination
-- 📌 Error handling
-- 📌 Resource management
+- 📌 文件收集与路径验证
+- 📌 批处理与并发控制
+- 📌 备份管理
+- 📌 缓存协调
+- 📌 格式化结果返回
 
 **Design Patterns:**
-- 🎨 **Facade Pattern**: Simplified interface to complex subsystems
-- 🎨 **Strategy Pattern**: Pluggable algorithms
-- 🎨 **Builder Pattern**: Flexible configuration
+- 🎨 **Facade Pattern**: 为复杂子系统提供简化的统一接口
+- 🎨 **Strategy Pattern**: 可插拔的格式化器
+- 🎨 **Template Method**: 文件处理流程模板
 
-### 2️⃣ Algorithm Manager
+### 2️⃣ ZenithRegistry
 
 ```mermaid
 classDiagram
-    class AlgorithmManager {
-        -HashMap algorithms
-        +register(Algorithm)
-        +get(AlgorithmType) Algorithm
-        +list() Vec~AlgorithmType~
+    class ZenithRegistry {
+        -HashMap zeniths
+        -HashMap extension_map
+        +register(Zenith)
+        +get_by_extension(ext) Option~Zenith~
+        +list_all() Vec~Zenith~
     }
     
-    class Algorithm {
+    class Zenith {
         <<interface>>
-        +execute(key, data) Result
-        +verify() bool
+        +name() str
+        +extensions() ~[&str]~
+        +priority() i32
+        +format(data, path, config) Result
+        +validate(data) Result
     }
     
-    class AesGcm {
-        +execute(key, data) Result
-        +verify() bool
+    class RustZenith {
+        +name() str
+        +extensions() ~[&str]~
+        +format(data, path, config) Result
     }
     
-    class RsaOaep {
-        +execute(key, data) Result
-        +verify() bool
+    class PythonZenith {
+        +name() str
+        +extensions() ~[&str]~
+        +format(data, path, config) Result
     }
     
-    AlgorithmManager --> Algorithm
-    Algorithm <|-- AesGcm
-    Algorithm <|-- RsaOaep
+    ZenithRegistry --> Zenith
+    Zenith <|-- RustZenith
+    Zenith <|-- PythonZenith
 ```
 
 <details>
 <summary><b>🔍 Implementation Details</b></summary>
 
 ```rust
-pub trait Algorithm: Send + Sync {
-    fn execute(&self, key: &Key, data: &[u8]) -> Result<Vec<u8>>;
-    fn verify(&self) -> bool;
-    fn metadata(&self) -> AlgorithmMetadata;
+pub trait Zenith: Send + Sync {
+    fn name(&self) -> &str;
+    fn extensions(&self) -> &[&str];
+    fn priority(&self) -> i32 {
+        0
+    }
+    async fn format(&self, content: &[u8], path: &Path, config: &ZenithConfig) -> Result<Vec<u8>>;
+    async fn validate(&self, _content: &[u8]) -> Result<bool> {
+        Ok(true)
+    }
 }
 
-pub struct AlgorithmManager {
-    algorithms: RwLock<HashMap<AlgorithmType, Box<dyn Algorithm>>>,
+pub struct ZenithRegistry {
+    zeniths: DashMap<String, Arc<dyn Zenith>>,
+    extension_map: DashMap<String, Vec<(i32, String, usize)>>,
 }
 
-impl AlgorithmManager {
-    pub fn register<A: Algorithm + 'static>(&self, algo: A) -> Result<()> {
-        let metadata = algo.metadata();
-        let mut algorithms = self.algorithms.write().unwrap();
-        algorithms.insert(metadata.algorithm_type, Box::new(algo));
-        Ok(())
+impl ZenithRegistry {
+    pub fn register(&self, zenith: Arc<dyn Zenith>) {
+        let name = zenith.name().to_string();
+        let priority = zenith.priority();
+        for ext in zenith.extensions() {
+            self.extension_map
+                .entry(ext.to_string())
+                .and_modify(|entries: &mut Vec<(i32, String, usize)>| {
+                    entries.retain(|(p, n, _)| !(p == &priority && n != &name));
+                    entries.push((priority, name.clone(), entries.len()));
+                    entries.sort_by_key(|(p, _, idx)| (std::cmp::Reverse(*p), *idx));
+                })
+                .or_insert_with(|| vec![(priority, name.clone(), 0)]);
+        }
+        self.zeniths.insert(name, zenith);
     }
     
-    pub fn get(&self, algo_type: AlgorithmType) -> Result<&dyn Algorithm> {
-        self.algorithms
-            .read()
-            .unwrap()
-            .get(&algo_type)
-            .ok_or(Error::AlgorithmNotFound)
+    pub fn get_by_extension(&self, ext: &str) -> Option<Arc<dyn Zenith>> {
+        self.extension_map
+            .get(ext)
+            .and_then(|entries| entries.first().map(|(_, n, _)| n.clone()))
+            .and_then(|name| self.zeniths.get(&name).map(|z| z.clone()))
     }
 }
 ```
 
 </details>
 
-### 3️⃣ Key Manager
+### 3️⃣ Plugin System
 
 <div align="center">
 
-#### 🔐 Key Lifecycle Management
+#### 🔌 Plugin Architecture
 
 </div>
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PreActive: Generate
-    PreActive --> Active: Activate
-    Active --> Deactivated: Deactivate
-    Active --> Compromised: Compromise Detected
-    Deactivated --> Destroyed: Destroy
-    Compromised --> Destroyed: Destroy
-    Destroyed --> [*]
+    [*] --> Loading: Load Config
+    Loading --> Validating: Validate Plugin
+    Validating --> Registered: Register Extensions
+    Registered --> Active: Enable Plugin
+    Active --> Disabled: Disable Plugin
+    Disabled --> Registered: Re-enable Plugin
+    Disabled --> [*]: Unload Plugin
     
     Active --> Active: Use
 ```
@@ -342,29 +389,29 @@ stateDiagram-v2
 <th>Transitions</th>
 </tr>
 <tr>
-<td><b>PreActive</b></td>
+<td><b>Loading</b></td>
 <td>None</td>
+<td>→ Validating</td>
+</tr>
+<tr>
+<td><b>Validating</b></td>
+<td>Security check</td>
+<td>→ Registered</td>
+</tr>
+<tr>
+<td><b>Registered</b></td>
+<td>Extension mapping</td>
 <td>→ Active</td>
 </tr>
 <tr>
 <td><b>Active</b></td>
-<td>Encrypt, Decrypt, Sign, Verify</td>
-<td>→ Deactivated, → Compromised</td>
+<td>Format files</td>
+<td>→ Disabled</td>
 </tr>
 <tr>
-<td><b>Deactivated</b></td>
-<td>Decrypt, Verify (read-only)</td>
-<td>→ Destroyed</td>
-</tr>
-<tr>
-<td><b>Compromised</b></td>
+<td><b>Disabled</b></td>
 <td>None</td>
-<td>→ Destroyed</td>
-</tr>
-<tr>
-<td><b>Destroyed</b></td>
-<td>None</td>
-<td>(Terminal state)</td>
+<td>→ Registered, → Unload</td>
 </tr>
 </table>
 
@@ -380,30 +427,35 @@ stateDiagram-v2
 
 ```mermaid
 sequenceDiagram
-    participant App as Application
-    participant API as API Layer
-    participant Core as Core Engine
-    participant Algo as Algorithm
-    participant Key as Key Manager
-    participant Audit as Audit Logger
+    participant User as User/CLI
+    participant MCP as MCP Protocol
+    participant Service as ZenithService
+    participant Registry as ZenithRegistry
+    participant Zenith as Zenith Formatter
+    participant Backup as Backup Service
+    participant Cache as Hash Cache
     
-    App->>API: Request (encrypt, data)
-    API->>API: Validate input
-    API->>Core: Process request
+    User->>Service: format_paths(paths)
+    Service->>Service: Collect files
+    Service->>Backup: init()
     
-    Core->>Key: Get key
-    Key-->>Core: Key material
+    par Batch Processing
+        Service->>Registry: get_by_extension(ext)
+        Registry-->>Service: Zenith instance
+        Service->>Zenith: format(content, path, config)
+        Zenith-->>Service: formatted content
+    and Caching
+        Service->>Cache: needs_processing(path)
+        Cache-->>Service: bool
+    end
     
-    Core->>Algo: Execute algorithm
-    Algo->>Algo: Encrypt data
-    Algo-->>Core: Ciphertext
-    
-    Core->>Audit: Log operation
-    Core-->>API: Response
-    API-->>App: Result
+    Service->>Backup: backup_file(path, content)
+    Service->>Service: Write formatted content
+    Service->>Cache: update(path, state)
+    Service-->>User: FormatResult
 ```
 
-### Encryption Flow
+### Formatting Flow
 
 <table>
 <tr>
@@ -411,30 +463,34 @@ sequenceDiagram
 
 **Step-by-Step**
 
-1. 📥 **Input Validation**
-   - Check data format
-   - Validate algorithm type
-   - Verify key ID exists
+1. 📥 **Path Validation**
+   - Check path format
+   - Validate file/directory existence
+   - Verify permissions
 
-2. 🔐 **Key Retrieval**
-   - Load key from storage
-   - Verify key state (Active)
-   - Check permissions
+2. 📄 **File Collection**
+   - Walk directory recursively
+   - Filter by extensions
+   - Apply ignore rules
 
-3. ⚙️ **Algorithm Execution**
-   - Initialize algorithm
-   - Generate nonce/IV
-   - Encrypt data
+3. 🔍 **Cache Check**
+   - Compute file hash
+   - Compare with cached state
+   - Skip if unchanged
 
-4. 📤 **Output Construction**
-   - Package ciphertext
-   - Add metadata
+4. ⚙️ **Backup Creation**
+   - Copy original file
+   - Track backup metadata
+
+5. 🎨 **Format Execution**
+   - Select Zenith by extension
+   - Apply formatting rules
+   - Generate formatted output
+
+6. 💾 **Result Handling**
+   - Write to file (if not check mode)
+   - Update cache
    - Return result
-
-5. 📝 **Audit Logging**
-   - Record operation
-   - Log timestamp
-   - Store metadata
 
 </td>
 <td width="50%">
@@ -442,31 +498,33 @@ sequenceDiagram
 **Code Flow**
 
 ```rust
-// 1. Validate
-request.validate()?;
+// 1. Validate paths
+validate_path(path)?;
 
-// 2. Get key
-let key = key_manager
-    .get(request.key_id)?;
+// 2. Collect files
+let files = walk_directory(path, recursive)?;
 
-// 3. Execute
-let ciphertext = algorithm
-    .encrypt(&key, request.data)?;
+// 3. Check cache
+if cache.needs_processing(&path).await? {
+    // 4. Backup
+    backup_service.backup_file(&path).await?;
+    
+    // 5. Get formatter
+    let zenith = registry.get_by_extension(ext)?;
+    
+    // 6. Format
+    let formatted = zenith
+        .format(&content, &path, &config)
+        .await?;
+    
+    // 7. Write result
+    fs::write(&path, &formatted).await?;
+    
+    // Update cache
+    cache.update(&path, new_state).await?;
+}
 
-// 4. Package
-let response = Response {
-    data: ciphertext,
-    metadata: Metadata {
-        algorithm: algo_type,
-        key_id: key.id(),
-        timestamp: now(),
-    },
-};
-
-// 5. Audit
-audit_logger.log(&response)?;
-
-Ok(response)
+Ok(FormatResult::success())
 ```
 
 </td>
@@ -483,121 +541,118 @@ Ok(response)
 
 </div>
 
-### Decision 1: Pure Rust Implementation
+### Decision 1: Trait-Based Plugin Architecture
 
 <table>
 <tr>
 <td width="50%">
 
 **✅ Pros**
-- Memory safety guarantees
-- Zero-cost abstractions
-- Excellent performance
-- No C dependencies
-- Modern tooling
+- 运行时动态扩展
+- 类型安全
+- 无需修改核心代码
+- 易于测试（Mock）
 
 </td>
 <td width="50%">
 
 **❌ Cons**
-- Steeper learning curve
-- Fewer libraries initially
-- Compilation time
+- 学习曲线较陡
+- 动态分发有少量开销
+- 调试复杂度增加
 
 </td>
 </tr>
 </table>
 
-**Verdict:** ✅ **Chosen** - Safety and performance benefits outweigh cons
+**Verdict:** ✅ **Chosen** - 灵活性和可扩展性是关键需求
 
 ---
 
-### Decision 2: Pluggable Algorithm Architecture
+### Decision 2: DashMap for Concurrent Registry
 
 ```rust
-// Before: Hardcoded algorithms
-match algo_type {
-    AlgorithmType::AES => aes_encrypt(data),
-    AlgorithmType::RSA => rsa_encrypt(data),
-    // Must modify code for new algorithms
-}
+// Before: Mutex<HashMap>
+Mutex<HashMap<String, Arc<dyn Zenith>>>
+// 每次访问都加锁，读取性能差
 
-// After: Plugin system
-let algorithm = algorithm_manager.get(algo_type)?;
-algorithm.execute(key, data)?;
-// New algorithms can be added without code changes
+// After: DashMap
+DashMap<String, Arc<dyn Zenith>>
+// 读操作无锁，写操作细粒度锁
 ```
 
 **Rationale:**
-- 🎯 Extensibility: Easy to add new algorithms
-- 🎯 Testability: Mock algorithms for testing
-- 🎯 Maintainability: Algorithms are independent
+- 🎯 高并发读取场景下性能优异
+- 🎯 自动处理并发冲突
+- 🎯 简单易用的 API
 
 ---
 
-### Decision 3: Arc + RwLock for Concurrency
+### Decision 3: Async/Await Runtime
 
 <table>
 <tr>
 <td width="33%" align="center">
 
-**Option 1: Mutex**
+**Option 1: Blocking**
 ```rust
-Arc<Mutex<Data>>
+std::fs::read()
 ```
-Simple but locks readers
+简单但阻塞线程
 
 </td>
 <td width="33%" align="center">
 
-**Option 2: RwLock** ✅
+**Option 2: ThreadPool**
 ```rust
-Arc<RwLock<Data>>
+tokio::spawn_blocking()
 ```
-Multiple readers, one writer
+复杂，需要管理线程池
 
 </td>
 <td width="33%" align="center">
 
-**Option 3: Channels**
+**Option 3: Async** ✅
 ```rust
-mpsc::channel()
+tokio::fs::read()
 ```
-Complex for simple cases
+非阻塞，高并发友好
 
 </td>
 </tr>
 </table>
 
-**Chosen:** RwLock - Optimized for read-heavy workloads
+**Chosen:** Tokio Async Runtime - 文件 I/O 高并发场景最佳选择
 
 ---
 
-### Decision 4: Builder Pattern for Configuration
+### Decision 4: Batch Processing with Dynamic Batching
 
 <table>
 <tr>
 <td width="50%">
 
-**❌ Direct Construction**
+**❌ Fixed Concurrency**
 ```rust
-let config = Config {
-    option_a: value_a,
-    option_b: value_b,
-    option_c: value_c,
-    // Many fields...
-};
+let tasks: Vec<_> = paths
+    .into_iter()
+    .map(|p| tokio::spawn(process(p)))
+    .collect();
+join_all(tasks).await
 ```
 
 </td>
 <td width="50%">
 
-**✅ Builder Pattern**
+**✅ Dynamic Batching**
 ```rust
-let config = Config::builder()
-    .option_a(value_a)
-    .option_b(value_b)
-    .build()?;
+let optimizer = BatchOptimizer::new(
+    batch_size,
+    worker_threads,
+);
+optimizer
+    .process_batches(files, |f| process(f))
+    .await
 ```
 
 </td>
@@ -605,10 +660,10 @@ let config = Config::builder()
 </table>
 
 **Benefits:**
-- 📌 Fluent API
-- 📌 Optional parameters
-- 📌 Validation on build
-- 📌 Better error messages
+- 📌 根据文件数量动态调整
+- 📌 内存使用可控
+- 📌 优雅处理大量文件
+- 📌 支持进度追踪
 
 ---
 
@@ -634,42 +689,53 @@ let config = Config::builder()
 <td>Primary language</td>
 </tr>
 <tr>
-<td>C (FFI)</td>
-<td>C11</td>
-<td>Foreign function interface</td>
+<td>Tokio</td>
+<td>1.0+</td>
+<td>Async runtime</td>
 </tr>
 <tr>
-<td rowspan="3"><b>Cryptography</b></td>
-<td>ring</td>
-<td>0.17</td>
-<td>Modern crypto primitives</td>
+<td rowspan="4"><b>Concurrency</b></td>
+<td>DashMap</td>
+<td>6.0+</td>
+<td>Concurrent hash map</td>
 </tr>
 <tr>
-<td>libsm</td>
-<td>0.6</td>
-<td>Chinese national standards</td>
+<td>Arc</td>
+<td>std</td>
+<td>Reference counting</td>
 </tr>
 <tr>
-<td>aes-gcm</td>
-<td>0.10</td>
-<td>AES-GCM implementation</td>
+<td>async-trait</td>
+<td>0.1</td>
+<td>Async trait methods</td>
 </tr>
 <tr>
-<td rowspan="2"><b>Security</b></td>
-<td>zeroize</td>
-<td>1.7</td>
-<td>Secure memory cleanup</td>
+<td>tokio::sync</td>
+<td>1.0+</td>
+<td>Async primitives</td>
 </tr>
 <tr>
-<td>argon2</td>
-<td>0.5</td>
-<td>Password hashing</td>
-</tr>
-<tr>
-<td><b>Serialization</b></td>
+<td rowspan="2"><b>Configuration</b></td>
 <td>serde</td>
 <td>1.0</td>
-<td>Data serialization</td>
+<td>Serialization</td>
+</tr>
+<tr>
+<td>toml</td>
+<td>0.8</td>
+<td>TOML parsing</td>
+</tr>
+<tr>
+<td><b>Web Server</b></td>
+<td>axum</td>
+<td>0.7</td>
+<td>MCP HTTP server</td>
+</tr>
+<tr>
+<td><b>File Operations</b></td>
+<td>ignore</td>
+<td>0.4</td>
+<td>File traversal</td>
 </tr>
 <tr>
 <td><b>Error Handling</b></td>
@@ -678,10 +744,10 @@ let config = Config::builder()
 <td>Error types</td>
 </tr>
 <tr>
-<td><b>Testing</b></td>
-<td>criterion</td>
-<td>0.5</td>
-<td>Benchmarking</td>
+<td><b>Tracing</b></td>
+<td>tracing</td>
+<td>0.1</td>
+<td>Logging/observability</td>
 </tr>
 </table>
 
@@ -689,14 +755,17 @@ let config = Config::builder()
 
 ```mermaid
 graph LR
-    A[project-name] --> B[ring]
-    A --> C[libsm]
-    A --> D[aes-gcm]
-    A --> E[zeroize]
-    A --> F[serde]
+    A[zenith] --> B[tokio]
+    A --> C[DashMap]
+    A --> D[async-trait]
+    A --> E[serde]
+    A --> F[toml]
+    A --> G[axum]
+    A --> H[ignore]
+    A --> I[thiserror]
+    A --> J[tracing]
     
-    D --> G[aes]
-    D --> H[ghash]
+    B --> K[tokio-util]
     
     style A fill:#81d4fa
     style B fill:#4fc3f7
@@ -704,6 +773,10 @@ graph LR
     style D fill:#4fc3f7
     style E fill:#4fc3f7
     style F fill:#4fc3f7
+    style G fill:#4fc3f7
+    style H fill:#4fc3f7
+    style I fill:#4fc3f7
+    style J fill:#4fc3f7
 ```
 
 ---
@@ -716,62 +789,67 @@ graph LR
 
 </div>
 
-### 1️⃣ Zero-Copy Design
+### 1️⃣ Hash-Based Content Caching
 
 ```rust
-// ❌ Copying data
-pub fn process(data: Vec<u8>) -> Vec<u8> {
-    let copied = data.clone();  // Unnecessary copy
-    transform(copied)
+// ❌ Always reformat
+pub async fn format(&self, content: &[u8]) -> Result<Vec<u8>> {
+    self.formatter.format(content).await
 }
 
-// ✅ Zero-copy with slices
-pub fn process(data: &[u8]) -> Vec<u8> {
-    transform(data)  // No copy needed
+// ✅ Skip if unchanged
+pub async fn needs_processing(&self, path: &Path) -> Result<bool> {
+    let current_hash = self.compute_file_hash(path).await?;
+    let cached_hash = self.cache.get(path).await?;
+    Ok(current_hash != cached_hash)
 }
 ```
 
-### 2️⃣ Memory Pooling
+### 2️⃣ Concurrent File Processing
 
 <table>
 <tr>
 <td width="50%">
 
-**Without Pooling**
+**Sequential Processing**
 ```rust
-// Allocate for every operation
-let buffer = vec![0u8; size];
-process(&buffer);
-// Buffer dropped
+for path in files {
+    process_file(path).await;
+}
+// 100 files = 100 * latency
 ```
 
 </td>
 <td width="50%">
 
-**With Pooling**
+**Concurrent Processing**
 ```rust
-// Reuse buffers
-let buffer = pool.acquire();
-process(&buffer);
-pool.release(buffer);
+let results = stream::iter(files)
+    .map(|p| process_file(p))
+    .buffer_unordered(workers)
+    .collect()
+}
+// 100 files = max(latencies)
 ```
 
 </td>
 </tr>
 </table>
 
-### 3️⃣ Caching Strategy
+### 3️⃣ Memory-Efficient File Processing
 
 ```mermaid
 graph LR
-    A[Request] --> B{Cache Hit?}
-    B -->|Yes| C[Return Cached]
-    B -->|No| D[Compute]
-    D --> E[Store in Cache]
-    E --> F[Return Result]
+    A[Large File] --> B{Size > Limit?}
+    B -->|Yes| C[Reject]
+    B -->|No| D[Read Content]
+    D --> E[Format]
+    E --> F[Write Result]
     
-    style C fill:#4caf50
-    style D fill:#ff9800
+    style C fill:#ff9800
+    style D fill:#4caf50
+    style E fill:#4caf50
+    style F fill:#4caf50
 ```
 
 ### Performance Metrics
@@ -784,22 +862,28 @@ graph LR
 <th>Latency (P99)</th>
 </tr>
 <tr>
-<td>AES-256-GCM Encrypt</td>
-<td>500 MB/s</td>
-<td>0.5 ms</td>
-<td>2 ms</td>
+<td>Rust File Format</td>
+<td>100 files/s</td>
+<td>5 ms</td>
+<td>20 ms</td>
 </tr>
 <tr>
-<td>ECDSA-P256 Sign</td>
+<td>Python File Format</td>
+<td>150 files/s</td>
+<td>3 ms</td>
+<td>15 ms</td>
+</tr>
+<tr>
+<td>Cache Hit</td>
 <td>10K ops/s</td>
 <td>0.1 ms</td>
 <td>0.5 ms</td>
 </tr>
 <tr>
-<td>SHA-256 Hash</td>
-<td>1 GB/s</td>
-<td>0.05 ms</td>
-<td>0.2 ms</td>
+<td>Batch Processing (1000 files)</td>
+<td>N/A</td>
+<td>50 ms total</td>
+<td>200 ms total</td>
 </tr>
 </table>
 
@@ -815,12 +899,11 @@ graph LR
 
 ```mermaid
 graph TB
-    A[Application Layer] --> B[Input Validation]
-    B --> C[Authentication]
-    C --> D[Authorization]
-    D --> E[Encryption]
+    A[Application Layer] --> B[Path Validation]
+    B --> C[Permission Check]
+    C --> D[File Size Limit]
+    D --> E[Plugin Security]
     E --> F[Audit Logging]
-    F --> G[Secure Storage]
     
     style A fill:#e1f5ff
     style B fill:#b3e5fc
@@ -828,7 +911,6 @@ graph TB
     style D fill:#4fc3f7
     style E fill:#29b6f6
     style F fill:#0288d1
-    style G fill:#01579b
 ```
 
 ### Security Layers
@@ -840,34 +922,29 @@ graph TB
 <th>Purpose</th>
 </tr>
 <tr>
-<td><b>1. Input Validation</b></td>
-<td>Type checking, sanitization</td>
-<td>Prevent injection attacks</td>
+<td><b>1. Path Validation</b></td>
+<td>Path sanitization, traversal prevention</td>
+<td>防止路径遍历攻击</td>
 </tr>
 <tr>
-<td><b>2. Authentication</b></td>
-<td>Identity verification</td>
-<td>Verify user identity</td>
+<td><b>2. Permission Check</b></td>
+<td>File permission verification</td>
+<td>验证读写权限</td>
 </tr>
 <tr>
-<td><b>3. Authorization</b></td>
-<td>Permission checks</td>
-<td>Control access to resources</td>
+<td><b>3. File Size Limit</b></td>
+<td>Max file size enforcement</td>
+<td>防止资源耗尽</td>
 </tr>
 <tr>
-<td><b>4. Encryption</b></td>
-<td>Data encryption, TLS</td>
-<td>Protect data confidentiality</td>
+<td><b>4. Plugin Security</b></td>
+<td>Plugin validation, allowed commands</td>
+<td>安全加载外部插件</td>
 </tr>
 <tr>
 <td><b>5. Audit Logging</b></td>
-<td>Activity logging</td>
-<td>Detection and forensics</td>
-</tr>
-<tr>
-<td><b>6. Secure Storage</b></td>
-<td>Encryption at rest</td>
-<td>Protect stored data</td>
+<td>Operation logging</td>
+<td>审计追踪</td>
 </tr>
 </table>
 
@@ -878,11 +955,11 @@ graph TB
 
 | Threat | Impact | Mitigation | Status |
 |--------|--------|------------|--------|
-| Memory disclosure | High | Zeroize on drop | ✅ |
-| Timing attacks | Medium | Constant-time ops | ✅ |
-| Key extraction | High | Memory locking | ✅ |
-| Algorithm substitution | Medium | Algorithm validation | ✅ |
-| Unauthorized access | High | RBAC + audit | ✅ |
+| Path traversal | High | Path validation | ✅ |
+| Unbounded file size | Medium | Size limits | ✅ |
+| Malicious plugins | High | Plugin whitelist | ✅ |
+| Resource exhaustion | Medium | Concurrency limits | ✅ |
+| Sensitive data leak | Medium | Content filtering | ✅ |
 
 </details>
 
@@ -896,16 +973,16 @@ graph TB
 
 </div>
 
-### Horizontal Scaling
+### Horizontal Scaling (MCP Server)
 
 ```mermaid
 graph TB
     LB[Load Balancer]
-    LB --> A[Instance 1]
-    LB --> B[Instance 2]
-    LB --> C[Instance 3]
+    LB --> A[MCP Instance 1]
+    LB --> B[MCP Instance 2]
+    LB --> C[MCP Instance 3]
     
-    A --> DB[(Shared Database)]
+    A --> DB[(Shared Config)]
     B --> DB
     C --> DB
     
@@ -917,9 +994,9 @@ graph TB
 ```
 
 **Key Points:**
-- 🔹 Stateless design enables easy scaling
-- 🔹 Shared key storage for consistency
-- 🔹 No session affinity required
+- 🔹 MCP 服务器可水平扩展
+- 🔹 共享配置存储
+- 🔹 无状态设计
 
 ### Vertical Scaling
 
@@ -931,36 +1008,36 @@ graph TB
 </tr>
 <tr>
 <td>CPU</td>
-<td>Increase cores, use parallelism</td>
-<td>⬆️ Throughput</td>
+<td>Increase cores, adjust worker threads</td>
+<td>⬆️ 并发处理能力</td>
 </tr>
 <tr>
 <td>Memory</td>
-<td>Increase RAM, larger caches</td>
-<td>⬆️ Performance</td>
+<td>Larger caches, HashMap capacity</td>
+<td>⬆️ 缓存命中率</td>
 </tr>
 <tr>
 <td>Storage</td>
-<td>Use SSD, increase IOPS</td>
-<td>⬇️ Latency</td>
+<td>Use SSD for backup directory</td>
+<td>⬇️ I/O 延迟</td>
 </tr>
 </table>
 
 ### Capacity Planning
 
 ```rust
-// Calculate capacity requirements
 pub fn calculate_capacity(requirements: Requirements) -> Capacity {
-    let ops_per_second = requirements.expected_load;
-    let latency_budget = requirements.max_latency;
+    let files_per_second = requirements.expected_files / 60;
+    let avg_format_time = requirements.avg_latency_ms / 1000.0;
     
-    let instances = (ops_per_second * latency_budget / 1000.0).ceil() as usize;
-    let memory_per_instance = requirements.cache_size + OVERHEAD;
+    let workers = (files_per_second * avg_format_time).ceil() as usize;
+    let cache_memory = requirements.cache_size_mb;
+    let backup_storage = requirements.max_backup_gb;
     
     Capacity {
-        instances,
-        memory_per_instance,
-        total_memory: instances * memory_per_instance,
+        workers: workers.max(1),
+        cache_memory_mb: cache_memory,
+        backup_storage_gb: backup_storage,
     }
 }
 ```
@@ -977,32 +1054,32 @@ pub fn calculate_capacity(requirements: Requirements) -> Capacity {
 
 ### Short Term (3-6 months)
 
-- [ ] **SIMD Optimization** - Vectorized crypto operations
-- [ ] **Hardware Acceleration** - AES-NI, SHA extensions
-- [ ] **Async Runtime** - Tokio integration for async operations
-- [ ] **Metrics System** - Prometheus-compatible metrics
+- [ ] **增量格式化** - 只处理变更的文件
+- [ ] **更细粒度的缓存** - 按配置和内容组合缓存
+- [ ] **进度可视化** - CLI 进度条增强
+- [ ] **更多语言支持** - TypeScript, Go, SQL 等
 
 ### Medium Term (6-12 months)
 
-- [ ] **HSM Integration** - PKCS#11 support
-- [ ] **Key Rotation** - Automatic key lifecycle management
-- [ ] **Multi-region Support** - Geographic distribution
-- [ ] **Plugin Marketplace** - Third-party algorithm plugins
+- [ ] **分布式缓存** - Redis 集成
+- [ ] **Web Dashboard** - 格式化统计和配置管理
+- [ ] **CI/CD 集成** - GitHub Actions, GitLab CI
+- [ ] **自定义规则引擎** - 用户可编写格式化规则
 
 ### Long Term (12+ months)
 
-- [ ] **Post-Quantum Crypto** - PQC algorithm support
-- [ ] **TEE Support** - SGX/TrustZone integration
-- [ ] **Formal Verification** - Mathematical proof of security properties
-- [ ] **Cloud-Native Features** - Kubernetes operators, service mesh
+- [ ] **云原生部署** - Kubernetes Operator
+- [ ] **AI 辅助格式化** - 基于上下文的智能格式化
+- [ ] **插件市场** - 社区贡献的格式化插件
+- [ ] **多格式支持增强** - 配置文件、文档等
 
 ---
 
 <div align="center">
 
-**[📖 User Guide](USER_GUIDE.md)** • **[🔧 API Docs](https://docs.rs/project-name)** • **[🏠 Home](../README.md)**
+**[📖 User Guide](USER_GUIDE.md)** • **[🔧 API Docs](API_REFERENCE.md)** • **[🏠 Home](../README.md)**
 
-Made with ❤️ by the Architecture Team
+Made with ❤️ by the Zenith Team
 
 [⬆ Back to Top](#️-architecture-design)
 
