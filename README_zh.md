@@ -3,7 +3,7 @@
 # 🚀 Zenith
 
 <p>
-  <img src="https://img.shields.io/badge/version-1.0.1-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.1.0-blue.svg" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
   <img src="https://img.shields.io/badge/Rust-1.75%2B-orange.svg" alt="Rust">
 </p>
