@@ -156,7 +156,11 @@
 #### 🦀 Cargo 安装
 
 ```bash
-cargo install --git https://github.com/Kirky-X/zenith.git
+# 1. 先安装 cargo-binstall（如果没有安装）
+cargo install cargo-binstall
+
+# 2. 使用 cargo-binstall 安装 zenith
+cargo binstall zenith
 ```
 
 </td>
@@ -272,6 +276,59 @@ zenith format src/
 ### MCP 服务器身份验证
 
 MCP 服务器支持 API 密钥身份验证和基于角色的授权。
+
+**JSON-RPC 配置示例**：
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "format",
+  "params": {
+    "paths": ["src/main.rs"],
+    "recursive": true,
+    "backup": true,
+    "workers": 4
+  }
+}
+```
+
+**恢复请求示例**：
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "recover",
+  "params": {
+    "backup_id": "backup_20231223_142030",
+    "target": "src/"
+  }
+}
+```
+
+**响应示例（成功）**：
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "total_files": 10,
+    "formatted_files": 8,
+    "failed_files": 0,
+    "backup_id": "backup_20231223_142030",
+    "duration_ms": 1250,
+    "results": [
+      {
+        "path": "src/main.rs",
+        "success": true,
+        "changed": true
+      }
+    ]
+  }
+}
+```
 
 **用户角色**：
 - `admin`：完全访问所有 MCP 方法
