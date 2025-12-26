@@ -257,7 +257,10 @@ zenith list-backups
 zenith clean-backups --days 7
 
 # 启动 MCP 服务器
-zenith mcp
+zenith mcp --addr 127.0.0.1:9000
+
+# 自动回滚到最新备份
+zenith auto-rollback
 
 # 检查系统环境
 zenith doctor
@@ -337,14 +340,14 @@ MCP 服务器支持 API 密钥身份验证和基于角色的授权。
 
 **使用方法**：
 ```bash
-# 启动带身份验证的 MCP 服务器
-zenith mcp
+# 启动带身份验证的 MCP 服务器（默认地址：127.0.0.1:9000）
+zenith mcp --addr 0.0.0.0:9000
 
 # 使用 Authorization 头发送请求
-curl -X POST http://127.0.0.1:8080 \
+curl -X POST http://127.0.0.1:9000 \
   -H "Authorization: Bearer your-api-key" \
   -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"format","params":{"path":"src/main.rs"}}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"format","params":{"paths":["src/main.rs"]}}'
 ```
 
 ### Doctor 命令
@@ -511,35 +514,48 @@ backup_enabled = true
 log_level = "info"
 recursive = true
 cache_enabled = true
+config_dir = ".zenith"
 
-[format.rust]
+[zeniths.rust]
 enabled = true
 config_path = ".rustfmt.toml"
+use_default = true
 
-[format.python]
+[zeniths.python]
 enabled = true
 config_path = "pyproject.toml"
+use_default = true
 
 [concurrency]
 workers = 8
 batch_size = 100
+
+[limits]
+max_file_size_mb = 10
+max_memory_mb = 100
 
 [backup]
 dir = ".zenith_backup"
 retention_days = 7
 
 [mcp]
-enabled = true
+enabled = false
 host = "127.0.0.1"
 port = 8080
 auth_enabled = true
-allowed_origins = ["http://localhost:3000"]
+api_key = "your-master-api-key"
+allowed_origins = ["*"]
 
-[[mcp.users]]
+[security]
+allowed_plugin_commands = ["rustfmt", "ruff"]
+allow_absolute_paths = true
+allow_relative_paths = false
+
+[mcp.users]
 api_key = "admin-secret-key"
 role = "admin"
 
-[[mcp.users]]
+[mcp.users]
 api_key = "user-secret-key"
 role = "user"
 ```
