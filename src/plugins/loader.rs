@@ -16,7 +16,7 @@ use crate::plugins::types::PluginInfo;
 use crate::utils::path::sanitize_path_for_log;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
 use tokio::fs;
@@ -123,7 +123,7 @@ pub struct ExternalPluginConfigList {
 }
 
 /// Security configuration for plugin loading
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct PluginSecurityConfig {
     /// List of allowed command prefixes or exact command names
     /// If empty, all commands are allowed (default behavior)
@@ -425,7 +425,7 @@ impl Default for PluginLoader {
 }
 
 /// A mapping of common extensions to static string slices
-const EXTENSION_MAP: &[(&str, &str)] = &[
+static EXTENSION_MAP: &[(&str, &str)] = &[
     ("js", "js"),
     ("jsx", "jsx"),
     ("ts", "ts"),
@@ -453,35 +453,37 @@ const EXTENSION_MAP: &[(&str, &str)] = &[
     ("go", "go"),
     ("rb", "rb"),
     ("php", "php"),
-    ("ts", "ts"),
 ];
 
+fn get_static_extension(ext: &str) -> &'static str {
+    EXTENSION_MAP
+        .iter()
+        .find(|(key, _)| *key == ext)
+        .map(|(_, static_ext)| *static_ext)
+        .unwrap_or("unknown")
+}
+
 /// Plugin implementation for external tools
+#[allow(dead_code)]
 pub struct ExternalZenith {
     name: String,
     command: String,
     args: Vec<String>,
     extensions: Vec<&'static str>,
+    resolved_command_path: Option<PathBuf>,
 }
 
 impl ExternalZenith {
+    #[allow(dead_code)]
     pub fn new(
         name: String,
         command: String,
         args: Vec<String>,
         extension_strings: Vec<String>,
     ) -> Self {
-        // Map the extension strings to static string slices
         let extensions: Vec<&'static str> = extension_strings
             .iter()
-            .map(|ext| {
-                // Look up the extension in our predefined map
-                EXTENSION_MAP
-                    .iter()
-                    .find(|(key, _)| key == ext)
-                    .map(|(_, static_ext)| *static_ext)
-                    .unwrap_or("unknown") // Default to "unknown" if not found
-            })
+            .map(|ext| get_static_extension(ext))
             .collect();
 
         Self {
@@ -489,7 +491,53 @@ impl ExternalZenith {
             command,
             args,
             extensions,
+            resolved_command_path: None,
         }
+    }
+
+    #[allow(dead_code)]
+    async fn resolve_command_path(&mut self) -> Result<PathBuf> {
+        if let Some(ref path) = self.resolved_command_path {
+            return Ok(path.clone());
+        }
+
+        let path = if Path::new(&self.command).exists() {
+            PathBuf::from(&self.command)
+        } else if let Ok(output) = Command::new("which").arg(&self.command).output().await {
+            if output.status.success() {
+                PathBuf::from(String::from_utf8(output.stdout)?.trim())
+            } else {
+                return Err(ZenithError::ToolNotFound {
+                    tool: self.command.clone(),
+                });
+            }
+        } else {
+            return Err(ZenithError::ToolNotFound {
+                tool: self.command.clone(),
+            });
+        };
+
+        self.resolved_command_path = Some(path.clone());
+        Ok(path)
+    }
+
+    #[allow(dead_code)]
+    async fn test_command_executable(&self, command_path: &Path) -> bool {
+        let test_args = ["--help", "--version", "-h"];
+        for test_arg in &test_args {
+            if let Ok(status) = Command::new(command_path)
+                .arg(test_arg)
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .status()
+                .await
+            {
+                if status.success() {
+                    return true;
+                }
+            }
+        }
+        false
     }
 }
 
@@ -510,8 +558,8 @@ impl Zenith for ExternalZenith {
         _config: &ZenithConfig,
     ) -> Result<Vec<u8>> {
         debug!(
-            "Executing plugin '{}' with command: {} and args: {:?}",
-            self.name, self.command, self.args
+            "Executing plugin '{}' with args: {:?}",
+            self.name, self.args
         );
 
         let mut cmd = Command::new(&self.command);
