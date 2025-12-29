@@ -9,14 +9,16 @@
 use clap::Parser;
 use colored::*;
 use std::sync::Arc;
+use std::time::Duration;
 use tracing::{error, info, warn, Level};
 use zenith::config::load_config;
 use zenith::error::Result;
 use zenith::internal::{
-    BackupService, Cli, Commands, EnvironmentChecker, HashCache, McpServer, PluginLoader,
-    ZenithRegistry, ZenithService,
+    BackupService, Cli, Commands, EnvironmentChecker, FileWatcher, HashCache, McpServer,
+    PluginLoader, WatchConfig, ZenithRegistry, ZenithService,
 };
 use zenith::plugins::loader::PluginSecurityConfig;
+use zenith::prelude::FormatResult;
 
 #[cfg(feature = "c")]
 use zenith::internal::ClangZenith;
@@ -72,7 +74,10 @@ async fn main() -> Result<()> {
     if let Err(e) = plugin_loader.load_plugins_from_dir(&plugins_dir).await {
         error!("加载外部插件失败: {}", e);
     } else {
-        info!("外部插件加载完成，共 {} 个插件", plugin_loader.list_plugins().len());
+        info!(
+            "外部插件加载完成，共 {} 个插件",
+            plugin_loader.list_plugins().len()
+        );
     }
 
     // 初始化统一注册中心
@@ -121,6 +126,7 @@ async fn main() -> Result<()> {
             no_backup,
             workers,
             check,
+            watch,
         } => {
             // 更新全局配置
             if recursive {
@@ -135,6 +141,8 @@ async fn main() -> Result<()> {
 
             let mode_str = if check {
                 "检查模式 (CHECK MODE)"
+            } else if watch {
+                "监听模式 (WATCH MODE)"
             } else {
                 "写入模式 (WRITE MODE)"
             };
@@ -146,43 +154,137 @@ async fn main() -> Result<()> {
             // 初始化服务组件
             let backup_service = Arc::new(BackupService::new(config.backup.clone()));
             let hash_cache = Arc::new(HashCache::new());
-            let service = ZenithService::new(config, registry, backup_service, hash_cache, check);
+            let service = Arc::new(ZenithService::new(
+                config.clone(),
+                registry,
+                backup_service,
+                hash_cache,
+                check,
+            ));
 
-            // 将 PathBuf 转换为 String 以保持 format_paths 兼容性
-            let string_paths: Vec<String> = paths
-                .into_iter()
-                .map(|p| p.to_string_lossy().into_owned())
-                .collect();
-            let results = service.format_paths(string_paths).await?;
+            // 如果是监听模式，启动文件监听
+            if watch {
+                info!("启动文件监听模式，监控路径: {:?}", paths);
 
-            // 统计执行结果
-            let total = results.len();
-            let success = results.iter().filter(|r| r.success).count();
-            let changed = results.iter().filter(|r| r.changed).count();
-            let failed = total - success;
+                // 首先格式化所有现有文件
+                let string_paths: Vec<String> = paths
+                    .clone()
+                    .into_iter()
+                    .map(|p| p.to_string_lossy().into_owned())
+                    .collect();
+                let initial_results = service.format_paths(string_paths).await?;
 
-            println!("\n{}", "执行摘要:".bold().underline());
-            println!("  文件总数: {}", total);
-            println!("  格式化成功: {}", success.to_string().green());
-            println!("  已修改:     {}", changed.to_string().yellow());
-            println!("  失败:       {}", failed.to_string().red());
+                // 统计初始格式化结果
+                let total = initial_results.len();
+                let changed = initial_results.iter().filter(|r| r.changed).count();
+                println!(
+                    "\n{}",
+                    format!("初始格式化完成: {} 个文件中 {} 个已修改", total, changed).green()
+                );
 
-            // 打印失败详情
-            if failed > 0 {
-                println!("\n{}", "失败详情:".red().bold());
-                for res in results.iter().filter(|r| !r.success) {
-                    if let Some(err) = &res.error {
-                        if !err.starts_with("Skipped") {
-                            println!("  {} -> {}", res.file_path.display(), err);
+                // 设置文件监听
+                let watch_config = WatchConfig {
+                    paths: paths.clone(),
+                    debounce_duration: Duration::from_millis(100),
+                    recursive,
+                };
+
+                let mut watcher = match FileWatcher::new(watch_config, service.clone()) {
+                    Ok(w) => w,
+                    Err(e) => {
+                        error!("创建文件监听器失败: {}", e);
+                        println!("{}", format!("创建文件监听器失败: {}", e).red());
+                        std::process::exit(1);
+                    }
+                };
+
+                info!(
+                    "正在监听 {} 个路径，按 Ctrl+C 停止...",
+                    watcher.watched_paths()
+                );
+                println!("\n{}", "监听中... (按 Ctrl+C 停止)".cyan());
+
+                // 启动监听循环
+                watcher
+                    .start(move |path| {
+                        let service = service.clone();
+                        async move {
+                            // 检查文件是否需要格式化
+                            if !service.is_cached(&path).await {
+                                let result = service.format_file(path).await;
+                                if result.changed {
+                                    println!(
+                                        "{}",
+                                        format!("  已格式化: {}", result.file_path.display())
+                                            .green()
+                                    );
+                                } else if result.success {
+                                    tracing::debug!("文件无需格式化: {:?}", result.file_path);
+                                } else if let Some(err) = &result.error {
+                                    if !err.starts_with("Skipped") {
+                                        println!(
+                                            "{}",
+                                            format!(
+                                                "  格式化失败: {} -> {}",
+                                                result.file_path.display(),
+                                                err
+                                            )
+                                            .red()
+                                        );
+                                    }
+                                }
+                                result
+                            } else {
+                                FormatResult {
+                                    file_path: path,
+                                    success: true,
+                                    changed: false,
+                                    original_size: 0,
+                                    formatted_size: 0,
+                                    duration_ms: 0,
+                                    error: None,
+                                }
+                            }
+                        }
+                    })
+                    .await;
+            } else {
+                // 非监听模式，一次性格式化
+                let string_paths: Vec<String> = paths
+                    .into_iter()
+                    .map(|p| p.to_string_lossy().into_owned())
+                    .collect();
+                let results = service.format_paths(string_paths).await?;
+
+                // 统计执行结果
+                let total = results.len();
+                let success = results.iter().filter(|r| r.success).count();
+                let changed = results.iter().filter(|r| r.changed).count();
+                let failed = total - success;
+
+                println!("\n{}", "执行摘要:".bold().underline());
+                println!("  文件总数: {}", total);
+                println!("  格式化成功: {}", success.to_string().green());
+                println!("  已修改:     {}", changed.to_string().yellow());
+                println!("  失败:       {}", failed.to_string().red());
+
+                // 打印失败详情
+                if failed > 0 {
+                    println!("\n{}", "失败详情:".red().bold());
+                    for res in results.iter().filter(|r| !r.success) {
+                        if let Some(err) = &res.error {
+                            if !err.starts_with("Skipped") {
+                                println!("  {} -> {}", res.file_path.display(), err);
+                            }
                         }
                     }
                 }
-            }
 
-            // 如果是检查模式且有文件需要格式化，则以非零状态码退出
-            if check && changed > 0 {
-                println!("\n{}", "检查失败：部分文件需要格式化。".red());
-                std::process::exit(1);
+                // 如果是检查模式且有文件需要格式化，则以非零状态码退出
+                if check && changed > 0 {
+                    println!("\n{}", "检查失败：部分文件需要格式化。".red());
+                    std::process::exit(1);
+                }
             }
         }
         Commands::Doctor { verbose } => {

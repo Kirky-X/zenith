@@ -88,6 +88,9 @@ sysinfo = { version = "0.30", default-features = false }
 # Plugin System
 libloading = "0.8"
 
+# File Watching (for --watch mode)
+notify = { version = "6.0" }
+
 
 [dev-dependencies]
 assert_cmd = "2.0"

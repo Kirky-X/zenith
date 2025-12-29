@@ -45,8 +45,10 @@ const SUPPORTED_LANGUAGES: &[&str] = &[
 static INLINE_CODE_PATTERN: Lazy<Regex> =
     Lazy::new(|| Regex::new(r#"`([^`]+)`"#).expect("Invalid regex pattern for inline code"));
 
-static TASK_LIST_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r#"(?m)^(\s*)(-\s+)\[(\s*)\]\s+(.+)$"#).expect("Invalid regex pattern for task lists"));
+static TASK_LIST_PATTERN: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r#"(?m)^(\s*)(-\s+)\[(\s*)\]\s+(.+)$"#)
+        .expect("Invalid regex pattern for task lists")
+});
 
 static STRIKETHROUGH_PATTERN: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"~~([^~]+)~~").expect("Invalid regex pattern for strikethrough"));
@@ -60,17 +62,24 @@ static BOLD_PATTERN: Lazy<Regex> =
 static ITALIC_PATTERN: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"\*([^*]+)\*").expect("Invalid regex pattern for italic"));
 
-static BOLD_ITALIC_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"\*\*\*([^*]+)\*\*\*").expect("Invalid regex pattern for bold italic"));
+static BOLD_ITALIC_PATTERN: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"\*\*\*([^*]+)\*\*\*").expect("Invalid regex pattern for bold italic")
+});
 
-static HORIZONTAL_RULE_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"(?m)^(\s*)(-{3,}|\*{3,}|_{3,})\s*$").expect("Invalid regex pattern for horizontal rules"));
+static HORIZONTAL_RULE_PATTERN: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"(?m)^(\s*)(-{3,}|\*{3,}|_{3,})\s*$")
+        .expect("Invalid regex pattern for horizontal rules")
+});
 
-static MULTI_LINE_CODE_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"(?s)```(\w+)\s*\n(.+?)\n```").expect("Invalid regex pattern for multi-line code blocks"));
+static MULTI_LINE_CODE_PATTERN: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"(?s)```(\w+)\s*\n(.+?)\n```")
+        .expect("Invalid regex pattern for multi-line code blocks")
+});
 
-static SINGLE_LINE_CODE_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"(?s)```(\w+)\s+([^\n]+?)\s*```").expect("Invalid regex pattern for single-line code blocks"));
+static SINGLE_LINE_CODE_PATTERN: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"(?s)```(\w+)\s+([^\n]+?)\s*```")
+        .expect("Invalid regex pattern for single-line code blocks")
+});
 
 #[async_trait]
 impl Zenith for MarkdownZenith {
@@ -453,11 +462,15 @@ fn clean_inline_code(formatted: &str) -> String {
 }
 
 fn format_task_lists(text: &str) -> String {
-    TASK_LIST_PATTERN.replace_all(text, "${1}${2}[ ] ${4}").to_string()
+    TASK_LIST_PATTERN
+        .replace_all(text, "${1}${2}[ ] ${4}")
+        .to_string()
 }
 
 fn format_strikethrough(text: &str) -> String {
-    STRIKETHROUGH_PATTERN.replace_all(text, "~~$1~~").to_string()
+    STRIKETHROUGH_PATTERN
+        .replace_all(text, "~~$1~~")
+        .to_string()
 }
 
 fn format_links_and_images(text: &str) -> String {

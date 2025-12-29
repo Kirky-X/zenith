@@ -124,6 +124,7 @@ zenith format <PATHS>... [OPTIONS]
 | `--no-backup` | bool | false | Disable automatic backup before formatting |
 | `-w, --workers` | usize | CPU count | Number of concurrent worker threads |
 | `--check` | bool | false | Dry-run mode, don't modify files |
+| `--watch` | bool | false | Enable file watching mode for real-time formatting |
 
 **Example:**
 
@@ -136,6 +137,9 @@ zenith format src/ --recursive --workers=4
 
 # Check without modifying (dry-run)
 zenith format . --check --recursive
+
+# Watch mode - monitor files and format automatically
+zenith format src/ --watch
 ```
 
 ---
@@ -998,27 +1002,44 @@ pub struct HashCache {
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `new()` | Self | Create a new cache |
-| `get(path: &Path)` | Option<[u8; 32]> | Get cached hash for file |
-| `insert(path: &Path, hash: [u8; 32])` | Result<()> | Store file hash |
-| `remove(path: &Path)` | Result<()> | Remove cached entry |
+| `with_cache_dir(path)` | Self | Create cache with persistence directory |
+| `with_config_aware(bool)` | Self | Enable config-aware caching |
+| `with_max_entry_age(duration)` | Self | Set cache entry expiration |
+| `compute_file_state(path)` | Result<FileState> | Compute file hash and metadata |
+| `needs_processing(path)` | Result<bool> | Check if file needs formatting |
+| `needs_processing_with_config(path, config)` | Result<bool> | Check with config awareness |
+| `update(path, state)` | Result<()> | Update cache entry |
+| `update_with_config(path, config)` | Result<> | Update with config hash |
+| `remove(path)` | Result<> | Remove cached entry |
 | `clear()` | Result<()> | Clear all cached entries |
-| `is_cached(path: &Path, content: &[u8])` | bool | Check if content matches cache |
+| `is_cached(path)` | bool | Check if file is in cache |
+| `get_cached_state(path)` | Option<FileState> | Get cached file state |
+| `cleanup()` | Result<usize> | Remove expired cache entries |
+| `stats()` | CacheStats | Get cache statistics |
+| `batch_needs_processing(paths)` | Result<Vec<bool>> | Batch check files |
+| `invalidate_matching(predicate)` | Result<usize> | Invalidate entries matching predicate |
+| `save()` | Result<()> | Persist cache to disk |
+| `save_background()` | () | Save cache asynchronously |
+| `load()` | Result<()> | Load cache from disk |
 
 **Example:**
 
 ```rust
 use zenith::storage::HashCache;
+use std::time::Duration;
 
-let cache = HashCache::new();
+let cache = HashCache::new()
+    .with_cache_dir(".zenith_cache".into())
+    .with_config_aware(true)
+    .with_max_entry_age(Duration::from_secs(3600));
 
 // Check if file needs formatting
-if !cache.is_cached(path, &current_content) {
+if cache.needs_processing(path).await? {
     // File changed or not cached, format it
     let formatted = formatter.format(&current_content).await?;
-    
+
     // Update cache
-    let new_hash = blake3::hash(&formatted);
-    cache.insert(path, new_hash)?;
+    cache.update_with_config(path, &config).await?;
 }
 ```
 

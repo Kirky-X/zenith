@@ -33,6 +33,7 @@ pub mod internal {
     pub use crate::mcp::server::McpServer;
     pub use crate::plugins::PluginLoader;
     pub use crate::services::formatter::ZenithService;
+    pub use crate::services::watch::{FileWatcher, WatchConfig};
     pub use crate::storage::backup::BackupService;
     pub use crate::storage::cache::HashCache;
     pub use crate::utils::environment::EnvironmentChecker;
