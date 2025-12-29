@@ -379,8 +379,16 @@ impl ZenithService {
     /// Format a single file (public method for use by file watcher)
     #[doc(hidden)]
     pub async fn format_file(&self, path: PathBuf) -> FormatResult {
-        self.process_file(std::env::current_dir().unwrap_or_default(), path)
-            .await
+        let root = match std::env::current_dir() {
+            Ok(root) => root,
+            Err(e) => {
+                let mut result = FormatResult::default();
+                result.file_path = path;
+                result.error = Some(format!("Failed to get current directory: {}", e));
+                return result;
+            }
+        };
+        self.process_file(root, path).await
     }
 
     /// Check if a file is in the cache (for watch mode)

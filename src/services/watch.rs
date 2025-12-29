@@ -65,16 +65,22 @@ impl FileWatcher {
         let mut watcher = RecommendedWatcher::new(
             move |result: notify::Result<notify::Event>| {
                 if let Ok(event) = result {
+                    let event_type = match event.kind {
+                        notify::EventKind::Create(_) => WatchEvent::Created,
+                        notify::EventKind::Modify(_) => WatchEvent::Modified,
+                        notify::EventKind::Remove(_) => WatchEvent::Deleted,
+                        _ => WatchEvent::Modified,
+                    };
+
                     for path in event.paths {
-                        let event_type = match event.kind {
-                            notify::EventKind::Create(_) => WatchEvent::Created(path),
-                            notify::EventKind::Modify(_) => WatchEvent::Modified(path),
-                            notify::EventKind::Remove(_) => WatchEvent::Deleted(path),
-                            _ => WatchEvent::Modified(path),
-                        };
-                        // Use blocking send since we're in a blocking context
-                        tokio::runtime::Handle::current().block_on(async {
-                            event_sender.send(event_type).await.ok();
+                        let sender = event_sender.clone();
+                        let event_type = event_type.clone();
+                        let path = path;
+                        tokio::task::spawn_blocking(move || {
+                            let event = event_type(path);
+                            if let Err(e) = sender.blocking_send(event) {
+                                tracing::warn!("Failed to send watch event: {}", e);
+                            }
                         });
                     }
                 }

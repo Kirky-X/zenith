@@ -251,7 +251,7 @@ impl Default for ZenithConfig {
 }
 
 /// 格式化操作的结果。
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct FormatResult {
     /// 文件路径。
     pub file_path: PathBuf,

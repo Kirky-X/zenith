@@ -18,12 +18,22 @@ pub fn validate_path(path: &Path) -> Result<()> {
 pub fn validate_path_strict(path: &Path) -> Result<()> {
     validate_path(path)?;
 
-    let path_str = path.to_string_lossy();
+    let canonical = match path.canonicalize() {
+        Ok(canonical) => canonical,
+        Err(_) => {
+            return Err(ZenithError::Config(format!(
+                "Cannot resolve path: {}",
+                path.display()
+            )));
+        }
+    };
 
-    if path_str.len() > 4096 {
+    let canonical_str = canonical.to_string_lossy().to_lowercase();
+
+    if canonical_str.len() > 4096 {
         return Err(ZenithError::Config(format!(
             "Path too long: {} characters",
-            path_str.len()
+            canonical_str.len()
         )));
     }
 
@@ -40,14 +50,33 @@ pub fn validate_path_strict(path: &Path) -> Result<()> {
         "/usr/sbin/",
         "/bin/",
         "/sbin/",
+        "/var/run/",
+        "/var/lock/",
+        "/tmp/",
+        "/mnt/",
+        "/media/",
+        "/opt/",
     ];
 
     for pattern in &dangerous_patterns {
-        if path_str.contains(pattern) {
+        if canonical_str.contains(pattern) {
             return Err(ZenithError::Config(format!(
                 "Access to system directory is not allowed: {}",
                 pattern
             )));
+        }
+    }
+
+    if let Some(file_name) = path.file_name() {
+        let name_lower = file_name.to_string_lossy().to_lowercase();
+        if name_lower.starts_with(".") && name_lower.len() > 1 {
+            let next_char = name_lower.chars().nth(1).unwrap();
+            if !next_char.is_ascii_alphabetic() {
+                return Err(ZenithError::Config(format!(
+                    "Hidden files starting with '.' followed by special characters are not allowed: {}",
+                    file_name.to_string_lossy()
+                )));
+            }
         }
     }
 
