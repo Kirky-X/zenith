@@ -25,4 +25,5 @@ __pycache__/
 *.bak
 *~
 Thumbs.db
-CLAUDE.md
+.claude
+.cargo
