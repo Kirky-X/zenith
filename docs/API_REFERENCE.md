@@ -2,7 +2,7 @@
 
 # 📘 API Reference
 
-### Complete API Documentation
+## Complete API Documentation
 
 [🏠 Home](../README.md) • [📖 User Guide](USER_GUIDE.md) • [🏗️ Architecture](ARCHITECTURE.md)
 
@@ -49,29 +49,31 @@
 <table>
 <tr>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/easy.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/easy.png" width="64" alt="Simple"><br>
 <b>Simple</b><br>
 Intuitive and easy to use
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/security-checked.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/security-checked.png" width="64" alt="Safe"><br>
 <b>Safe</b><br>
 Type-safe and secure by default
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/module.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/module.png" width="64" alt="Composable"><br>
 <b>Composable</b><br>
 Build complex workflows easily
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/documentation.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/documentation.png" width="64" alt="Well-documented"><br>
 <b>Well-documented</b><br>
 Comprehensive documentation
 </td>
 </tr>
 </table>
 
-Zenith provides a comprehensive API for code formatting, backup management, and MCP server integration. The API is designed to be type-safe, composable, and easy to use.
+Zenith provides a comprehensive API for code formatting, backup management,
+and MCP server integration. The API is designed to be type-safe, composable,
+and easy to use.
 
 ---
 
@@ -1221,7 +1223,7 @@ auto_update = false
 
 <div align="center">
 
-#### 🚨 Error Types and Handling
+### 🚨 Error Types and Handling
 
 </div>
 
@@ -1268,7 +1270,8 @@ pub enum ZenithError {
 <tr>
 <td width="50%">
 
-**Pattern Matching**
+#### Pattern Matching
+
 ```rust
 match service.format_file(path) {
     Ok(_) => {
@@ -1289,7 +1292,8 @@ match service.format_file(path) {
 </td>
 <td width="50%">
 
-**? Operator**
+#### ? Operator
+
 ```rust
 fn process_files() -> Result<(), ZenithError> {
     let config = AppConfig::load("zenith.toml")?;

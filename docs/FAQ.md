@@ -2,7 +2,7 @@
 
 # ❓ Frequently Asked Questions (FAQ)
 
-### Quick Answers to Common Questions
+## Quick Answers to Common Questions
 
 [🏠 Home](../README.md) • [📖 User Guide](USER_GUIDE.md) • [🐛 Report Issue](https://github.com/Kirky-X/zenith/issues)
 
@@ -14,12 +14,12 @@
 
 - [General Questions](#general-questions)
 - [Installation & Setup](#installation--setup)
-- [Usage & Features](#usage--features)
-- [Performance](#performance)
-- [Security](#security)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [Licensing](#licensing)
+- [Usage & Features]
+- [Performance]
+- [Security]
+- [Troubleshooting]
+- [Contributing]
+- [Licensing]
 
 ---
 
@@ -39,9 +39,13 @@
 **Zenith** is a high-performance, multi-language code formatter with automatic backup and one-click recovery. It provides:
 
 - ✅ **14+ Language Support** - Rust, Python, Markdown, JSON, TOML, Shell, C, Java, INI, and more
+
 - ✅ **Intelligent Caching** - Skips already-formatted files for faster processing
+
 - ✅ **Automatic Backups** - Preserves original code before formatting
+
 - ✅ **MCP Server** - Model Context Protocol server for AI integration
+
 - ✅ **Plugin System** - Extensible architecture for custom formatters
 
 It's designed for developers who need a reliable, fast, and safe code formatting solution.
@@ -100,7 +104,8 @@ It's designed for developers who need a reliable, fast, and safe code formatting
 </tr>
 </table>
 
-**Key Advantages:**
+### Key Advantages
+
 - 🚀 **Fast** - Built in Rust with async/await and intelligent caching
 - 🔒 **Safe** - Automatic backups before formatting, one-click recovery
 - 🧩 **Extensible** - Plugin system for custom formatters
@@ -119,17 +124,23 @@ It's designed for developers who need a reliable, fast, and safe code formatting
 <tr>
 <td width="50%">
 
-**What's Ready:**
+### What's Ready
+
 - ✅ Core formatting functionality stable
+
 - ✅ 14+ language formatters available
+
 - ✅ Backup and recovery system
+
 - ✅ MCP server for AI integration
+
 - ✅ Comprehensive configuration options
 
 </td>
 <td width="50%">
 
-**Maturity Indicators:**
+### ### Maturity Indicators
+
 - 📊 Well-tested Rust codebase
 - 🔄 Active development
 - 📝 MIT Licensed
@@ -197,7 +208,7 @@ It's designed for developers who need a reliable, fast, and safe code formatting
 <tr>
 <td width="33%" align="center">
 
-**🦀 Rust**
+### 🦀 Rust
 
 ✅ **Native Support**
 
@@ -206,7 +217,7 @@ Full support with rustfmt
 </td>
 <td width="33%" align="center">
 
-**🐍 Python**
+### 🐍 Python
 
 ✅ **Native Support**
 
@@ -215,7 +226,7 @@ Full support with ruff
 </td>
 <td width="33%" align="center">
 
-**📝 Markdown**
+### 📝 Markdown
 
 ✅ **Native Support**
 
@@ -226,7 +237,7 @@ Built-in formatter
 <tr>
 <td width="33%" align="center">
 
-**📋 JSON/TOML**
+### 📋 JSON/TOML
 
 ✅ **Native Support**
 
@@ -235,7 +246,7 @@ Built-in formatters
 </td>
 <td width="33%" align="center">
 
-**🔧 Shell**
+### 🔧 Shell
 
 ✅ **Native Support**
 
@@ -244,7 +255,7 @@ sh/bash formatting
 </td>
 <td width="33%" align="center">
 
-**©️ C/C++**
+### ©️ C/C++
 
 ✅ **Native Support**
 
@@ -255,7 +266,7 @@ With clang-format
 <tr>
 <td width="33%" align="center">
 
-**☕ Java**
+### ☕ Java
 
 ✅ **Native Support**
 
@@ -264,7 +275,7 @@ Java formatting
 </td>
 <td width="33%" align="center">
 
-**⚙️ INI**
+### ⚙️ INI
 
 ✅ **Native Support**
 
@@ -273,7 +284,7 @@ INI file formatting
 </td>
 <td width="33%" align="center">
 
-**🎨 Prettier**
+### 🎨 Prettier
 
 🚧 **Plugin**
 
@@ -283,7 +294,8 @@ Via external integration
 </tr>
 </table>
 
-**Documentation:**
+### ### Documentation
+
 - [User Guide](USER_GUIDE.md#core-concepts)
 - [Examples](../examples/)
 
@@ -304,33 +316,33 @@ Via external integration
 
 <br>
 
-**Using Cargo Install (Recommended):**
+### ### Using Cargo Install (Recommended)
 
 ```bash
 cargo install --git https://github.com/Kirky-X/zenith.git
-```
+```bash
 
-**From Source:**
+### ### From Source
 
 ```bash
 git clone https://github.com/Kirky-X/zenith.git
 cd zenith
 cargo build --release
-```
+```bash
 
-**Quick Install Script (Linux/macOS):**
+### ### Quick Install Script (Linux/macOS)
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
-```
+```bash
 
-**Windows (PowerShell):**
+### ### Windows (PowerShell)
 
 ```powershell
 iwr -useb https://raw.githubusercontent.com/Kirky-X/zenith/main/install.ps1 | iex
-```
+```bash
 
-**Verification:**
+### ### Verification
 
 ```bash
 zenith --version
@@ -338,7 +350,7 @@ zenith --version
 
 zenith doctor
 # Checks environment and dependencies
-```
+```bash
 
 **See also:** [Installation Guide](USER_GUIDE.md#installation)
 
@@ -349,7 +361,7 @@ zenith doctor
 
 <br>
 
-**Minimum Requirements:**
+### ### Minimum Requirements
 
 <table>
 <tr>
@@ -379,7 +391,8 @@ zenith doctor
 </tr>
 </table>
 
-**Optional:**
+### ### Optional
+
 - 🔧 Formatter tools (rustfmt, ruff, clang-format) for specific languages
 - 🐳 Docker (for containerized deployment)
 
@@ -390,13 +403,13 @@ zenith doctor
 
 <br>
 
-**Initialize Configuration:**
+### ### Initialize Configuration
 
 ```bash
 zenith init
-```
+```bash
 
-**Create `zenith.toml`:**
+### ### Create `zenith.toml`
 
 ```toml
 [global]
@@ -429,16 +442,16 @@ enabled = false
 host = "127.0.0.1"
 port = 9000
 auth_enabled = false
-```
+```bash
 
-**Environment Variables:**
+### ### Environment Variables
 
 ```bash
 export ZENITH_WORKERS=16
 export ZENITH_LOG_LEVEL=debug
 export ZENITH_NO_BACKUP=false
 export ZENITH_RECURSIVE=true
-```
+```bash
 
 **See also:** [Configuration Guide](USER_GUIDE.md#configuration)
 
@@ -460,24 +473,28 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v3
       - name: Install Zenith
         run: curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
+
       - name: Check formatting
         run: zenith format ./ --recursive --check
-```
+```bash
 
-**GitLab CI:**
+### ### GitLab CI
 
 ```yaml
 format:
   stage: test
   script:
+
     - curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
     - zenith format ./ --recursive --check
-```
+```bash
 
-**Best Practices:**
+### ### Best Practices
+
 - Use `--check` mode in CI to validate without modifying files
 - Enable backups in production for safety
 - Use caching for faster CI runs
@@ -499,7 +516,7 @@ format:
 
 <br>
 
-**Basic Usage:**
+### ### Basic Usage
 
 ```bash
 # Format a single file
@@ -519,9 +536,9 @@ zenith format ./ --recursive --no-backup
 
 # Specify number of workers
 zenith format ./ --workers 16
-```
+```bash
 
-**Initialize Project:**
+### ### Initialize Project
 
 ```bash
 # Simple initialization
@@ -532,9 +549,9 @@ zenith init --force
 
 # Check environment
 zenith doctor
-```
+```bash
 
-**Backup and Recovery:**
+### ### Backup and Recovery
 
 ```bash
 # List available backups
@@ -545,7 +562,7 @@ zenith recover backup_20231223_142030
 
 # Clean old backups
 zenith clean-backups --days 7
-```
+```bash
 
 **See also:** [User Guide](USER_GUIDE.md#basic-operations)
 
@@ -558,14 +575,14 @@ zenith clean-backups --days 7
 
 **MCP (Model Context Protocol)** enables AI assistants to interact with Zenith.
 
-**Start MCP Server:**
+### ### Start MCP Server
 
 ```bash
 zenith mcp
 zenith mcp --addr 127.0.0.1:9000
-```
+```bash
 
-**API Request:**
+### ### API Request
 
 ```bash
 curl -X POST http://127.0.0.1:9000 \
@@ -581,9 +598,9 @@ curl -X POST http://127.0.0.1:9000 \
       "backup": true
     }
   }'
-```
+```bash
 
-**Configuration:**
+### ### Configuration
 
 ```toml
 [mcp]
@@ -593,9 +610,10 @@ port = 9000
 auth_enabled = false
 api_key = null
 allowed_origins = ["*"]
-```
+```bash
 
-**Use Cases:**
+### ### Use Cases
+
 - AI-assisted code formatting
 - Automated code review workflows
 - IDE integration via MCP protocol
@@ -607,7 +625,7 @@ allowed_origins = ["*"]
 
 <br>
 
-**Automatic Backups:**
+### ### Automatic Backups
 
 Zenith automatically creates backups before formatting files.
 
@@ -615,9 +633,9 @@ Zenith automatically creates backups before formatting files.
 [backup]
 dir = ".zenith_backup"
 retention_days = 7
-```
+```bash
 
-**Backup Commands:**
+### ### Backup Commands
 
 ```bash
 # List all backups
@@ -631,18 +649,18 @@ zenith clean-backups --days 7
 
 # Auto rollback to latest backup
 zenith auto-rollback
-```
+```bash
 
-**Backup Structure:**
+### ### Backup Structure
 
-```
+```bash
 .zenith_backup/
 ├── backup_20231223_142030/
 │   ├── src_main.rs
 │   └── src_lib.rs
 ├── backup_20231223_143000/
 │   └── src_main.rs
-```
+```bash
 
 </details>
 
@@ -651,41 +669,43 @@ zenith auto-rollback
 
 <br>
 
-**How It Works:**
+### ### How It Works
 
 Zenith tracks file hashes and skips already-formatted files.
 
 ```toml
 [global]
 cache_enabled = true
-```
+```bash
 
-**Performance Comparison:**
+### ### Performance Comparison
 
 <table>
 <tr>
 <td width="50%">
 
-**Without Cache**
+### Without Cache
+
 ```bash
 zenith format ./ --recursive
 # Time: 10s (all files)
-```
+```bash
 
 </td>
 <td width="50%">
 
-**With Cache**
+### With Cache
+
 ```bash
 zenith format ./ --recursive
 # Time: 1s (only changed files)
-```
+```bash
 
 </td>
 </tr>
 </table>
 
-**Cache Management:**
+### ### Cache Management
 
 - Cache is automatic - no manual intervention needed
 - Cache invalidates when file content changes
@@ -698,11 +718,11 @@ zenith format ./ --recursive
 
 <br>
 
-**Plugin System:**
+### ### Plugin System
 
 Zenith supports custom formatters through its plugin architecture.
 
-**Create Custom Zenith:**
+### ### Create Custom Zenith
 
 ```rust
 use zenith::core::traits::Zenith;
@@ -727,16 +747,16 @@ impl Zenith for CustomZenith {
         Ok(formatted_content)
     }
 }
-```
+```bash
 
-**Security Configuration:**
+### ### Security Configuration
 
 ```toml
 [security]
 allowed_plugin_commands = ["custom-formatter"]
 allow_absolute_paths = false
 allow_relative_paths = false
-```
+```bash
 
 </details>
 
@@ -755,7 +775,7 @@ allow_relative_paths = false
 
 <br>
 
-**Increase Workers:**
+### ### Increase Workers
 
 ```bash
 # Match CPU cores
@@ -763,23 +783,23 @@ zenith format ./ --workers $(nproc)
 
 # For very large projects
 zenith format ./ --workers 32
-```
+```bash
 
-**Configuration:**
+### Configuration (2)
 
 ```toml
 [concurrency]
 workers = 16
 batch_size = 200
-```
+```bash
 
-**Disable Backup for CI:**
+### ### Disable Backup for CI
 
 ```bash
 zenith format ./ --recursive --no-backup
-```
+```bash
 
-**Selective Formatting:**
+### ### Selective Formatting
 
 ```bash
 # Only specific file types
@@ -787,9 +807,9 @@ zenith format $(find ./ -name "*.rs" -o -name "*.py")
 
 # Exclude directories
 zenith format ./ --recursive --exclude target --exclude node_modules
-```
+```bash
 
-**Performance Profiles:**
+### ### Performance Profiles
 
 <table>
 <tr>
@@ -825,7 +845,7 @@ zenith format ./ --recursive --exclude target --exclude node_modules
 
 <br>
 
-**✅ DO's:**
+### ### ✅ DO's
 
 - Use `--workers` to match your CPU cores
 - Enable caching for repeated formatting
@@ -833,13 +853,13 @@ zenith format ./ --recursive --exclude target --exclude node_modules
 - Exclude build directories (`target`, `node_modules`)
 - Keep backups enabled for safety
 
-**❌ DON'Ts:**
+### ### ❌ DON'Ts
 
 - Don't use debug logging in production
 - Don't disable caching for small projects
 - Don't format entire filesystem without recursion control
 
-**Tips:**
+### ### Tips
 
 ```bash
 # Check performance with verbose logging
@@ -847,7 +867,7 @@ zenith format ./ --verbose
 
 # Monitor with debug level
 ZENITH_LOG_LEVEL=debug zenith format ./
-```
+```bash
 
 </details>
 
@@ -869,17 +889,21 @@ ZENITH_LOG_LEVEL=debug zenith format ./
 **Yes!** Zenith is designed with safety in mind:
 
 - ✅ **Automatic Backups** - Original code preserved before formatting
+
 - ✅ **One-Click Recovery** - Easily restore from backups
+
 - ✅ **Sandboxed Plugins** - Plugin security configuration
+
 - ✅ **Safe Defaults** - Backup enabled by default
 
-**Security Features:**
+### ### Security Features
 
 <table>
 <tr>
 <td width="50%">
 
-**Code Safety:**
+### ### Code Safety
+
 - Automatic backups before formatting
 - Dry-run mode (`--check`) available
 - Versioned backup storage
@@ -888,7 +912,8 @@ ZENITH_LOG_LEVEL=debug zenith format ./
 </td>
 <td width="50%">
 
-**Plugin Security:**
+### ### Plugin Security
+
 - Command whitelisting
 - Path access control
 - Secure defaults
@@ -905,7 +930,7 @@ ZENITH_LOG_LEVEL=debug zenith format ./
 
 <br>
 
-**Enable Authentication:**
+### ### Enable Authentication
 
 ```toml
 [mcp]
@@ -913,15 +938,15 @@ enabled = true
 auth_enabled = true
 api_key = "${ZENITH_API_KEY}"
 allowed_origins = ["https://your-domain.com"]
-```
+```bash
 
-**Use Environment Variables:**
+### ### Use Environment Variables
 
 ```bash
 export ZENITH_API_KEY="your-secure-api-key"
-```
+```bash
 
-**Don't commit API keys:**
+### ### Don't commit API keys
 
 ```toml
 # ❌ Bad - exposes API key
@@ -929,9 +954,10 @@ api_key = "secret-key"
 
 # ✅ Good - uses environment variable
 api_key = "${ZENITH_API_KEY}"
-```
+```bash
 
-**Security Recommendations:**
+### ### Security Recommendations
+
 - Always enable authentication in production
 - Use strong API keys
 - Restrict allowed origins
@@ -944,21 +970,22 @@ api_key = "${ZENITH_API_KEY}"
 
 <br>
 
-**Exclude Sensitive Files:**
+### ### Exclude Sensitive Files
 
 ```bash
 # Exclude specific directories
 zenith format ./ --exclude .env --exclude secrets --exclude credentials
-```
+```bash
 
-**Configuration:**
+### Configuration (3)
 
 ```toml
 [limits]
 max_file_size_mb = 10
-```
+```bash
 
-**Best Practices:**
+### Best Practices (2)
+
 - Don't format files containing secrets
 - Use `.gitignore` to exclude sensitive directories
 - Review changes before committing
@@ -983,7 +1010,7 @@ max_file_size_mb = 10
 
 **Problem:** Missing formatter tool for a specific language.
 
-**Solution:**
+### ### Solution
 
 ```bash
 # Check environment
@@ -1001,15 +1028,15 @@ apt install clang-format
 
 # Prettier
 npm install -g prettier
-```
+```bash
 
-**Configure external formatters:**
+### ### Configure external formatters
 
 ```toml
 [zeniths.python]
 enabled = true
 config_path = "pyproject.toml"
-```
+```bash
 
 </details>
 
@@ -1020,7 +1047,7 @@ config_path = "pyproject.toml"
 
 **Problem:** File access issues.
 
-**Solution:**
+### Solution (2)
 
 ```bash
 # Check file permissions
@@ -1031,7 +1058,7 @@ chmod +w path/to/file
 
 # Or use sudo (caution)
 sudo zenith format /etc/config/file.conf
-```
+```bash
 
 **Note:** Be careful with sudo - only use when necessary.
 
@@ -1044,7 +1071,7 @@ sudo zenith format /etc/config/file.conf
 
 **Problem:** Disk space issues from backups.
 
-**Solution:**
+### Solution (3)
 
 ```bash
 # Clean old backups
@@ -1056,7 +1083,7 @@ rm -rf .zenith_backup/*
 # Configure retention
 [backup]
 retention_days = 3
-```
+```bash
 
 </details>
 
@@ -1067,7 +1094,7 @@ retention_days = 3
 
 **Problem:** Formatting takes too long.
 
-**Diagnosis & Solution:**
+### ### Diagnosis & Solution
 
 ```bash
 # Increase workers
@@ -1081,9 +1108,10 @@ zenith format ./ --recursive --exclude target --exclude node_modules
 
 # Check with verbose mode
 zenith format ./ --verbose
-```
+```bash
 
-**Performance Tips:**
+### ### Performance Tips
+
 - Match workers to CPU cores
 - Enable caching for repeated runs
 - Exclude build and dependency directories
@@ -1098,7 +1126,7 @@ zenith format ./ --verbose
 
 **Problem:** Invalid configuration file.
 
-**Solution:**
+### Solution (4)
 
 ```bash
 # Validate configuration
@@ -1109,9 +1137,10 @@ cat zenith.toml
 
 # Reset to defaults
 zenith init --force
-```
+```bash
 
-**Common Issues:**
+### ### Common Issues
+
 - Invalid TOML syntax
 - Missing required fields
 - Invalid enum values
@@ -1140,15 +1169,16 @@ zenith init --force
 
 <br>
 
-**Ways to Contribute:**
+### ### Ways to Contribute
 
 - 🐛 **Bug Reports** - Report issues on GitHub
 - 💡 **Feature Requests** - Suggest new features
 - 📝 **Documentation** - Improve docs and guides
+
 - 🔧 **Code Contributions** - Submit pull requests
 - 🧪 **Testing** - Help test new features
 
-**Getting Started:**
+### ### Getting Started
 
 ```bash
 # Fork the repository
@@ -1163,7 +1193,7 @@ cargo test
 
 # Submit pull request
 git push origin feature/amazing-feature
-```
+```bash
 
 **See also:** [CONTRIBUTING.md](../CONTRIBUTING.md)
 
@@ -1174,7 +1204,7 @@ git push origin feature/amazing-feature
 
 <br>
 
-**Rust Standards:**
+### ### Rust Standards
 
 - Follow [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
 - Use `rustfmt` for formatting
@@ -1182,7 +1212,7 @@ git push origin feature/amazing-feature
 - Write documentation for public APIs
 - Add tests for new functionality
 
-**Code Style:**
+### ### Code Style
 
 ```bash
 # Format code
@@ -1193,7 +1223,7 @@ cargo clippy
 
 # Run tests
 cargo test
-```
+```bash
 
 </details>
 
@@ -1212,21 +1242,27 @@ cargo test
 
 <br>
 
-**MIT License**
+### MIT License
 
 Zenith is licensed under the MIT License. This is a permissive license that allows:
 
 - ✅ Commercial use
+
 - ✅ Modification
+
 - ✅ Distribution
+
 - ✅ Private use
+
 - ✅ Sublicensing
 
-**Required:**
+### ### Required
+
 - Include copyright notice
 - Include license notice
 
-**No Liability:**
+### ### No Liability
+
 - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY
 
 **Full License:** See [LICENSE](../LICENSE) file for details.
@@ -1241,11 +1277,15 @@ Zenith is licensed under the MIT License. This is a permissive license that allo
 **Yes!** The MIT License allows commercial use:
 
 - ✅ Use Zenith in commercial products
+
 - ✅ Modify Zenith for your needs
+
 - ✅ Distribute modified versions
+
 - ✅ No attribution required (but appreciated)
 
-**Example Commercial Use:**
+### ### Example Commercial Use
+
 - Internal company tooling
 - SaaS products
 - Open-source libraries

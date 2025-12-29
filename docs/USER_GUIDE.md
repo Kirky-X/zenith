@@ -2,14 +2,6 @@
 
 # 📖 Zenith User Guide
 
-### Complete Guide to Using Zenith
-
-[🏠 Home](../README.md) • [📚 Docs](README.md) • [🎯 Examples](../examples/) • [❓ FAQ](FAQ.md)
-
----
-
-</div>
-
 ## 📋 Table of Contents
 
 - [Introduction](#introduction)
@@ -44,31 +36,34 @@
 <table>
 <tr>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/rocket.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/rocket.png" alt="Quick Start 图标" width="64"><br>
 <b>Quick Start</b><br>
 Get up and running in 5 minutes
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/settings.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/settings.png" alt="Contributing 图标" width="64"><br>
 <b>Configuration</b><br>
 Customize to your needs
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/code.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/code.png" alt="Best Practices 图标" width="64"><br>
 <b>Best Practices</b><br>
 Learn the right way
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/rocket-take-off.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/rocket-take-off.png" alt="Advanced Topics 图标" width="64"><br>
 <b>Advanced Topics</b><br>
 Master the details
 </td>
 </tr>
 </table>
 
-**Zenith** is a high-performance, multi-language code formatter with automatic backup and one-click recovery. This guide will walk you through everything from basic setup to advanced usage patterns.
+**Zenith** is a high-performance, multi-language code formatter with
+automatic backup and one-click recovery. This guide will walk you through
+everything from basic setup to advanced usage patterns.
 
-> 💡 **Tip**: This guide assumes basic knowledge of command-line tools. If you're new to code formatters, check out our [Quick Start](#first-steps) section first.
+> 💡 **Tip**: This guide assumes basic knowledge of command-line tools. If you're new
+to code formatters, check out our [Quick Start](#first-steps) section first.
 
 ---
 
@@ -82,7 +77,8 @@ Before you begin, ensure you have the following installed:
 <tr>
 <td width="50%">
 
-**Required**
+### Required
+
 - ✅ Rust 1.75+ (stable)
 - ✅ Cargo (comes with Rust)
 - ✅ Git
@@ -90,7 +86,8 @@ Before you begin, ensure you have the following installed:
 </td>
 <td width="50%">
 
-**Optional**
+### Optional
+
 - 🔧 IDE with Rust support
 - 🔧 Formatter tools (rustfmt, ruff, prettier, etc.)
 - 🔧 Docker (for containerized deployment)
@@ -130,7 +127,7 @@ git --version
 <tr>
 <td width="50%">
 
-**📦 Using Cargo Install (Recommended)**
+### 📦 Using Cargo Install (Recommended)
 
 ```bash
 cargo install --git https://github.com/Kirky-X/zenith.git
@@ -139,7 +136,7 @@ cargo install --git https://github.com/Kirky-X/zenith.git
 </td>
 <td width="50%">
 
-**🐙 From Source**
+### 🐙 From Source
 
 ```bash
 git clone https://github.com/Kirky-X/zenith.git
@@ -154,17 +151,20 @@ cargo build --release
 <details>
 <summary><b>🌐 Other Installation Methods</b></summary>
 
-**Quick Install Script (Linux/macOS)**
+### Quick Install Script (Linux/macOS)
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/Kirky-X/zenith/main/install.sh | sh
 ```
 
-**Windows (PowerShell)**
+### Windows (PowerShell)
+
 ```powershell
 iwr -useb https://raw.githubusercontent.com/Kirky-X/zenith/main/install.ps1 | iex
 ```
 
-**Pre-compiled Binaries**
+### Pre-compiled Binaries
+
 1. Visit [Releases](https://github.com/Kirky-X/zenith/releases)
 2. Download the binary for your platform
 3. Extract and add to PATH:
@@ -256,11 +256,13 @@ graph TD
 **Why it matters:** Provides unified interface for different language formatters with automatic detection.
 
 **Key Features:**
+
 - ✅ Automatic language detection
 - ✅ Plugin-based architecture
 - ✅ 14+ language support
 
 **Example:**
+
 ```bash
 # Auto-detect and format
 zenith format src/main.rs
@@ -273,10 +275,11 @@ zenith format src/main.py --formatter ruff
 <summary><b>📚 Learn More</b></summary>
 
 The formatter registry:
+
 - Automatically detects file type by extension
 - Loads appropriate formatter based on configuration
 - Supports plugin system for custom formatters
-- Falls back to built-in formatters when external tools unavailable
+- Falls back to built-in formatters when unavailable
 
 </details>
 
@@ -284,15 +287,18 @@ The formatter registry:
 
 **What it is:** Automatic backup system that preserves original code before formatting.
 
-**Why it matters:** Provides safety net for accidental formatting or unwanted changes.
+**Why it matters:** Provides safety net for accidental formatting or
+unwanted changes.
 
 **Key Features:**
+
 - ✅ Automatic backups before formatting
 - ✅ Versioned backup storage
 - ✅ One-click recovery
 - ✅ Configurable retention
 
 **Example:**
+
 ```bash
 # Automatic backup is enabled by default
 zenith format src/
@@ -314,7 +320,8 @@ zenith recover backup_20231223_142030
 <tr>
 <td width="50%">
 
-**Without Cache**
+### Without Cache
+
 ```bash
 # Re-formats all files every time
 zenith format ./ --recursive
@@ -324,7 +331,8 @@ zenith format ./ --recursive
 </td>
 <td width="50%">
 
-**With Cache**
+### With Cache
+
 ```bash
 # Only reformats changed files
 zenith format ./ --recursive
@@ -368,11 +376,35 @@ zenith init --force
 **Configuration File Location:**
 
 Zenith looks for configuration files in the following order (first found wins):
+
 1. `./zenith.toml` (current directory)
 2. `~/.config/zenith/config.toml` (user config)
 3. `/etc/zenith/config.toml` (system config)
 
 **Create `zenith.toml`:**
+
+```toml
+[global]
+backup_enabled = true
+log_level = "info"
+recursive = true
+cache_enabled = true
+
+[formatters.rust]
+enabled = true
+use_default = true
+
+[formatters.python]
+enabled = true
+use_default = true
+
+[formatters.markdown]
+enabled = true
+use_default = true
+
+[formatters.json]
+enabled = true
+```
 
 ```toml
 [global]
@@ -428,43 +460,14 @@ allow_relative_paths = false
 
 </details>
 
-<table>
-<tr>
-<th>Option</th>
-<th>Type</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-<tr>
-<td><code>backup_enabled</code></td>
-<td>bool</td>
-<td>true</td>
-<td>Enable automatic backups before formatting</td>
-</tr>
-<tr>
-<td><code>log_level</code></td>
-<td>String</td>
-<td>"info"</td>
-<td>Logging verbosity (debug/info/warn/error)</td>
-</tr>
-<tr>
-<td><code>recursive</code></td>
-<td>bool</td>
-<td>false</td>
-<td>Process directories recursively</td>
-</tr>
-<tr>
-<td><code>cache_enabled</code></td>
-<td>bool</td>
-<td>true</td>
-<td>Enable caching for performance</td>
-</tr>
-<tr>
-<td><code>workers</code></td>
-<td>usize</td>
-<td>8</td>
-<td>Number of concurrent workers</td>
-</tr>
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `backup_enabled` | bool | true | Enable automatic backups before formatting |
+| `log_level` | String | "info" | Logging verbosity (debug/info/warn/error) |
+| `recursive` | bool | false | Process directories recursively |
+| `cache_enabled` | bool | true | Enable caching for performance |
+| `workers` | usize | 8 | Number of concurrent workers |
+
 </table>
 
 **Environment Variables:**
@@ -493,7 +496,8 @@ export ZENITH_MCP_ENABLED=true
 <tr>
 <td width="50%">
 
-**Format Files**
+### Format Files
+
 ```bash
 # Single file
 zenith format src/main.rs
@@ -511,7 +515,8 @@ zenith format src/ --check
 </td>
 <td width="50%">
 
-**Backup Operations**
+### Backup Operations
+
 ```bash
 # List backups
 zenith list-backups
@@ -571,36 +576,11 @@ zenith format src/ --exclude target --exclude node_modules
 <details>
 <summary><b>🎛️ Performance Profiles</b></summary>
 
-<table>
-<tr>
-<th>Profile</th>
-<th>Use Case</th>
-<th>Throughput</th>
-<th>Latency</th>
-<th>Memory</th>
-</tr>
-<tr>
-<td><b>Default</b></td>
-<td>General purpose</td>
-<td>High</td>
-<td>Low</td>
-<td>Medium</td>
-</tr>
-<tr>
-<td><b>High Throughput</b></td>
-<td>Large projects</td>
-<td>⚡ Very High</td>
-<td>Medium</td>
-<td>High</td>
-</tr>
-<tr>
-<td><b>Low Memory</b></td>
-<td>Resource-constrained</td>
-<td>Low</td>
-<td>Medium</td>
-<td>⚡ Very Low</td>
-</tr>
-</table>
+| Profile | Use Case | Throughput | Latency | Memory |
+|---------|----------|------------|---------|--------|
+| **Default** | General purpose | High | Low | Medium |
+| **High Throughput** | Large projects | ⚡ Very High | Medium | High |
+| **Low Memory** | Resource-constrained | Low | Medium | ⚡ Very Low |
 
 </details>
 
@@ -610,22 +590,20 @@ zenith format src/ --exclude target --exclude node_modules
 
 #### ⚡ Optimization Strategies
 
-</div>
-
-**1. Increase Workers**
+### 1. Increase Workers
 
 ```bash
 # For large projects
 zenith format ./ --recursive --workers 32
 ```
 
-**2. Disable Cache for One-off**
+### 2. Disable Cache for One-off
 
 ```bash
 ZENITH_CACHE_ENABLED=false zenith format ./ --recursive
 ```
 
-**3. Batch Processing Configuration**
+### 3. Batch Processing Configuration
 
 ```toml
 [concurrency]
@@ -633,7 +611,7 @@ workers = 16
 batch_size = 200
 ```
 
-**4. Selective Formatting**
+### 4. Selective Formatting
 
 ```bash
 # Only specific file types
@@ -690,7 +668,8 @@ ZENITH_LOG_LEVEL=debug zenith format ./ --recursive
 <tr>
 <td width="50%">
 
-**Initialize Early**
+### Initialize Early
+
 ```bash
 # Initialize at project start
 zenith init
@@ -702,7 +681,8 @@ zenith init
 </td>
 <td width="50%">
 
-**Use Check Mode in CI**
+### Use Check Mode in CI
+
 ```bash
 # In CI pipelines
 zenith format ./ --recursive --check
@@ -713,7 +693,8 @@ zenith format ./ --recursive --check
 <tr>
 <td width="50%">
 
-**Keep Backups Enabled**
+### Keep Backups Enabled
+
 ```toml
 [global]
 backup_enabled = true
@@ -722,7 +703,8 @@ backup_enabled = true
 </td>
 <td width="50%">
 
-**Regular Cleanup**
+### Regular Cleanup
+
 ```bash
 # Clean old backups monthly
 zenith clean-backups --days 30
@@ -738,7 +720,8 @@ zenith clean-backups --days 30
 <tr>
 <td width="50%">
 
-**Don't Disable Backup in Production**
+### Don't Disable Backup in Production
+
 ```toml
 # ❌ Bad
 backup_enabled = false
@@ -750,7 +733,8 @@ backup_enabled = true
 </td>
 <td width="50%">
 
-**Don't Use Debug Mode in Production**
+### Don't Use Debug Mode in Production
+
 ```bash
 # ❌ Bad
 ZENITH_LOG_LEVEL=debug zenith format ./
@@ -766,23 +750,26 @@ ZENITH_LOG_LEVEL=info zenith format ./
 ### 💡 Tips and Tricks
 
 > **🔥 Performance Tip**: Use `--workers` to match your CPU cores:
-> ```bash
-> zenith format ./ --workers $(nproc)
-> ```
+
+```bash
+zenith format ./ --workers $(nproc)
+```
 
 > **🔒 Security Tip**: Don't commit zenith.toml with sensitive API keys:
-> ```toml
-> # ❌ Bad
-> api_key = "secret-key"
-> 
-> # ✅ Good (use environment variable)
-> api_key = "${ZENITH_API_KEY}"
-> ```
+
+```toml
+# ❌ Bad
+api_key = "secret-key"
+
+# ✅ Good (use environment variable)
+api_key = "${ZENITH_API_KEY}"
+```
 
 > **📊 Monitoring Tip**: Enable verbose logging for debugging:
-> ```bash
-> zenith format ./ --verbose
-> ```
+
+```bash
+zenith format ./ --verbose
+```
 
 ---
 
@@ -791,6 +778,7 @@ ZENITH_LOG_LEVEL=info zenith format ./
 ### Pattern 1: Pre-commit Hooks
 
 **Using pre-commit:**
+
 ```yaml
 repos:
   - repo: local
@@ -803,6 +791,7 @@ repos:
 ```
 
 **Using Git hooks directly:**
+
 ```bash
 cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
@@ -815,6 +804,7 @@ chmod +x .git/hooks/pre-commit
 ### Pattern 2: CI/CD Integration
 
 **GitHub Actions:**
+
 ```yaml
 name: Format Check
 
@@ -832,6 +822,7 @@ jobs:
 ```
 
 **GitLab CI:**
+
 ```yaml
 format:
   stage: test
@@ -843,16 +834,19 @@ format:
 ### Pattern 3: Git Integration
 
 **Format staged files:**
+
 ```bash
 zenith format $(git diff --cached --name-only --diff-filter=ACM)
 ```
 
 **Format changed files:**
+
 ```bash
 zenith format $(git diff --name-only --diff-filter=ACM)
 ```
 
 **Format files in last commit:**
+
 ```bash
 zenith format $(git diff HEAD~1 --name-only)
 ```
@@ -860,12 +854,14 @@ zenith format $(git diff HEAD~1 --name-only)
 ### Pattern 4: MCP Server
 
 **Start MCP Server:**
+
 ```bash
 zenith mcp
 zenith mcp --addr 127.0.0.1:9000
 ```
 
 **API Request:**
+
 ```bash
 curl -X POST http://127.0.0.1:9000 \
   -H "Authorization: Bearer your-api-key" \
@@ -890,6 +886,7 @@ curl -X POST http://127.0.0.1:9000 \
 <summary><b>❓ Problem: Formatter not found</b></summary>
 
 **Solution:**
+
 ```bash
 zenith doctor
 # Install missing formatters:
@@ -904,6 +901,7 @@ npm install -g prettier
 <summary><b>❓ Problem: Permission denied</b></summary>
 
 **Solution:**
+
 ```bash
 # Use sudo or fix permissions
 sudo zenith format /etc/config/file.conf
@@ -917,6 +915,7 @@ chmod +w /path/to/file
 <summary><b>❓ Problem: Backup directory full</b></summary>
 
 **Solution:**
+
 ```bash
 # Clean old backups
 zenith clean-backups --days 7
@@ -928,6 +927,7 @@ zenith clean-backups --days 7
 <summary><b>❓ Problem: Slow performance</b></summary>
 
 **Diagnosis & Solution:**
+
 ```bash
 # Increase workers
 zenith format ./ --recursive --workers 32
@@ -958,21 +958,21 @@ ZENITH_CACHE_ENABLED=false zenith format ./ --recursive
 <tr>
 <td width="33%" align="center">
 <a href="ARCHITECTURE.md">
-<img src="https://img.icons8.com/fluency/96/000000/graduation-cap.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/graduation-cap.png" alt="Architecture 图标" width="64"><br>
 <b>📚 Architecture</b>
 </a><br>
 Understand the design
 </td>
 <td width="33%" align="center">
 <a href="CONTRIBUTING.md">
-<img src="https://img.icons8.com/fluency/96/000000/settings.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/settings.png" alt="Contributing 图标" width="64"><br>
 <b>🔧 Contributing</b>
 </a><br>
 Help improve Zenith
 </td>
 <td width="33%" align="center">
 <a href="../examples/">
-<img src="https://img.icons8.com/fluency/96/000000/code.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/code.png" alt="Examples 图标" width="64"><br>
 <b>💻 Examples</b>
 </a><br>
 Real-world code samples

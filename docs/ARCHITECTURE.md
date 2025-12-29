@@ -2,7 +2,7 @@
 
 # 🏗️ Architecture Design
 
-### Zenith 代码格式化工具架构设计
+## Zenith 代码格式化工具架构设计
 
 [🏠 Home](../README.md) • [📖 User Guide](USER_GUIDE.md) • [🔧 API Docs](API_REFERENCE.md)
 
@@ -36,22 +36,22 @@
 <table>
 <tr>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/speed.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/speed.png" width="64" alt="Performance icon"><br>
 <b>Performance</b><br>
 Low latency, high throughput
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/security-checked.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/security-checked.png" width="64" alt="Security icon"><br>
 <b>Security</b><br>
 Defense in depth
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/module.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/module.png" width="64" alt="Modularity icon"><br>
 <b>Modularity</b><br>
 Loose coupling
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/maintenance.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/maintenance.png" width="64" alt="Maintainability icon"><br>
 <b>Maintainability</b><br>
 Clean, documented code
 </td>
@@ -158,6 +158,7 @@ graph TB
     style Backup fill:#29b6f6
     style Cache fill:#29b6f6
     style Config fill:#29b6f6
+
 ```
 
 ### Layer Responsibilities
@@ -213,6 +214,7 @@ graph TB
 ZenithService 是核心格式化服务，协调所有文件处理操作。
 
 ```rust
+
 pub struct ZenithService {
     pub config: AppConfig,
     registry: Arc<ZenithRegistry>,
@@ -258,18 +260,23 @@ impl ZenithService {
         // 8. 更新缓存
     }
 }
+
 ```
 
 </details>
 
 **Responsibilities:**
+
 - 📌 文件收集与路径验证
+
 - 📌 批处理与并发控制
+
 - 📌 备份管理
 - 📌 缓存协调
 - 📌 格式化结果返回
 
 **Design Patterns:**
+
 - 🎨 **Facade Pattern**: 为复杂子系统提供简化的统一接口
 - 🎨 **Strategy Pattern**: 可插拔的格式化器
 - 🎨 **Template Method**: 文件处理流程模板
@@ -310,12 +317,14 @@ classDiagram
     ZenithRegistry --> Zenith
     Zenith <|-- RustZenith
     Zenith <|-- PythonZenith
+
 ```
 
 <details>
 <summary><b>🔍 Implementation Details</b></summary>
 
 ```rust
+
 pub trait Zenith: Send + Sync {
     fn name(&self) -> &str;
     fn extensions(&self) -> &[&str];
@@ -357,6 +366,7 @@ impl ZenithRegistry {
             .and_then(|name| self.zeniths.get(&name).map(|z| z.clone()))
     }
 }
+
 ```
 
 </details>
@@ -380,6 +390,7 @@ stateDiagram-v2
     Disabled --> [*]: Unload Plugin
     
     Active --> Active: Use
+
 ```
 
 <table>
@@ -453,6 +464,7 @@ sequenceDiagram
     Service->>Service: Write formatted content
     Service->>Cache: update(path, state)
     Service-->>User: FormatResult
+
 ```
 
 ### Formatting Flow
@@ -461,7 +473,7 @@ sequenceDiagram
 <tr>
 <td width="50%">
 
-**Step-by-Step**
+### Step-by-Step
 
 1. 📥 **Path Validation**
    - Check path format
@@ -495,9 +507,10 @@ sequenceDiagram
 </td>
 <td width="50%">
 
-**Code Flow**
+### Code Flow
 
 ```rust
+
 // 1. Validate paths
 validate_path(path)?;
 
@@ -525,6 +538,7 @@ if cache.needs_processing(&path).await? {
 }
 
 Ok(FormatResult::success())
+
 ```
 
 </td>
@@ -547,18 +561,18 @@ Ok(FormatResult::success())
 <tr>
 <td width="50%">
 
-**✅ Pros**
-- 运行时动态扩展
-- 类型安全
+### ✅ Pros
+
+- 运行时动态扩展- 类型安全
 - 无需修改核心代码
 - 易于测试（Mock）
 
 </td>
 <td width="50%">
 
-**❌ Cons**
-- 学习曲线较陡
-- 动态分发有少量开销
+### ❌ Cons
+
+- 学习曲线较陡- 动态分发有少量开销
 - 调试复杂度增加
 
 </td>
@@ -572,6 +586,7 @@ Ok(FormatResult::success())
 ### Decision 2: DashMap for Concurrent Registry
 
 ```rust
+
 // Before: Mutex<HashMap>
 Mutex<HashMap<String, Arc<dyn Zenith>>>
 // 每次访问都加锁，读取性能差
@@ -579,11 +594,12 @@ Mutex<HashMap<String, Arc<dyn Zenith>>>
 // After: DashMap
 DashMap<String, Arc<dyn Zenith>>
 // 读操作无锁，写操作细粒度锁
+
 ```
 
 **Rationale:**
-- 🎯 高并发读取场景下性能优异
-- 🎯 自动处理并发冲突
+
+- 🎯 高并发读取场景下性能优异- 🎯 自动处理并发冲突
 - 🎯 简单易用的 API
 
 ---
@@ -594,28 +610,40 @@ DashMap<String, Arc<dyn Zenith>>
 <tr>
 <td width="33%" align="center">
 
-**Option 1: Blocking**
+### Option 1: Blocking
+
 ```rust
+
 std::fs::read()
+
 ```
+
 简单但阻塞线程
 
 </td>
 <td width="33%" align="center">
 
-**Option 2: ThreadPool**
+### Option 2: ThreadPool
+
 ```rust
+
 tokio::spawn_blocking()
+
 ```
+
 复杂，需要管理线程池
 
 </td>
 <td width="33%" align="center">
 
 **Option 3: Async** ✅
+
 ```rust
+
 tokio::fs::read()
+
 ```
+
 非阻塞，高并发友好
 
 </td>
@@ -632,20 +660,25 @@ tokio::fs::read()
 <tr>
 <td width="50%">
 
-**❌ Fixed Concurrency**
+### ❌ Fixed Concurrency
+
 ```rust
+
 let tasks: Vec<_> = paths
     .into_iter()
     .map(|p| tokio::spawn(process(p)))
     .collect();
 join_all(tasks).await
+
 ```
 
 </td>
 <td width="50%">
 
-**✅ Dynamic Batching**
+### ✅ Dynamic Batching
+
 ```rust
+
 let optimizer = BatchOptimizer::new(
     batch_size,
     worker_threads,
@@ -653,6 +686,7 @@ let optimizer = BatchOptimizer::new(
 optimizer
     .process_batches(files, |f| process(f))
     .await
+
 ```
 
 </td>
@@ -660,8 +694,8 @@ optimizer
 </table>
 
 **Benefits:**
-- 📌 根据文件数量动态调整
-- 📌 内存使用可控
+
+- 📌 根据文件数量动态调整- 📌 内存使用可控
 - 📌 优雅处理大量文件
 - 📌 支持进度追踪
 
@@ -777,6 +811,7 @@ graph LR
     style H fill:#4fc3f7
     style I fill:#4fc3f7
     style J fill:#4fc3f7
+
 ```
 
 ---
@@ -792,6 +827,7 @@ graph LR
 ### 1️⃣ Hash-Based Content Caching
 
 ```rust
+
 // ❌ Always reformat
 pub async fn format(&self, content: &[u8]) -> Result<Vec<u8>> {
     self.formatter.format(content).await
@@ -803,6 +839,7 @@ pub async fn needs_processing(&self, path: &Path) -> Result<bool> {
     let cached_hash = self.cache.get(path).await?;
     Ok(current_hash != cached_hash)
 }
+
 ```
 
 ### 2️⃣ Concurrent File Processing
@@ -811,25 +848,31 @@ pub async fn needs_processing(&self, path: &Path) -> Result<bool> {
 <tr>
 <td width="50%">
 
-**Sequential Processing**
+### Sequential Processing
+
 ```rust
+
 for path in files {
     process_file(path).await;
 }
 // 100 files = 100 * latency
+
 ```
 
 </td>
 <td width="50%">
 
-**Concurrent Processing**
+### Concurrent Processing
+
 ```rust
+
 let results = stream::iter(files)
     .map(|p| process_file(p))
     .buffer_unordered(workers)
     .collect()
 }
 // 100 files = max(latencies)
+
 ```
 
 </td>
@@ -850,6 +893,7 @@ graph LR
     style D fill:#4caf50
     style E fill:#4caf50
     style F fill:#4caf50
+
 ```
 
 ### Performance Metrics
@@ -911,6 +955,7 @@ graph TB
     style D fill:#4fc3f7
     style E fill:#29b6f6
     style F fill:#0288d1
+
 ```
 
 ### Security Layers
@@ -991,11 +1036,12 @@ graph TB
     style B fill:#4fc3f7
     style C fill:#4fc3f7
     style DB fill:#29b6f6
+
 ```
 
 **Key Points:**
-- 🔹 MCP 服务器可水平扩展
-- 🔹 共享配置存储
+
+- 🔹 MCP 服务器可水平扩展- 🔹 共享配置存储
 - 🔹 无状态设计
 
 ### Vertical Scaling
@@ -1026,6 +1072,7 @@ graph TB
 ### Capacity Planning
 
 ```rust
+
 pub fn calculate_capacity(requirements: Requirements) -> Capacity {
     let files_per_second = requirements.expected_files / 60;
     let avg_format_time = requirements.avg_latency_ms / 1000.0;
@@ -1040,6 +1087,7 @@ pub fn calculate_capacity(requirements: Requirements) -> Capacity {
         backup_storage_gb: backup_storage,
     }
 }
+
 ```
 
 ---

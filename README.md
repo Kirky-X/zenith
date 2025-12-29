@@ -60,7 +60,8 @@
 
 ### 🚀 Core Features
 
-- ✅ **Multi-language Support** - Supports 14 languages including Rust, Python, JavaScript, TypeScript, C/C++, Java, Vue, and React
+- ✅ **Multi-language Support** - Supports 14 languages including Rust, Python,
+  JavaScript, TypeScript, C/C++, Java, Vue, and React
 - ✅ **High-performance Processing** - Handles 10+ files per second with intelligent concurrency
 - ✅ **Safe Backup** - Automatic backup before formatting with one-click recovery
 - ✅ **Flexible Configuration** - TOML configuration files + environment variables
@@ -192,7 +193,7 @@ sudo mv target/release/zenith /usr/local/bin/
 <tr>
 <td width="50%">
 
-**Step 1: Verify Installation**
+#### Step 1: Verify Installation
 
 ```bash
 zenith --version
@@ -202,7 +203,7 @@ zenith --version
 </td>
 <td width="50%">
 
-**Step 2: Format Files**
+#### Step 2: Format Files
 
 ```bash
 zenith format src/main.rs
@@ -240,28 +241,31 @@ cargo build --release
 
 ---
 
-## � Usage
+## 📚 Usage
 
 ### Basic Commands
 
 ```bash
 # Format files/directories
-zenith format <PATH>...
+zenith format <PATH>... [--recursive] [--no-backup] [--workers <N>] [--check] [--watch]
 
-# Recover backup
-zenith recover <BACKUP_ID>
+# Check system environment
+zenith doctor [--verbose]
 
 # List all backups
 zenith list-backups
 
+# Recover backup
+zenith recover <BACKUP_ID> [--target <PATH>]
+
 # Clean expired backups
-zenith clean-backups --days 7
+zenith clean-backups [--days <DAYS>]
 
 # Start MCP server
-zenith mcp
+zenith mcp [--addr <ADDR>]
 
-# Check system environment
-zenith doctor
+# Auto-rollback to latest backup
+zenith auto-rollback
 ```
 
 ### Environment Variables
@@ -279,13 +283,14 @@ zenith format src/
 The MCP server supports API key authentication and role-based authorization.
 
 **User Roles**:
+
 - `admin`: Full access to all MCP methods
 - `user`: Access only to `format` and `recover` methods
 - `readonly`: Read-only access to `format` method
 
-**JSON-RPC Configuration Examples**:
+#### JSON-RPC Configuration Examples
 
-**Format Request Example**:
+#### Format Request Example
 
 ```json
 {
@@ -301,7 +306,7 @@ The MCP server supports API key authentication and role-based authorization.
 }
 ```
 
-**Recover Request Example**:
+#### Recover Request Example
 
 ```json
 {
@@ -313,9 +318,10 @@ The MCP server supports API key authentication and role-based authorization.
     "target": "src/"
   }
 }
+}
 ```
 
-**Response Example (Success)**:
+#### Response Example (Success)
 
 ```json
 {
@@ -338,7 +344,8 @@ The MCP server supports API key authentication and role-based authorization.
 }
 ```
 
-**Usage**:
+#### Usage
+
 ```bash
 # Start MCP server with authentication
 zenith mcp
@@ -359,8 +366,31 @@ zenith doctor
 ```
 
 Exit codes:
+
 - `0`: All required tools are available
 - `1`: Some required tools are missing
+
+### Watch Mode
+
+The `watch` mode enables file monitoring, real-time detection of file changes and automatic formatting:
+
+```bash
+# Monitor current directory for file changes
+zenith format ./ --watch
+
+# Monitor specific files
+zenith format src/main.rs --watch
+
+# Watch mode with recursive scanning
+zenith format ./ --recursive --watch
+```
+
+Watch mode features:
+
+- **Debounce mechanism**: Triggers formatting 100ms after file changes, avoiding performance issues from frequent saves
+- **Incremental processing**: Only processes changed files with caching support
+- **Real-time feedback**: Console displays formatting status in real-time
+- **Exit watch**: Press `Ctrl+C` to stop monitoring
 
 ---
 
@@ -370,7 +400,7 @@ Exit codes:
 <tr>
 <td width="50%">
 
-#### 📝 Example 1: Format a Single File
+### 📝 Example 1: Format a Single File
 
 ```bash
 zenith format src/main.rs
@@ -379,7 +409,7 @@ zenith format src/main.rs
 <details>
 <summary>View Output</summary>
 
-```
+```text
 ✅ Formatting complete: src/main.rs
 ```
 
@@ -388,7 +418,7 @@ zenith format src/main.rs
 </td>
 <td width="50%">
 
-#### 🔥 Example 2: Recursively Format Project
+### 🔥 Example 2: Recursively Format Project
 
 ```bash
 zenith format ./ --recursive
@@ -397,7 +427,7 @@ zenith format ./ --recursive
 <details>
 <summary>View Output</summary>
 
-```
+```text
 ✅ Formatting complete: 15 files
 ⏱️ Duration: 1.23s
 ```
@@ -412,7 +442,7 @@ zenith format ./ --recursive
 <tr>
 <td width="50%">
 
-#### 🔧 Example 3: Check Mode
+### 🔧 Example 3: Check Mode
 
 ```bash
 zenith format src/ --check
@@ -421,7 +451,7 @@ zenith format src/ --check
 <details>
 <summary>View Output</summary>
 
-```
+```text
 ⚠️ Files needing formatting:
   - src/utils.rs
   - src/cli.rs
@@ -433,7 +463,32 @@ zenith format src/ --check
 </td>
 <td width="50%">
 
-#### 💾 Example 4: Recover Backup
+### 🔔 Example 4: Watch Mode
+
+```bash
+zenith format ./ --watch
+```
+
+<details>
+<summary>View Output</summary>
+
+```text
+Watching... (Press Ctrl+C to stop)
+  Formatted: src/main.rs
+  Formatted: src/utils.rs
+```
+
+</details>
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="50%">
+
+### 💾 Example 5: Recover Backup
 
 ```bash
 zenith recover backup_20231223_142030
@@ -442,10 +497,32 @@ zenith recover backup_20231223_142030
 <details>
 <summary>View Output</summary>
 
-```
+```text
 ✅ Recovery successful: backup_20231223_142030
   - Recovered file: src/main.rs
   - Recovered file: src/utils.rs
+```
+
+</details>
+
+</td>
+<td width="50%">
+
+### 🔄 Example 6: Auto-rollback
+
+```bash
+zenith auto-rollback
+```
+
+<details>
+<summary>View Output</summary>
+
+```text
+✅ Auto-rollback successful: Recovered 3 files
+Recovered files:
+  - src/main.rs
+  - src/utils.rs
+  - src/cli.rs
 ```
 
 </details>
@@ -458,7 +535,7 @@ zenith recover backup_20231223_142030
 
 ## 🏗️ Architecture
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │         User Interface Layer             │
 │   CLI (clap)    |    MCP Server (rmcp)  │
@@ -486,7 +563,7 @@ zenith recover backup_20231223_142030
 ```
 
 <details>
-<summary><b>� Component Details</b></summary>
+<summary><b>📋 Component Details</b></summary>
 
 <br>
 
@@ -611,9 +688,9 @@ cargo test test_name
 <tr>
 <td width="50%">
 
-**Throughput**
+#### Throughput
 
-```
+```text
 Single file processing: 10+ files/second
 Batch processing: 100 files/10 seconds
 1000 file batch: < 100 seconds
@@ -622,9 +699,9 @@ Batch processing: 100 files/10 seconds
 </td>
 <td width="50%">
 
-**Latency**
+#### Latency
 
-```
+```text
 Small files (<10KB): < 50ms
 Medium files (100KB): < 200ms
 10 file concurrency: < 1 second
@@ -656,7 +733,7 @@ Medium files (100KB): < 200ms
 
 ### Report Security Issues
 
-Please report security issues to: kirky.x@example.com
+Please report security issues to: <kirky.x@example.com>
 
 ---
 
@@ -682,7 +759,7 @@ Please report security issues to: kirky.x@example.com
 </td>
 <td width="50%">
 
-### � In Progress
+### 🚧 In Progress
 
 - [ ] Incremental formatting (only format changed files)
 - [ ] Git Hooks integration
@@ -800,21 +877,21 @@ Thanks to the following open source projects:
 <tr>
 <td align="center" width="33%">
 <a href="../../issues">
-<img src="https://img.icons8.com/fluency/96/000000/bug.png" width="48" height="48"><br>
+<img src="https://img.icons8.com/fluency/96/000000/bug.png" alt="Issues" width="48" height="48"><br>
 <b>Issues</b>
 </a><br>
 Report bugs and issues
 </td>
 <td align="center" width="33%">
 <a href="../../discussions">
-<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="48" height="48"><br>
+<img src="https://img.icons8.com/fluency/96/000000/chat.png" alt="Discussions" width="48" height="48"><br>
 <b>Discussions</b>
 </a><br>
 Ask questions and share ideas
 </td>
 <td align="center" width="33%">
 <a href="mailto:kirky.x@example.com">
-<img src="https://img.icons8.com/fluency/96/000000/email.png" width="48" height="48"><br>
+<img src="https://img.icons8.com/fluency/96/000000/email.png" alt="Email" width="48" height="48"><br>
 <b>Email</b>
 </a><br>
 Contact email
@@ -843,7 +920,7 @@ Contact email
 
 If you find this useful, please give a ⭐️ Star!
 
-**Made with ❤️ by Kirky-X**
+### Made with ❤️ by Kirky-X
 
 [⬆ Back to Top](#-zenith)
 

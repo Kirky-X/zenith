@@ -191,7 +191,7 @@ sudo mv target/release/zenith /usr/local/bin/
 <tr>
 <td width="50%">
 
-**步骤 1：验证安装**
+### 步骤 1：验证安装
 
 ```bash
 zenith --version
@@ -201,7 +201,7 @@ zenith --version
 </td>
 <td width="50%">
 
-**步骤 2：格式化文件**
+#### 步骤 2：格式化文件
 
 ```bash
 zenith format src/main.rs
@@ -245,25 +245,25 @@ cargo build --release
 
 ```bash
 # 格式化文件/目录
-zenith format <PATH>...
+zenith format <PATH>... [--recursive] [--no-backup] [--workers <N>] [--check] [--watch]
 
-# 恢复备份
-zenith recover <BACKUP_ID>
+# 检查系统环境
+zenith doctor [--verbose]
 
 # 列出所有备份
 zenith list-backups
 
+# 恢复备份
+zenith recover <BACKUP_ID> [--target <PATH>]
+
 # 清理过期备份
-zenith clean-backups --days 7
+zenith clean-backups [--days <DAYS>]
 
 # 启动 MCP 服务器
-zenith mcp --addr 127.0.0.1:9000
+zenith mcp [--addr <ADDR>]
 
 # 自动回滚到最新备份
 zenith auto-rollback
-
-# 检查系统环境
-zenith doctor
 ```
 
 ### 环境变量
@@ -334,13 +334,18 @@ MCP 服务器支持 API 密钥身份验证和基于角色的授权。
 ```
 
 **用户角色**：
+
 - `admin`：完全访问所有 MCP 方法
 - `user`：仅限访问 `format` 和 `recover` 方法
 - `readonly`：只读访问 `format` 方法
 
 **使用方法**：
+
 ```bash
-# 启动带身份验证的 MCP 服务器（默认地址：127.0.0.1:9000）
+# 启动 MCP 服务器（默认地址：127.0.0.1:9000）
+zenith mcp
+
+# 指定自定义地址
 zenith mcp --addr 0.0.0.0:9000
 
 # 使用 Authorization 头发送请求
@@ -359,18 +364,41 @@ zenith doctor
 ```
 
 退出代码：
+
 - `0`：所有必需工具都可用
 - `1`：某些必需工具缺失
 
+### 监听模式
+
+`watch` 模式启动文件监听，实时监控文件变化并自动格式化：
+
+```bash
+# 监听当前目录的文件变化
+zenith format ./ --watch
+
+# 监听指定文件
+zenith format src/main.rs --watch
+
+# 带递归的监听模式
+zenith format ./ --recursive --watch
+```
+
+监听模式特性：
+
+- **防抖机制**：文件变化后 100ms 才触发格式化，避免频繁保存导致的性能问题
+- **增量处理**：仅处理变更的文件，支持缓存机制
+- **实时反馈**：控制台实时显示格式化状态
+- **退出监听**：按 `Ctrl+C` 停止监听
+
 ---
 
-## � 示例
+## 🎨 示例
 
 <table>
 <tr>
 <td width="50%">
 
-#### 📝 示例 1：格式化单个文件
+### 📝 示例 1：格式化单个文件
 
 ```bash
 zenith format src/main.rs
@@ -379,7 +407,7 @@ zenith format src/main.rs
 <details>
 <summary>查看输出</summary>
 
-```
+```text
 ✅ 格式化完成: src/main.rs
 ```
 
@@ -388,7 +416,7 @@ zenith format src/main.rs
 </td>
 <td width="50%">
 
-#### 🔥 示例 2：递归格式化项目
+### 🔥 示例 2：递归格式化项目
 
 ```bash
 zenith format ./ --recursive
@@ -397,7 +425,7 @@ zenith format ./ --recursive
 <details>
 <summary>查看输出</summary>
 
-```
+```text
 ✅ 格式化完成: 15 个文件
 ⏱️ 耗时: 1.23s
 ```
@@ -412,7 +440,7 @@ zenith format ./ --recursive
 <tr>
 <td width="50%">
 
-#### 🔧 示例 3：检查模式
+### 示例 3：检查模式
 
 ```bash
 zenith format src/ --check
@@ -421,7 +449,7 @@ zenith format src/ --check
 <details>
 <summary>查看输出</summary>
 
-```
+```text
 ⚠️ 需要格式化的文件:
   - src/utils.rs
   - src/cli.rs
@@ -433,7 +461,32 @@ zenith format src/ --check
 </td>
 <td width="50%">
 
-#### 💾 示例 4：恢复备份
+### 🔔 示例 4：监听模式
+
+```bash
+zenith format ./ --watch
+```
+
+<details>
+<summary>查看输出</summary>
+
+```text
+监听中... (按 Ctrl+C 停止)
+  已格式化: src/main.rs
+  已格式化: src/utils.rs
+```
+
+</details>
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="50%">
+
+### 💾 示例 5：恢复备份
 
 ```bash
 zenith recover backup_20231223_142030
@@ -442,10 +495,32 @@ zenith recover backup_20231223_142030
 <details>
 <summary>查看输出</summary>
 
-```
+```text
 ✅ 恢复成功: backup_20231223_142030
   - 恢复文件: src/main.rs
   - 恢复文件: src/utils.rs
+```
+
+</details>
+
+</td>
+<td width="50%">
+
+### 🔄 示例 6：自动回滚
+
+```bash
+zenith auto-rollback
+```
+
+<details>
+<summary>查看输出</summary>
+
+```text
+✅ 自动回滚成功: 已恢复 3 个文件
+已恢复的文件:
+  - src/main.rs
+  - src/utils.rs
+  - src/cli.rs
 ```
 
 </details>
@@ -456,9 +531,9 @@ zenith recover backup_20231223_142030
 
 ---
 
-## �️ 架构设计
+## 🏗️ 架构设计
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │         用户接口层                        │
 │   CLI (clap)    |    MCP Server (rmcp)  │
@@ -486,7 +561,7 @@ zenith recover backup_20231223_142030
 ```
 
 <details>
-<summary><b>� 组件详情</b></summary>
+<summary><b>📦 组件详情</b></summary>
 
 <br>
 
@@ -624,9 +699,9 @@ cargo test test_name
 <tr>
 <td width="50%">
 
-**吞吐量**
+### 吞吐量
 
-```
+```text
 单文件处理: 10+ 文件/秒
 批量处理: 100 文件/10秒
 1000文件批处理: < 100秒
@@ -635,9 +710,9 @@ cargo test test_name
 </td>
 <td width="50%">
 
-**延迟**
+#### 延迟
 
-```
+```text
 小文件 (<10KB): < 50ms
 中文件 (100KB): < 200ms
 10文件并发: < 1秒
@@ -669,7 +744,7 @@ cargo test test_name
 
 ### 报告安全问题
 
-请将安全问题报告至：kirky.x@example.com
+请将安全问题报告至：<kirky.x@example.com>
 
 ---
 
@@ -813,23 +888,27 @@ cargo test test_name
 <tr>
 <td align="center" width="33%">
 <a href="../../issues">
-<img src="https://img.icons8.com/fluency/96/000000/bug.png" width="48" height="48"><br>
+<img src="https://img.icons8.com/fluency/96/000000/bug.png" alt="Issues 图标" width="48" height="48"><br>
 <b>Issues</b>
 </a><br>
 报告 bug 和问题
 </td>
 <td align="center" width="33%">
 <a href="../../discussions">
-<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="48" height="48"><br>
+<img src="https://img.icons8.com/fluency/96/000000/chat.png" alt="Discussions 图标" width="48" height="48"><br>
 <b>Discussions</b>
 </a><br>
 提问和分享想法
 </td>
 <td align="center" width="33%">
 <a href="mailto:kirky.x@example.com">
-<img src="https://img.icons8.com/fluency/96/000000/email.png" width="48" height="48"><br>
+<img src="https://img.icons8.com/fluency/96/000000/email.png" alt="邮箱图标" width="48" height="48"><br>
 <b>Email</b>
 </a><br>
+联系作者
+</td>
+</tr>
+</table><br>
 联系邮箱
 </td>
 </tr>
@@ -856,7 +935,7 @@ cargo test test_name
 
 如果觉得有用，请给个 ⭐️ Star！
 
-**由 Kirky-X 用 ❤️ 制作**
+### 由 Kirky-X 用 ❤️ 制作
 
 [⬆ 返回顶部](#-zenith)
 

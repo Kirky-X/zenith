@@ -2,7 +2,7 @@
 
 # 🤝 Contributing Guide
 
-### Join Us in Building Something Great!
+## Join Us in Building Something Great
 
 [🏠 Home](README.md) • [📖 Docs](docs/USER_GUIDE.md) • [💬 Discussions](../../discussions)
 
@@ -10,9 +10,13 @@
 
 </div>
 
-## 🎯 Welcome Contributors!
+## 🎯 Welcome Contributors
 
-Thank you for your interest in contributing to **Zenith**! We're excited to have you here. Whether you're fixing a bug, adding a new formatter, improving documentation, or helping others, your contributions are valuable and appreciated.
+Thank you for your interest in contributing to **Zenith**! We're excited to have you here
+  
+  . Whether you're fixing a bug, adding a new formatter,
+  improving documentation, or helping others, your contributions are valuable
+  and appreciated.
 
 <div align="center">
 
@@ -21,22 +25,22 @@ Thank you for your interest in contributing to **Zenith**! We're excited to have
 <table>
 <tr>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/code.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/code.png" width="64" alt=""><br>
 <b>Code</b><br>
 Fix bugs & add formatters
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/documentation.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/documentation.png" width="64" alt=""><br>
 <b>Documentation</b><br>
 Improve docs & guides
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/test-tube.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/test-tube.png" width="64" alt=""><br>
 <b>Testing</b><br>
 Write tests & find bugs
 </td>
 <td width="25%" align="center">
-<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="64" alt=""><br>
 <b>Community</b><br>
 Help & support others
 </td>
@@ -51,13 +55,6 @@ Help & support others
 
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Coding Standards](#coding-standards)
-- [Testing Guidelines](#testing-guidelines)
-- [Documentation](#documentation)
-- [Submitting Changes](#submitting-changes)
-- [Review Process](#review-process)
-- [Community](#community)
 
 ---
 
@@ -75,7 +72,8 @@ We are committed to providing a welcoming and inclusive environment. By particip
 <tr>
 <td width="50%">
 
-**✅ DO**
+### ✅ DO
+
 - Be respectful and considerate
 - Welcome newcomers
 - Accept constructive criticism
@@ -85,7 +83,8 @@ We are committed to providing a welcoming and inclusive environment. By particip
 </td>
 <td width="50%">
 
-**❌ DON'T**
+### ❌ DON'T
+
 - Use offensive language
 - Harass or insult others
 - Publish private information
@@ -115,12 +114,17 @@ Before you begin, ensure you have:
 <summary><b>🔧 Setting Up Your Environment</b></summary>
 
 **1. Install Rust:**
+
 ```bash
+
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
+
+```bash
 
 **2. Install additional tools:**
+
 ```bash
+
 # Code formatter
 rustup component add rustfmt
 
@@ -129,13 +133,17 @@ rustup component add clippy
 
 # Code coverage (optional)
 cargo install cargo-tarpaulin
-```
+
+```bash
 
 **3. Verify installation:**
+
 ```bash
+
 rustc --version
 cargo --version
-```
+
+```bash
 
 </details>
 
@@ -155,9 +163,11 @@ Click the "Fork" button on GitHub
 **2. Clone Your Fork**
 
 ```bash
+
 git clone https://github.com/YOUR_USERNAME/zenith
 cd zenith
-```
+
+```bash
 
 </td>
 </tr>
@@ -167,9 +177,11 @@ cd zenith
 **3. Add Upstream Remote**
 
 ```bash
+
 git remote add upstream \
   https://github.com/ORIGINAL/zenith
-```
+
+```bash
 
 </td>
 <td width="50%">
@@ -177,10 +189,12 @@ git remote add upstream \
 **4. Verify Remotes**
 
 ```bash
+
 git remote -v
 # origin    your-fork
 # upstream  original-repo
-```
+
+```bash
 
 </td>
 </tr>
@@ -189,6 +203,7 @@ git remote -v
 ### Build and Test
 
 ```bash
+
 # Build the project
 cargo build
 
@@ -197,7 +212,8 @@ cargo test
 
 # Run with examples
 cargo run -- format --help
-```
+
+```bash
 
 ✅ **Success!** You're ready to contribute!
 
@@ -229,13 +245,15 @@ graph LR
     
     style A fill:#e1f5ff
     style L fill:#4caf50
-```
+
+```bash
 
 ### Step-by-Step Guide
 
 #### 1️⃣ Create a Branch
 
 ```bash
+
 # Update your fork
 git fetch upstream
 git checkout main
@@ -246,7 +264,8 @@ git checkout -b feature/your-feature-name
 
 # Or for bug fixes
 git checkout -b fix/issue-123
-```
+
+```bash
 
 **Branch Naming:**
 - `feature/` - New formatters or features
@@ -263,6 +282,7 @@ git checkout -b fix/issue-123
 <td width="50%">
 
 **Writing a new Zenith:**
+
 ```rust
 use async_trait::async_trait;
 use std::path::Path;
@@ -287,12 +307,14 @@ impl super::Zenith for MyZenith {
         Ok(content.to_vec())
     }
 }
-```
+
+```bash
 
 </td>
 <td width="50%">
 
 **Adding Tests:**
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -306,7 +328,8 @@ mod tests {
         assert!(result.is_ok());
     }
 }
-```
+
+```bash
 
 </td>
 </tr>
@@ -315,6 +338,7 @@ mod tests {
 #### 3️⃣ Test Your Changes
 
 ```bash
+
 # Format code
 cargo fmt
 
@@ -329,13 +353,15 @@ cargo test test_format_rust_code
 
 # Check coverage (optional)
 cargo tarpaulin --out Html
-```
+
+```bash
 
 #### 4️⃣ Commit Your Changes
 
 **Good Commit Messages:**
 
 ```bash
+
 # Format: <type>(<scope>): <description>
 
 git commit -m "feat(rust): add support for Rust 2024 edition"
@@ -343,7 +369,8 @@ git commit -m "fix(cache): resolve memory leak in HashCache"
 git commit -m "docs(contributing): update branch naming conventions"
 git commit -m "test(zenith): add edge case tests for Python formatter"
 git commit -m "refactor(batch): improve batch processing performance"
-```
+
+```bash
 
 **Commit Types:**
 - `feat` - New formatter or feature
@@ -357,16 +384,20 @@ git commit -m "refactor(batch): improve batch processing performance"
 <details>
 <summary><b>📝 Commit Message Template</b></summary>
 
-```
+```bash
+
 <type>(<scope>): <short summary>
 
 <detailed description>
 
 <footer>
-```
+
+```bash
 
 **Example:**
-```
+
+```bash
+
 feat(java): add support for Java record formatting
 
 Implement formatting support for Java 16+ record types.
@@ -374,15 +405,18 @@ This includes proper indentation and spacing for record
 declarations, component annotations, and derive clauses.
 
 Closes #123
-```
+
+```bash
 
 </details>
 
 #### 5️⃣ Push to Your Fork
 
 ```bash
+
 git push origin feature/your-feature-name
-```
+
+```bash
 
 #### 6️⃣ Create Pull Request
 
@@ -427,7 +461,8 @@ match self.process_content(content).await {
     Ok(formatted) => Ok(formatted),
     Err(e) => return Err(ZenithError::FormatFailed(e)),
 }
-```
+
+```bash
 
 </td>
 <td width="50%">
@@ -443,7 +478,8 @@ pub async fn fmt(c: &[u8], p: &Path)
 
 // Ignoring errors
 let result = self.process(c).await.unwrap();
-```
+
+```bash
 
 </td>
 </tr>
@@ -451,7 +487,8 @@ let result = self.process(c).await.unwrap();
 
 ### Code Organization
 
-```
+```bash
+
 src/
 ├── lib.rs           # Public API
 ├── main.rs          # CLI entrypoint
@@ -495,7 +532,8 @@ src/
     ├── mod.rs
     ├── path.rs
     └── environment.rs
-```
+
+```bash
 
 ### Documentation
 
@@ -539,7 +577,8 @@ pub struct RustZenith {
     config_path: Option<PathBuf>,
     use_default: bool,
 }
-```
+
+```bash
 
 </details>
 
@@ -560,7 +599,8 @@ Err(ZenithError::FormatterFailed {
 
 // ❌ Don't panic in library code
 // panic!("Something went wrong");  // Bad!
-```
+
+```bash
 
 ---
 
@@ -630,7 +670,8 @@ mod tests {
         assert!(result.is_none());
     }
 }
-```
+
+```bash
 
 **Integration Test Example:**
 
@@ -651,19 +692,22 @@ fn test_full_format_workflow() {
     assert_eq!(results.len(), 1);
     assert!(results[0].success);
 }
-```
+
+```bash
 
 ### Test Coverage
 
 **Aim for ≥90% coverage:**
 
 ```bash
+
 # Generate coverage report
 cargo tarpaulin --out Html --output-dir coverage
 
 # View report
 open coverage/index.html
-```
+
+```bash
 
 ---
 
@@ -755,7 +799,8 @@ Brief description of changes
 
 ## Related Issues
 Closes #123
-```
+
+```bash
 
 </details>
 
@@ -808,7 +853,8 @@ gantt
     Feedback Round 2     :a3, after a2, 2d
     Final Approval       :a4, after a3, 1d
     Merge                :milestone, after a4, 0d
-```
+
+```bash
 
 **Typical Timeline:**
 - 📧 Initial review: 1-3 days
@@ -829,13 +875,15 @@ Reviewers will check:
 ### Responding to Feedback
 
 ```bash
+
 # Address feedback
 git add .
 git commit -m "Address review comments"
 git push origin feature/your-feature
 
 # PR automatically updates!
-```
+
+```bash
 
 ---
 
@@ -851,21 +899,21 @@ git push origin feature/your-feature
 <tr>
 <td width="33%" align="center">
 <a href="../../discussions">
-<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/chat.png" width="64" alt=""><br>
 <b>Discussions</b>
 </a><br>
 Q&A and ideas
 </td>
 <td width="33%" align="center">
 <a href="https://discord.gg/zenith">
-<img src="https://img.icons8.com/fluency/96/000000/discord-logo.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/discord-logo.png" width="64" alt=""><br>
 <b>Discord</b>
 </a><br>
 Live chat
 </td>
 <td width="33%" align="center">
 <a href="https://twitter.com/zenith">
-<img src="https://img.icons8.com/fluency/96/000000/twitter.png" width="64"><br>
+<img src="https://img.icons8.com/fluency/96/000000/twitter.png" width="64" alt=""><br>
 <b>Twitter</b>
 </a><br>
 Updates & news
