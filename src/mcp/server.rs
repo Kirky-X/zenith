@@ -84,9 +84,11 @@ async fn auth_middleware(
     next: axum::middleware::Next,
 ) -> Result<axum::response::Response, StatusCode> {
     if !state.config.mcp.auth_enabled {
+        // When auth is disabled, use a placeholder API key and limit to user role
+        // for security - admin access should require explicit authentication
         let user_context = UserContext {
-            api_key: "default".into(),
-            role: "admin".into(),
+            api_key: "[auth-disabled]".into(),
+            role: "user".into(),
         };
         request.extensions_mut().insert(user_context);
         return Ok(next.run(request).await);
@@ -96,7 +98,11 @@ async fn auth_middleware(
 
     match auth_header {
         Some(header_value) => {
-            let header_str = header_value.to_str().unwrap_or("");
+            // Properly handle the header value, converting to str or using default
+            let header_str = header_value.to_str().map_err(|_| {
+                warn!("Invalid UTF-8 in authorization header");
+                StatusCode::UNAUTHORIZED
+            })?;
 
             if let Some(token) = header_str.strip_prefix("Bearer ") {
                 for user in &state.config.mcp.users {
