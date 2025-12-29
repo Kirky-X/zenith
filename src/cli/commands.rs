@@ -50,6 +50,10 @@ pub enum Commands {
         /// 运行在检查模式（dry-run），不修改文件内容。
         #[arg(long)]
         check: bool,
+
+        /// 启用文件监听模式，监控文件变化并自动格式化。
+        #[arg(long)]
+        watch: bool,
     },
 
     /// 检查系统环境。

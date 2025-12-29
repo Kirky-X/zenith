@@ -5,3 +5,4 @@
 
 pub mod batch;
 pub mod formatter;
+pub mod watch;
