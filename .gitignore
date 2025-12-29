@@ -26,5 +26,6 @@ __pycache__/
 *~
 Thumbs.db
 .claude
-.cargo
+.cargo/*
+!/.cargo/config.toml
 CLAUDE.md
