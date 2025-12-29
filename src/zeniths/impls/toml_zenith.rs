@@ -31,6 +31,7 @@ impl Zenith for TomlZenith {
                 "--stdin-filepath".into(),
                 path.to_string_lossy().into(),
             ],
+            timeout_seconds: None,
         };
         formatter
             .format_with_stdio_no_path(content, path, None)

@@ -26,6 +26,7 @@ impl Zenith for JavaZenith {
         let formatter = StdioFormatter {
             tool_name: "google-java-format",
             args: vec!["--stdin-filename".into()],
+            timeout_seconds: None,
         };
         formatter.format_with_stdio(content, path, None).await
     }

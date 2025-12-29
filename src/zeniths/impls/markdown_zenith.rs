@@ -8,10 +8,8 @@ use crate::core::traits::Zenith;
 use crate::error::{Result, ZenithError};
 use crate::zeniths::common::StdioFormatter;
 use async_trait::async_trait;
-use once_cell::sync::Lazy;
-use regex::Regex;
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 pub struct MarkdownZenith;
@@ -42,44 +40,47 @@ const SUPPORTED_LANGUAGES: &[&str] = &[
     "powershell",
 ];
 
-static INLINE_CODE_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r#"`([^`]+)`"#).expect("Invalid regex pattern for inline code"));
+// Compile regex with proper error handling
+macro_rules! try_lazy_regex {
+    ($name:ident, $pattern:expr) => {
+        static $name: ::once_cell::sync::Lazy<std::result::Result<regex::Regex, regex::Error>> =
+            ::once_cell::sync::Lazy::new(|| regex::Regex::new($pattern));
+    };
+}
 
-static TASK_LIST_PATTERN: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"(?m)^(\s*)(-\s+)\[(\s*)\]\s+(.+)$"#)
-        .expect("Invalid regex pattern for task lists")
-});
+try_lazy_regex!(INLINE_CODE_PATTERN, r#"`([^`]+)`"#);
+try_lazy_regex!(TASK_LIST_PATTERN, r#"(?m)^(\s*)(-\s+)\[(\s*)\]\s+(.+)$"#);
+try_lazy_regex!(STRIKETHROUGH_PATTERN, r"~~([^~]+)~~");
+try_lazy_regex!(LINK_PATTERN, r"\[([^\]]+)\]\(([^)]+)\)");
+try_lazy_regex!(BOLD_PATTERN, r"\*\*([^*]+)\*\*");
+try_lazy_regex!(ITALIC_PATTERN, r"\*([^*]+)\*");
+try_lazy_regex!(BOLD_ITALIC_PATTERN, r"\*\*\*([^*]+)\*\*\*");
+try_lazy_regex!(
+    HORIZONTAL_RULE_PATTERN,
+    r"(?m)^(\s*)(-{3,}|\*{3,}|_{3,})\s*$"
+);
+try_lazy_regex!(MULTI_LINE_CODE_PATTERN, r"(?s)```(\w+)\s*\n(.+?)\n```");
+try_lazy_regex!(SINGLE_LINE_CODE_PATTERN, r"(?s)```(\w+)\s+([^\n]+?)\s*```");
 
-static STRIKETHROUGH_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"~~([^~]+)~~").expect("Invalid regex pattern for strikethrough"));
-
-static LINK_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").expect("Invalid regex pattern for links"));
-
-static BOLD_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"\*\*([^*]+)\*\*").expect("Invalid regex pattern for bold"));
-
-static ITALIC_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"\*([^*]+)\*").expect("Invalid regex pattern for italic"));
-
-static BOLD_ITALIC_PATTERN: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"\*\*\*([^*]+)\*\*\*").expect("Invalid regex pattern for bold italic")
-});
-
-static HORIZONTAL_RULE_PATTERN: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"(?m)^(\s*)(-{3,}|\*{3,}|_{3,})\s*$")
-        .expect("Invalid regex pattern for horizontal rules")
-});
-
-static MULTI_LINE_CODE_PATTERN: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"(?s)```(\w+)\s*\n(.+?)\n```")
-        .expect("Invalid regex pattern for multi-line code blocks")
-});
-
-static SINGLE_LINE_CODE_PATTERN: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"(?s)```(\w+)\s+([^\n]+?)\s*```")
-        .expect("Invalid regex pattern for single-line code blocks")
-});
+/// Safely get a regex from a Lazy<Result<Regex, Error>>, converting errors to ZenithError
+macro_rules! get_regex {
+    ($name:ident) => {
+        match &$name {
+            lazy_regex => {
+                let result = lazy_regex.as_ref();
+                match result {
+                    Ok(regex) => regex.clone(),
+                    Err(e) => {
+                        return Err(ZenithError::Config(format!(
+                            "Failed to compile regex: {}",
+                            e
+                        )));
+                    }
+                }
+            }
+        }
+    };
+}
 
 #[async_trait]
 impl Zenith for MarkdownZenith {
@@ -96,14 +97,14 @@ impl Zenith for MarkdownZenith {
     }
 
     async fn format(&self, content: &[u8], path: &Path, _config: &ZenithConfig) -> Result<Vec<u8>> {
-        let preprocessed = preprocess_extremely_compressed(content);
-        let with_inline_code_formatted = format_inline_code(&preprocessed);
-        let with_task_lists = format_task_lists(&with_inline_code_formatted);
-        let with_strikethrough = format_strikethrough(&with_task_lists);
-        let with_links = format_links_and_images(&with_strikethrough);
-        let with_emphasis = format_emphasis(&with_links);
-        let with_horizontal_rules = format_horizontal_rules(&with_emphasis);
-        let with_rust_formatted = format_rust_code_blocks(&with_horizontal_rules);
+        let preprocessed = preprocess_extremely_compressed(content)?;
+        let with_inline_code_formatted = format_inline_code(&preprocessed)?;
+        let with_task_lists = format_task_lists(&with_inline_code_formatted)?;
+        let with_strikethrough = format_strikethrough(&with_task_lists)?;
+        let with_links = format_links_and_images(&with_strikethrough)?;
+        let with_emphasis = format_emphasis(&with_links)?;
+        let with_horizontal_rules = format_horizontal_rules(&with_emphasis)?;
+        let with_rust_formatted = format_rust_code_blocks(&with_horizontal_rules)?;
         let formatter = StdioFormatter {
             tool_name: "prettier",
             args: vec![
@@ -111,6 +112,7 @@ impl Zenith for MarkdownZenith {
                 "--parser".into(),
                 "markdown".into(),
             ],
+            timeout_seconds: None,
         };
         formatter
             .format_with_stdio_no_path(with_rust_formatted.as_bytes(), path, None)
@@ -118,7 +120,7 @@ impl Zenith for MarkdownZenith {
     }
 }
 
-fn preprocess_extremely_compressed(content: &[u8]) -> String {
+fn preprocess_extremely_compressed(content: &[u8]) -> Result<String> {
     let text = String::from_utf8_lossy(content);
     let mut result = String::new();
     let chars: Vec<char> = text.chars().collect();
@@ -138,27 +140,27 @@ fn preprocess_extremely_compressed(content: &[u8]) -> String {
         }
 
         if is_header_start(&chars, i) {
-            let header_result = parse_header(&chars, i);
+            let header_result = parse_header(&chars, i)?;
             result.push_str(&header_result.text);
             result.push('\n');
             i = header_result.next_pos;
         } else if is_table_start(&chars, i) {
-            let table_result = parse_table(&chars, i);
+            let table_result = parse_table(&chars, i)?;
             result.push_str(&table_result.text);
             result.push('\n');
             i = table_result.next_pos;
         } else if is_blockquote_start(&chars, i) {
-            let quote_result = parse_blockquote(&chars, i);
+            let quote_result = parse_blockquote(&chars, i)?;
             result.push_str(&quote_result.text);
             result.push('\n');
             i = quote_result.next_pos;
         } else if is_unordered_list_start(&chars, i) {
-            let list_result = parse_list(&chars, i);
+            let list_result = parse_list(&chars, i)?;
             result.push_str(&list_result.text);
             result.push('\n');
             i = list_result.next_pos;
         } else if is_ordered_list_start(&chars, i) {
-            let list_result = parse_ordered_list(&chars, i);
+            let list_result = parse_ordered_list(&chars, i)?;
             result.push_str(&list_result.text);
             result.push('\n');
             i = list_result.next_pos;
@@ -168,7 +170,7 @@ fn preprocess_extremely_compressed(content: &[u8]) -> String {
         }
     }
 
-    result.trim().to_string()
+    Ok(result.trim().to_string())
 }
 
 fn is_header_start(chars: &[char], i: usize) -> bool {
@@ -206,7 +208,7 @@ struct ParseResult {
     next_pos: usize,
 }
 
-fn parse_header(chars: &[char], mut i: usize) -> ParseResult {
+fn parse_header(chars: &[char], mut i: usize) -> Result<ParseResult> {
     let header_start = i;
     while i < chars.len() && chars[i] == '#' {
         i += 1;
@@ -239,13 +241,35 @@ fn parse_header(chars: &[char], mut i: usize) -> ParseResult {
     let title_text: String = chars[title_start..next_pos].iter().collect();
     let header_pattern: String = chars[header_start..title_start].iter().collect();
 
-    ParseResult {
-        text: format!("{}{}", header_pattern, title_text.trim()),
+    // Validate title text to prevent potential injection issues
+    let validated_title = validate_title_text(&title_text)?;
+
+    Ok(ParseResult {
+        text: format!("{}{}", header_pattern, validated_title),
         next_pos,
-    }
+    })
 }
 
-fn parse_table(chars: &[char], i: usize) -> ParseResult {
+/// Validate title text to prevent path traversal and other injection attacks
+fn validate_title_text(text: &str) -> Result<String> {
+    // Check for null bytes and control characters
+    for ch in text.chars() {
+        if ch == '\0' || (ch.is_control() && ch != '\n' && ch != '\r' && ch != '\t') {
+            return Err(ZenithError::Config(
+                "Invalid characters in title text".to_string(),
+            ));
+        }
+    }
+
+    // Check for potential path traversal attempts
+    if text.contains("..") || text.contains('\0') {
+        return Err(ZenithError::PathTraversal(PathBuf::from(text.to_string())));
+    }
+
+    Ok(text.trim().to_string())
+}
+
+fn parse_table(chars: &[char], i: usize) -> Result<ParseResult> {
     let table_start = i;
     let mut table_end = i;
     let mut has_content = false;
@@ -273,23 +297,23 @@ fn parse_table(chars: &[char], i: usize) -> ParseResult {
     }
 
     if !has_content {
-        return ParseResult {
+        return Ok(ParseResult {
             text: chars[table_start..table_end].iter().collect(),
             next_pos: table_end,
-        };
+        });
     }
 
     let table_text: String = chars[table_start..table_end].iter().collect();
     let mut result = String::new();
-    process_table(&table_text, &mut result);
+    process_table(&table_text, &mut result)?;
 
-    ParseResult {
+    Ok(ParseResult {
         text: result.trim().to_string(),
         next_pos: table_end,
-    }
+    })
 }
 
-fn parse_blockquote(chars: &[char], i: usize) -> ParseResult {
+fn parse_blockquote(chars: &[char], i: usize) -> Result<ParseResult> {
     let quote_start = i;
     let mut quote_end = i;
     while quote_end < chars.len() && !is_header_start(chars, quote_end) {
@@ -304,13 +328,13 @@ fn parse_blockquote(chars: &[char], i: usize) -> ParseResult {
 
     let quote_text: String = chars[quote_start..quote_end].iter().collect();
 
-    ParseResult {
+    Ok(ParseResult {
         text: quote_text,
         next_pos: quote_end,
-    }
+    })
 }
 
-fn parse_list(chars: &[char], i: usize) -> ParseResult {
+fn parse_list(chars: &[char], i: usize) -> Result<ParseResult> {
     let list_start = i;
     let mut list_end = i;
 
@@ -359,13 +383,13 @@ fn parse_list(chars: &[char], i: usize) -> ParseResult {
         result.push_str(list_text.trim());
     }
 
-    ParseResult {
+    Ok(ParseResult {
         text: result.trim().to_string(),
         next_pos: list_end,
-    }
+    })
 }
 
-fn parse_ordered_list(chars: &[char], i: usize) -> ParseResult {
+fn parse_ordered_list(chars: &[char], i: usize) -> Result<ParseResult> {
     let list_start = i;
     let mut list_end = i;
 
@@ -387,16 +411,18 @@ fn parse_ordered_list(chars: &[char], i: usize) -> ParseResult {
 
     let list_text: String = chars[list_start..list_end].iter().collect();
 
-    ParseResult {
+    Ok(ParseResult {
         text: list_text,
         next_pos: list_end,
-    }
+    })
 }
 
-fn format_inline_code(text: &str) -> String {
+fn format_inline_code(text: &str) -> Result<String> {
+    let regex = get_regex!(INLINE_CODE_PATTERN);
+
     let mut result = text.to_string();
 
-    let replacements: Vec<(String, String)> = INLINE_CODE_PATTERN
+    let replacements: Vec<(String, String)> = regex
         .captures_iter(&result)
         .filter_map(|cap| {
             let full_match = cap.get(0)?.as_str().to_string();
@@ -420,7 +446,7 @@ fn format_inline_code(text: &str) -> String {
         }
     }
 
-    result
+    Ok(result)
 }
 
 fn detect_inline_language(code: &str) -> &'static str {
@@ -461,41 +487,48 @@ fn clean_inline_code(formatted: &str) -> String {
         .join(" ")
 }
 
-fn format_task_lists(text: &str) -> String {
-    TASK_LIST_PATTERN
-        .replace_all(text, "${1}${2}[ ] ${4}")
-        .to_string()
+fn format_task_lists(text: &str) -> Result<String> {
+    let regex = get_regex!(TASK_LIST_PATTERN);
+    Ok(regex.replace_all(text, "${1}${2}[ ] ${4}").to_string())
 }
 
-fn format_strikethrough(text: &str) -> String {
-    STRIKETHROUGH_PATTERN
-        .replace_all(text, "~~$1~~")
-        .to_string()
+fn format_strikethrough(text: &str) -> Result<String> {
+    let regex = get_regex!(STRIKETHROUGH_PATTERN);
+    Ok(regex.replace_all(text, "~~$1~~").to_string())
 }
 
-fn format_links_and_images(text: &str) -> String {
-    LINK_PATTERN.replace_all(text, "[$1]($2)").to_string()
+fn format_links_and_images(text: &str) -> Result<String> {
+    let regex = get_regex!(LINK_PATTERN);
+    Ok(regex.replace_all(text, "[$1]($2)").to_string())
 }
 
-fn format_emphasis(text: &str) -> String {
+fn format_emphasis(text: &str) -> Result<String> {
+    let regex_bold_italic = get_regex!(BOLD_ITALIC_PATTERN);
+    let regex_bold = get_regex!(BOLD_PATTERN);
+    let regex_italic = get_regex!(ITALIC_PATTERN);
+
     let mut result = text.to_string();
-    result = BOLD_ITALIC_PATTERN
+    result = regex_bold_italic
         .replace_all(&result, "***$1***")
         .to_string();
-    result = BOLD_PATTERN.replace_all(&result, "**$1**").to_string();
-    result = ITALIC_PATTERN.replace_all(&result, "*$1*").to_string();
+    result = regex_bold.replace_all(&result, "**$1**").to_string();
+    result = regex_italic.replace_all(&result, "*$1*").to_string();
 
-    result
+    Ok(result)
 }
 
-fn format_horizontal_rules(text: &str) -> String {
-    HORIZONTAL_RULE_PATTERN.replace_all(text, "---").to_string()
+fn format_horizontal_rules(text: &str) -> Result<String> {
+    let regex = get_regex!(HORIZONTAL_RULE_PATTERN);
+    Ok(regex.replace_all(text, "---").to_string())
 }
 
-fn format_rust_code_blocks(content: &str) -> String {
+fn format_rust_code_blocks(content: &str) -> Result<String> {
+    let multi_regex = get_regex!(MULTI_LINE_CODE_PATTERN);
+    let single_regex = get_regex!(SINGLE_LINE_CODE_PATTERN);
+
     let mut result = content.to_string();
 
-    let replacements: Vec<(String, String, String)> = MULTI_LINE_CODE_PATTERN
+    let replacements: Vec<(String, String, String)> = multi_regex
         .captures_iter(&result)
         .filter_map(|cap| {
             let lang = cap.get(1)?.as_str();
@@ -522,7 +555,7 @@ fn format_rust_code_blocks(content: &str) -> String {
         }
     }
 
-    let single_replacements: Vec<(String, String, String)> = SINGLE_LINE_CODE_PATTERN
+    let single_replacements: Vec<(String, String, String)> = single_regex
         .captures_iter(&result)
         .filter_map(|cap| {
             let lang = cap.get(1)?.as_str();
@@ -550,7 +583,7 @@ fn format_rust_code_blocks(content: &str) -> String {
         }
     }
 
-    result
+    Ok(result)
 }
 
 fn format_with_rustfmt(code: &str) -> Result<String> {
@@ -608,12 +641,12 @@ fn is_separator_cell(cell: &str) -> bool {
     sep_count == total && total >= 3
 }
 
-fn process_table(table_text: &str, result: &mut String) {
+fn process_table(table_text: &str, result: &mut String) -> Result<()> {
     let raw_cells: Vec<&str> = table_text.split('|').collect();
     let mut cells: Vec<String> = raw_cells.iter().map(|&s| s.trim().to_string()).collect();
 
     if cells.is_empty() {
-        return;
+        return Ok(());
     }
 
     while cells.last().is_some_and(|s| s.is_empty()) {
@@ -621,7 +654,7 @@ fn process_table(table_text: &str, result: &mut String) {
     }
 
     if cells.is_empty() {
-        return;
+        return Ok(());
     }
 
     let first_is_empty = cells.first().is_some_and(|s| s.is_empty());
@@ -629,7 +662,7 @@ fn process_table(table_text: &str, result: &mut String) {
     let data_cells: Vec<String> = cells[start_idx..].to_vec();
 
     if data_cells.len() < 2 {
-        return;
+        return Ok(());
     }
 
     let mut header_end = 0;
@@ -641,7 +674,7 @@ fn process_table(table_text: &str, result: &mut String) {
     }
 
     if header_end < 1 {
-        return;
+        return Ok(());
     }
 
     let mut separator_end = header_end;
@@ -709,4 +742,6 @@ fn process_table(table_text: &str, result: &mut String) {
         result.push('|');
         result.push('\n');
     }
+
+    Ok(())
 }

@@ -26,6 +26,7 @@ impl Zenith for PythonZenith {
         let formatter = StdioFormatter {
             tool_name: "ruff",
             args: vec!["format".into(), "--stdin-filename".into()],
+            timeout_seconds: None,
         };
         formatter.format_with_stdio(content, path, None).await
     }

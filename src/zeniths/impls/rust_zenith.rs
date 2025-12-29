@@ -47,6 +47,7 @@ impl Zenith for RustZenith {
         let formatter = StdioFormatter {
             tool_name: "rustfmt",
             args: extra_args,
+            timeout_seconds: None,
         };
         formatter
             .format_with_stdio_no_path(content, path, None)

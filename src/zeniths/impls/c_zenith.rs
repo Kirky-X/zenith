@@ -26,6 +26,7 @@ impl Zenith for ClangZenith {
         let formatter = StdioFormatter {
             tool_name: "clang-format",
             args: vec!["--assume-filename".into()],
+            timeout_seconds: None,
         };
         formatter.format_with_stdio(content, path, None).await
     }

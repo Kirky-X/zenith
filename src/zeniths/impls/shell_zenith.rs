@@ -26,6 +26,7 @@ impl Zenith for ShellZenith {
         let formatter = StdioFormatter {
             tool_name: "shfmt",
             args: vec!["-filename".into()],
+            timeout_seconds: None,
         };
         formatter.format_with_stdio(content, path, None).await
     }
