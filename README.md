@@ -344,7 +344,7 @@ The MCP server supports API key authentication and role-based authorization.
 zenith mcp
 
 # Send requests with Authorization header
-curl -X POST http://127.0.0.1:8080 \
+curl -X POST http://127.0.0.1:9000 \
   -H "Authorization: Bearer your-api-key" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"format","params":{"path":"src/main.rs"}}'
