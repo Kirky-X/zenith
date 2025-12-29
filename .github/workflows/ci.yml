@@ -28,7 +28,7 @@ jobs:
       with:
         toolchain: ${{ matrix.rust }}
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
@@ -60,7 +60,7 @@ jobs:
       with:
         node-version: '20'
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
@@ -90,7 +90,7 @@ jobs:
       with:
         toolchain: ${{ matrix.rust }}
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
@@ -137,19 +137,10 @@ jobs:
       run: chmod +x ./scripts/build_cross_platform.sh
     - name: Run cross-platform build
       run: ./scripts/build_cross_platform.sh --all --cross
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
+    - name: Upload Release Assets
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ./dist/*
+        fail_on_unmatched_files: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-    - name: Upload Release Assets
-      run: |
-        gh release upload ${{ github.ref_name }} ./dist/* --clobber
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      if: success()
