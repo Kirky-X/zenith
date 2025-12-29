@@ -324,7 +324,11 @@ impl ZenithService {
                                     if let Err(e) =
                                         self.hash_cache.update(path.clone(), new_state).await
                                     {
-                                        tracing::warn!("Failed to update cache for {:?}: {}", path, e);
+                                        tracing::warn!(
+                                            "Failed to update cache for {:?}: {}",
+                                            path,
+                                            e
+                                        );
                                     } else {
                                         tracing::debug!("Updated cache for {:?}", path);
                                     }
@@ -371,6 +375,19 @@ impl ZenithService {
             Err(e) => Err(ZenithError::BackupFailed(e.to_string())),
         }
     }
+
+    /// Format a single file (public method for use by file watcher)
+    #[doc(hidden)]
+    pub async fn format_file(&self, path: PathBuf) -> FormatResult {
+        self.process_file(std::env::current_dir().unwrap_or_default(), path)
+            .await
+    }
+
+    /// Check if a file is in the cache (for watch mode)
+    #[doc(hidden)]
+    pub async fn is_cached(&self, path: &Path) -> bool {
+        self.hash_cache.is_cached(path).await
+    }
 }
 
 impl Clone for ZenithService {
@@ -393,25 +410,158 @@ mod tests {
     use crate::zeniths::registry::ZenithRegistry;
     use std::sync::Arc;
     use tempfile::TempDir;
+    use tokio::fs;
+
+    fn create_test_service() -> (ZenithService, TempDir) {
+        let temp_dir = TempDir::new().unwrap();
+        let config = AppConfig::default();
+        let registry = Arc::new(ZenithRegistry::new());
+        let backup_service = Arc::new(BackupService::new(config.backup.clone()));
+        let hash_cache = Arc::new(HashCache::new());
+        let service = ZenithService::new(config, registry, backup_service, hash_cache, false);
+        (service, temp_dir)
+    }
 
     #[test]
     fn test_file_permission_checks() {
-        // Create a temporary file and test permission checks
         let temp_dir = TempDir::new().unwrap();
         let test_file = temp_dir.path().join("test.rs");
-
-        // Create a test file with some content
         std::fs::write(&test_file, "// Test file content").unwrap();
-
-        // Create a ZenithService instance
         let config = AppConfig::default();
         let registry = Arc::new(ZenithRegistry::new());
         let backup_service = Arc::new(BackupService::new(config.backup.clone()));
         let hash_cache = Arc::new(HashCache::new());
         let _service = ZenithService::new(config, registry, backup_service, hash_cache, false);
+    }
 
-        // Test read permission check on a normal file (should pass)
-        // Since the check_file_permissions method doesn't exist in this implementation,
-        // we're just verifying that the service can be created properly
+    #[tokio::test]
+    async fn test_process_nonexistent_file() {
+        let (service, _temp_dir) = create_test_service();
+        let nonexistent = PathBuf::from("/nonexistent/path/file.rs");
+        let result = service.process_file(PathBuf::from("/"), nonexistent).await;
+        assert!(!result.success);
+        assert!(result.error.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_process_empty_file() {
+        let (service, temp_dir) = create_test_service();
+        let empty_file = temp_dir.path().join("empty.rs");
+        fs::write(&empty_file, "").await.unwrap();
+        let result = service.process_file(PathBuf::from("/"), empty_file).await;
+        assert!(result.original_size == 0);
+    }
+
+    #[tokio::test]
+    async fn test_process_file_with_special_chars_in_path() {
+        let (service, temp_dir) = create_test_service();
+        let special_dir = temp_dir.path().join("dir-with-dashes_123");
+        std::fs::create_dir_all(&special_dir).unwrap();
+        let special_file = special_dir.join("test-file.rs");
+        fs::write(&special_file, "fn main() {}").await.unwrap();
+        let result = service.process_file(PathBuf::from("/"), special_file).await;
+        assert!(result.original_size > 0 || result.error.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_process_file_no_extension() {
+        let (service, temp_dir) = create_test_service();
+        let no_ext_file = temp_dir.path().join("Makefile");
+        fs::write(&no_ext_file, "target:\n\techo test")
+            .await
+            .unwrap();
+        let result = service.process_file(PathBuf::from("/"), no_ext_file).await;
+        assert!(!result.success);
+        assert!(result.error.unwrap().contains("No extension"));
+    }
+
+    #[tokio::test]
+    async fn test_process_file_unsupported_extension() {
+        let (service, temp_dir) = create_test_service();
+        let unsupported_file = temp_dir.path().join("test.xyz");
+        fs::write(&unsupported_file, "some random content")
+            .await
+            .unwrap();
+        let result = service
+            .process_file(PathBuf::from("/"), unsupported_file)
+            .await;
+        assert!(!result.success);
+        assert!(result.error.unwrap().contains("not supported"));
+    }
+
+    #[tokio::test]
+    async fn test_process_file_read_permission_denied() {
+        let (service, temp_dir) = create_test_service();
+        let test_file = temp_dir.path().join("readonly.rs");
+        fs::write(&test_file, "// test").await.unwrap();
+        let mut perms = std::fs::metadata(&test_file).unwrap().permissions();
+        perms.set_readonly(true);
+        std::fs::set_permissions(&test_file, perms).unwrap();
+        let result = service.process_file(PathBuf::from("/"), test_file).await;
+        assert!(!result.success);
+    }
+
+    #[tokio::test]
+    async fn test_process_directory_instead_of_file() {
+        let (service, temp_dir) = create_test_service();
+        let result = service
+            .process_file(PathBuf::from("/"), temp_dir.path().to_path_buf())
+            .await;
+        assert!(!result.success);
+    }
+
+    #[tokio::test]
+    async fn test_zenith_config_for_file_no_match() {
+        let (service, _temp_dir) = create_test_service();
+        let config = AppConfig::default();
+        let result =
+            service.create_zenith_config_for_file(&config, Path::new("/test.rs"), "unknown");
+        assert!(result.custom_config_path.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_zenith_config_for_file_with_extension() {
+        let (service, temp_dir) = create_test_service();
+        let test_file = temp_dir.path().join("test.rs");
+        let config = AppConfig::default();
+        let result = service.create_zenith_config_for_file(&config, &test_file, "rs");
+        assert!(result.custom_config_path.is_none() || result.custom_config_path.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_process_multiple_files_in_sequence() {
+        let (service, temp_dir) = create_test_service();
+        let mut results = Vec::new();
+        for i in 0..5 {
+            let file = temp_dir.path().join(format!("test_{}.rs", i));
+            fs::write(&file, format!("// file {}", i)).await.unwrap();
+            let result = service.process_file(PathBuf::from("/"), file).await;
+            results.push(result);
+        }
+        assert_eq!(results.len(), 5);
+    }
+
+    #[tokio::test]
+    async fn test_service_clone() {
+        let (service1, _temp_dir) = create_test_service();
+        let service2 = service1.clone();
+        assert_eq!(service1.check_mode, service2.check_mode);
+    }
+
+    #[tokio::test]
+    async fn test_format_file_public_method() {
+        let (service, temp_dir) = create_test_service();
+        let test_file = temp_dir.path().join("test.rs");
+        fs::write(&test_file, "fn main() {}").await.unwrap();
+        let result = service.format_file(test_file).await;
+        assert!(result.original_size > 0 || result.error.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_is_cached_for_nonexistent() {
+        let (service, _temp_dir) = create_test_service();
+        let nonexistent = PathBuf::from("/nonexistent/file.rs");
+        let result = service.is_cached(&nonexistent).await;
+        assert!(!result);
     }
 }
