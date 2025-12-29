@@ -9,6 +9,7 @@ version = "0.1.0"
 edition = "2021"
 description = "A multi-language code formatter with backup capabilities"
 authors = ["Zenith Team"]
+license = "MIT"
 
 [features]
 default = ["full"]
