@@ -72,12 +72,10 @@ impl FileWatcher {
                         _ => WatchEvent::Modified,
                     };
 
-                    for path in event.paths {
+                    for event_path in event.paths {
                         let sender = event_sender.clone();
-                        let event_type = event_type.clone();
-                        let path = path;
                         tokio::task::spawn_blocking(move || {
-                            let event = event_type(path);
+                            let event = event_type(event_path);
                             if let Err(e) = sender.blocking_send(event) {
                                 tracing::warn!("Failed to send watch event: {}", e);
                             }
@@ -257,10 +255,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_watch_config_with_paths() {
-        let mut config = WatchConfig::default();
-        config.paths = vec![PathBuf::from("/test/path")];
-        config.debounce_duration = Duration::from_millis(500);
-        config.recursive = false;
+        let config = WatchConfig {
+            paths: vec![PathBuf::from("/test/path")],
+            debounce_duration: Duration::from_millis(500),
+            recursive: false,
+        };
 
         assert_eq!(config.paths.len(), 1);
         assert_eq!(config.debounce_duration, Duration::from_millis(500));

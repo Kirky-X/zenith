@@ -382,10 +382,11 @@ impl ZenithService {
         let root = match std::env::current_dir() {
             Ok(root) => root,
             Err(e) => {
-                let mut result = FormatResult::default();
-                result.file_path = path;
-                result.error = Some(format!("Failed to get current directory: {}", e));
-                return result;
+                return FormatResult {
+                    file_path: path,
+                    error: Some(format!("Failed to get current directory: {}", e)),
+                    ..Default::default()
+                };
             }
         };
         self.process_file(root, path).await
