@@ -217,8 +217,8 @@ impl HashCache {
             entries,
         };
 
-        let json = serde_json::to_string(&serialized)
-            .map_err(crate::error::ZenithError::Serialization)?;
+        let json =
+            serde_json::to_string(&serialized).map_err(crate::error::ZenithError::Serialization)?;
 
         let file = File::create(&cache_file).await?;
         let mut writer = BufWriter::new(file);
